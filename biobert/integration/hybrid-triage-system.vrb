@@ -1,0 +1,11 @@
+\frametitle{Conceptual API sequence (implementation)}
+\footnotesize
+	\begin{verbatim}
+POST /speech/recognize  -> transcript, language_code
+POST /translate         -> english_text (if not English)
+POST /nlp/analyze       -> entities, discriminators D
+POST /triage/compute    -> TEWS T, bayesian P, final_color C
+	\end{verbatim}
+
+	\vspace{0.3em}
+	\textbf{Audit log:} Store original Twi transcript + English translation + model outputs for clinical governance review.

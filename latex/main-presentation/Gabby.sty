@@ -1,0 +1,148 @@
+%=====================================================================
+%                          BEAMER PREAMBLE
+%=====================================================================
+
+%------------------- Remove extra vertical space ---------------------
+%\setlength{\abovedisplayskip}{0pt}
+%\setlength{\belowdisplayskip}{0pt}
+
+%\setcounter{tocdepth}{1}
+
+%=====================================================================
+%                          CUSTOM COMMANDS
+%=====================================================================
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\renewcommand{\S}{\mathbb{S}}
+
+% Indicator function (portable)
+\newcommand{\1}{\mathbb{1}}
+
+\newcommand{\tensor}[2]{{#1}^{\otimes #2}}
+\newcommand{\overeq}[1]{\stackrel{#1}{=}}
+\newcommand{\pd}[1]{\partial #1}
+\newcommand{\norm}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\parent}[1]{\left(#1\right)}
+\newcommand{\Brace}[1]{\left[#1\right]}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+\newcommand{\defset}[2]{\left\{ #1 \mid #2 \right\}}
+\newcommand{\inp}[1]{\langle #1\rangle}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\newcommand{\vect}[1]{\overrightarrow{#1}}
+\newcommand{\Vect}[1]{\overrightarrow{#1}}
+\newcommand{\mf}[1]{\mathbf{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+\newcommand{\Limf}[3][x]{\displaystyle\lim_{#1 \to #3} #2(#1)}
+\newcommand{\Lim}[2][x]{\displaystyle\lim_{#1 \to #2}}
+
+\newcommand{\fdef}[5][f]{
+	\begin{matrix}
+		#1 : & #2 & \to & #3 \\
+		& #4 & \mapsto & #5
+	\end{matrix}
+}
+
+%=====================================================================
+%                          BEAMER SETTINGS
+%=====================================================================
+
+\graphicspath{{Pics/}}
+
+\usefonttheme[onlymath]{serif}
+\setbeamercovered{invisible}
+\setbeamertemplate{caption}[numbered]
+
+\mode<presentation>
+\AtBeginSection[]{
+	\begin{frame}
+		\frametitle{Outline}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+%------------------- Theme & colors ----------------------------------
+\usetheme{EastLansing}
+
+\setbeamercolor{title}{bg=green!40!black, fg=white}
+\setbeamercolor{structure}{fg=green!50!black}
+
+\setbeamercolor*{palette primary}{fg=black,bg=yellow!50!green}
+\setbeamercolor*{palette secondary}{fg=yellow,bg=black}
+\setbeamercolor*{palette tertiary}{fg=white,bg=green!50!black}
+
+\setbeamercolor{frametitle}{bg=black,fg=white}
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{items}[ball]
+
+%=====================================================================
+%           MAKE \pause WORK IN ALIGN / EQUATION ENVIRONMENTS
+%=====================================================================
+
+\makeatletter
+\let\save@measuring@true\measuring@true
+\def\measuring@true{%
+	\save@measuring@true
+	\def\beamer@sortzero##1{\beamer@ifnextcharospec{\beamer@sortzeroread{##1}}{}}%
+	\def\beamer@sortzeroread##1<##2>{}%
+	\def\beamer@finalnospec{}%
+}
+\makeatother
+
+%=====================================================================
+%                          PACKAGES
+%=====================================================================
+
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Math (SAFE)
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% Graphics & plots
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pgfplots}
+
+% TikZ
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,patterns,decorations.pathreplacing}
+
+% Physics & helpers
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{tensor}
+
+% Boxes & formatting
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{theorems,breakable,fitting}
+
+% Misc
+\usepackage{hyperref}
+\urlstyle{same}
+
+%=====================================================================
+%                      THEOREM ENVIRONMENTS
+%=====================================================================
+
+\newtheorem{theo}{Theorem}[section]
+\newtheorem{cor}{Corollary}[section]
+\newtheorem{lem}{Lemma}[section]
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{deff}{Definition}[section]
+\newtheorem{rem}{Remark}[section]
+\newtheorem{egs}{Example}[subsection]
+
+%=====================================================================
+%                              END
+%=====================================================================

@@ -1,0 +1,91 @@
+% =============================================================================
+\section{Patient Input Pipeline}
+% =============================================================================
+
+\begin{frame}{Step 1: How data enters the system}
+  \textbf{Session start:} patient describes symptoms via the Curatio chatbot.
+
+  \vspace{0.3em}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \begin{block}{Two input modes}
+      \begin{itemize}
+        \item \textbf{Typed text} --- stored directly as raw complaint
+        \item \textbf{Voice note} --- Twi / local Ghanaian language
+      \end{itemize}
+    \end{block}
+
+    \column{0.48\textwidth}
+    \begin{block}{5-step pipeline}
+      \footnotesize
+      \begin{enumerate}
+        \item Patient input (this slide)
+        \item Text example
+        \item Speech \& translation
+        \item Fine-tuned BioBERT
+        \item Fusion $\to$ colour $C$
+      \end{enumerate}
+      \normalsize
+      TEWS and Bayesian join at Step 5.
+    \end{block}
+  \end{columns}
+
+  \plain{Whether the patient types or speaks, the goal is the same: produce English text $X$ for the NLP layer.}
+\end{frame}
+
+\begin{frame}{Step 2: Example text input}
+  \textbf{Typed complaint} is stored as \texttt{chief\_complaint\_raw} and becomes text $X$ (max 128 tokens).
+
+  \examplebox{
+    \textbf{Patient ID:} TG-UXRGA9UCO\\
+    \textbf{Complaint:} \textit{``thunderclap headache, worsening with movement''}\\
+    \textbf{Nurse ground truth:} Acuity Level 2 --- \sats{triageOrange}{Orange} (highly urgent)
+  }
+
+  \vspace{0.3em}
+  Voice input skips this direct path and goes to Step 3 (ASR + translation) before BioBERT.
+
+  \plain{Real hospital phrasing --- not textbook English --- is exactly what fine-tuning teaches BioBERT to handle.}
+\end{frame}
+
+\begin{frame}{Step 3: Speech and translation}
+  \begin{equation*}
+    X = g_{\mathrm{trans}}\!\bigl(g_{\mathrm{ASR}}(\mathrm{audio})\bigr)
+  \end{equation*}
+
+  \begin{itemize}
+    \item $g_{\mathrm{ASR}}$ --- automatic speech recognition (Twi $\to$ transcript)
+    \item $g_{\mathrm{trans}}$ --- medical translation (Twi $\to$ English)
+    \item Typed English from Step 2 bypasses both functions
+  \end{itemize}
+
+  \examplebox{
+    \textbf{Patient TG-001} (Twi voice):
+    \begin{enumerate}
+      \item Audio: \textit{``Me koma mu yɛ me ya, me home yɛ me''}
+      \item ASR: \textit{Me koma mu yɛ me ya}
+      \item Translation: \textit{``I have chest pain, I feel unwell''}
+      \item $X \to$ BioBERT in Step 4
+    \end{enumerate}
+  }
+
+  \plain{$g_{\mathrm{ASR}}$ = ears writing words; $g_{\mathrm{trans}}$ = medical interpreter. BioBERT reads \textbf{English only}.}
+\end{frame}
+
+\begin{frame}{Step 3: Pipeline diagram}
+  \begin{center}
+    \resizebox{0.85\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=0.8cm]
+      \node[flowbox, minimum width=2cm] (audio) {Voice\\audio};
+      \node[flowbox, right=of audio] (asr) {$g_{\mathrm{ASR}}$\\Transcribe};
+      \node[flowbox, right=of asr] (trans) {$g_{\mathrm{trans}}$\\Translate};
+      \node[flowbox, right=of trans, fill=triageGreen!10] (x) {English $X$};
+      \node[flowbox, below=1cm of audio, minimum width=2cm] (text) {Typed\\text};
+      \draw[flowarr] (audio) -- (asr) -- (trans) -- (x);
+      \draw[flowarr] (text) -| (x);
+    \end{tikzpicture}}
+  \end{center}
+
+  \vspace{0.5em}
+  Both paths converge on the same $X$ before the BioBERT layer.
+\end{frame}

@@ -1,0 +1,19 @@
+{
+  "name": "curatio-server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "dev": "concurrently -n api,ml -c green,blue \"nodemon index.js\" \"cd ml && ../.venv/bin/python -m uvicorn app:app --reload --host 127.0.0.1 --port 8001\"",
+    "ml": "cd ml && ../.venv/bin/python -m uvicorn app:app --host 127.0.0.1 --port 8001"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "nodemon": "^3.1.14"
+  }
+}

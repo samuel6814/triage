@@ -1,0 +1,59 @@
+% =============================================================================
+\section{End-to-End Worked Example}
+% =============================================================================
+
+\begin{frame}{Kumasi chest-pain case: all layers}
+  \textbf{Scenario:} Patient at KATH with central crushing chest pain. All three layers evaluated before fusion.
+
+  \vspace{0.3em}
+  \begin{columns}[T]
+    \column{0.32\textwidth}
+    \begin{block}{BioBERT}
+      \small
+      ``central crushing chest pain, radiating to left arm''\\
+      $d_{\mathrm{chest}} > \tau$\\
+      $\Rightarrow$ Orange language signal
+    \end{block}
+
+    \column{0.32\textwidth}
+    \begin{block}{TEWS}
+      \small
+      HR = 125, RR = 26\\
+      $T = 4$\\
+      $\Rightarrow$ Yellow alone
+    \end{block}
+
+    \column{0.32\textwidth}
+    \begin{block}{Bayesian}
+      \small
+      $P(\mathrm{Orange} \mid E) \approx 0.89$\\
+      $\Rightarrow$ Orange posterior
+    \end{block}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Worked example: fusion resolution}
+  \begin{equation*}
+    f_1(125) = 2,\quad f_2(26) = 2,\quad f_{3:6} = 0
+    \;\Rightarrow\; T = 4 \;\Rightarrow\; C_{\mathrm{TEWS}} = \text{Yellow}
+  \end{equation*}
+
+  \begin{equation*}
+    \underbrace{d_{\mathrm{chest}} > \tau}_{\text{language (Orange)}}
+    + \underbrace{T = 4}_{\text{TEWS alone = Yellow}}
+    + \underbrace{P(\mathrm{Orange} \mid E) \approx 0.89}_{\text{Bayesian (Orange)}}
+    \;\Rightarrow\; C = \text{Orange}
+  \end{equation*}
+
+  \examplebox{
+    \textbf{Final routing at KATH:}
+    \begin{itemize}
+      \item $C = \sats{triageOrange}{Orange}$
+      \item Destination: Majors (ED)
+      \item Cardiology alert triggered
+      \item 10-minute countdown starts
+    \end{itemize}
+  }
+
+  \plain{Two of three layers say Orange; safety rule ensures $C$ is at least Orange. Mild vitals alone cannot downgrade chest pain.}
+\end{frame}

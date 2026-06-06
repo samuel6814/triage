@@ -1,0 +1,450 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+
+%----------------------------------------------------
+% Packages
+%----------------------------------------------------
+%\RequirePackage{Gabby} % Commented out as I do not have this custom package. Uncomment if you have the .sty file.
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{natbib}
+\usepackage{booktabs} % Added for better table formatting
+
+%----------------------------------------------------
+% Custom Command
+%----------------------------------------------------
+\newcommand{\bcol}[2][blue]{\textcolor{#1}{#2}}
+
+%----------------------------------------------------
+% Title Information
+%----------------------------------------------------
+\title[Hospital Chatbot (Synopsis)]%
+{Hospital Chatbot for Patient Color-Coded Clinical Pathways}
+
+\author[Student Names]%
+{{\scriptsize by}\\
+	\bcol[green!40!black]{Quaigraine Samuel }\\
+	\bigskip
+	{\small }}
+
+\institute[KNUST-Maths]%
+{Department of Mathematics\\
+	Kwame Nkrumah University of Science and Technology}
+
+% Note: Ensure you have a file named KNUSTlogo.png/jpg in the directory
+\logo{\includegraphics[scale=0.1]{Pics/KNUSTLogo}} 
+\date{\scriptsize Feb 7, 2026}
+
+%====================================================
+\begin{document}
+	
+	%----------------------------------------------------
+	% Title Page
+	%----------------------------------------------------
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	%----------------------------------------------------
+	% Outline
+	%----------------------------------------------------
+	\begin{frame}{Outline of Presentation}
+		\tableofcontents
+	\end{frame}
+	
+	%====================================================
+	\section{Background of the Study }
+	
+	\begin{frame}{Background: Evolution of Triage}
+		\begin{block}{The Concept of Triage}
+			Derived from the French \textit{trier} ("to sort"). Historically evolved from Napoleonic battlefields to modern emergency medicine.
+		\end{block}
+		
+		\begin{itemize}
+			\item \textbf{Goal:} Allocate scarce resources based on urgency, not arrival order.
+			\item \textbf{Global Standard:} Time-sensitive conditions (stroke, trauma) require narrow therapeutic windows.
+			\item \textbf{Current Reality (LMICs):} A "bottleneck of access" where patient volume overwhelms clinical staff \citep{Rominski2014}.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Background: The Ghanaian Context}
+		\begin{columns}[T]
+			\begin{column}{0.48\textwidth}
+				\begin{alertblock}{Double Burden of Disease}
+					\begin{itemize}
+						\item \textbf{Infectious:} Malaria, TB, HIV.
+						\item \textbf{NCDs:} Hypertension, Diabetes, Cardiovascular.
+					\end{itemize}
+				\end{alertblock}
+			\end{column}
+			
+			\begin{column}{0.48\textwidth}
+				\begin{block}{Impact on KNUST/KATH}
+					\begin{itemize}
+						\item Apex referral centers besieged by high volumes.
+						\item Widespread "No Bed Syndrome" \citep{ReachAlliance2026}.
+						\item Patients bypass lower-level clinics, causing congestion.
+					\end{itemize}
+				\end{block}
+			\end{column}
+		\end{columns}
+	\end{frame}
+	
+	\begin{frame}{Background: Triage Protocols}
+		\begin{itemize}
+			\item \textbf{Manchester Triage System (MTS):} Europe. Relies on 52 flowcharts and experienced clinical judgment.
+			\item \textbf{South African Triage Scale (SATS):} Africa. Uses Physiology-based scoring (TEWS) + Discriminators. Validated at KATH \citep{Rominski2014}.
+			\item \textbf{Interagency Integrated Triage Tool (IITT):} WHO. Simplified 3-color protocol.
+		\end{itemize}
+		
+		\begin{exampleblock}{Project Choice}
+			This study adopts a hybrid approach: \textbf{SATS logic} within an \textbf{Automated Chatbot} using Red/Yellow/Green pathways.
+		\end{exampleblock}
+	\end{frame}
+	
+	\begin{frame}{Background: AI and Math Modeling}
+		\begin{block}{Mathematical Perspective}
+			An ED functions as a stochastic queuing network.
+			\begin{itemize}
+				\item Current state: Arrival ($\lambda$) $>$ Service ($\mu$).
+				\item Result: Exponential growth in waiting times ($W_q$).
+			\end{itemize}
+		\end{block}
+		
+		\begin{block}{The Shift}
+			Moving from reactive physical triage to \textbf{predictive virtual triage}.
+			\begin{itemize}
+				\item \textbf{NLP:} Extracts symptoms from unstructured text.
+				\item \textbf{Decision Trees:} Maps symptoms to SATS clinical pathways (Explainable AI).
+			\end{itemize}
+		\end{block}
+	\end{frame}
+	
+	%====================================================
+	\section{Problem Statement }
+	
+	\begin{frame}{Problem Statement: Systemic Inefficiency}
+		\begin{columns}[T]
+			\begin{column}{0.48\textwidth}
+				\begin{block}{Access Block}
+					\begin{itemize}
+						\item "No Bed Syndrome" is a failure of information flow, not just physical capacity \citep{ReachAlliance2026}.
+						\item Uncoordinated self-referral clogs tertiary OPDs with minor (Green) cases.
+					\end{itemize}
+				\end{block}
+			\end{column}
+			
+			\begin{column}{0.48\textwidth}
+				\begin{block}{Resource Constraints}
+					\begin{itemize}
+						\item Shortage of specialized triage nurses.
+						\item Manual documentation creates a hard limit on throughput.
+						\item Wait times often exceed 3 hours \citep{Asante2019}.
+					\end{itemize}
+				\end{block}
+			\end{column}
+		\end{columns}
+	\end{frame}
+	
+	\begin{frame}{Problem Statement: Mathematical Instability}
+		\begin{alertblock}{Queuing Instability}
+			The current system represents an unstable $M/M/s$ queue.
+		\end{alertblock}
+		
+		\begin{itemize}
+			\item As utilization factor $\rho = \frac{\lambda}{s\mu} \to 1$, the queue length $L_q \to \infty$.
+			\item \textbf{Current State:} High arrival rate ($\lambda$) + Constrained service rate ($\mu$) due to manual vitals/history.
+			\item \textbf{Consequence:} Chaotic waiting rooms and stochastic increase in mortality risk.
+		\end{itemize}
+		
+		\begin{exampleblock}{The Gap}
+			Existing AI checkers (Babylon/Ada) lack Ghanaian linguistic nuance and specific local clinical pathways (Polyclinic vs. Teaching Hospital).
+		\end{exampleblock}
+	\end{frame}
+	
+	%====================================================
+	\section{Objectives }
+	
+	\begin{frame}{Objectives of the Study}
+		\begin{block}{General Objective}
+			To develop, analyze, and simulate an AI-powered Hospital Chatbot that automates patient triage classification using color-coded clinical pathways to optimize patient flow in Ghanaian hospitals.
+		\end{block}
+		
+		\begin{block}{Specific Objectives}
+			\begin{enumerate}
+				\item \textbf{Develop} an Automated Triage Algorithm based on SATS and Decision Trees.
+				\item \textbf{Guide} Clinical Pathways (Red $\to$ Emergency, Green $\to$ Self-care) to mitigate congestion.
+				\item \textbf{Optimize} Patient Flow using Queuing Theory (comparing $M/M/s$ vs AI-augmented models).
+				\item \textbf{Integrate} NLP for symptom extraction adapting to local linguistics.
+				\item \textbf{Evaluate} diagnostic accuracy (Sensitivity, Cohen's Kappa) against expert data.
+			\end{enumerate}
+		\end{block}
+	\end{frame}
+	
+	%====================================================
+	\section{Methodology }
+	
+	\begin{frame}{Methodology: Study Design}
+		\begin{itemize}
+			\item \textbf{Approach:} Quantitative, Simulation-based experimental design.
+			\item \textbf{Phases:}
+			\begin{enumerate}
+				\item Algorithm Development (Software Engineering).
+				\item System Simulation (Mathematical Modeling).
+				\item Performance Evaluation (Statistical Analysis).
+			\end{enumerate}
+		\end{itemize}
+		
+		\begin{exampleblock}{Rationale}
+			Allows rigorous testing of logic and theoretical impact on hospital operations without clinical risk during development.
+		\end{exampleblock}
+	\end{frame}
+	
+	\begin{frame}{Methodology: Mathematical Modeling (Decision Trees)}
+		The chatbot logic uses \textbf{Decision Tree Classification} mapping symptoms (Nodes) to Acuity (Leaves).
+		
+		\begin{block}{Splitting Criteria}
+			Uses \textbf{Information Gain (IG)} and \textbf{Entropy ($H$)} to determine the most efficient question sequence.
+		\end{block}
+		
+		\begin{equation}\label{entropy}
+			H(S) = - \sum_{i=1}^{c} p_i \log_2 p_i
+		\end{equation}
+		
+		\begin{equation}\label{infogain}
+			IG(S, A) = H(S) - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} H(S_v)
+		\end{equation}
+		
+		\small{Where $S$ is the dataset and $A$ is the symptom attribute.}
+	\end{frame}
+	
+	\begin{frame}{Methodology: Queuing Theory Application}
+		To quantify impact, we model the Emergency Department (ED) operations using Kendall's notation.
+		
+		\begin{itemize}
+			\item \textbf{Baseline Model (Manual):} $M/M/s$ Queue.
+			\item \textbf{Arrivals ($M$):} Poisson process with rate $\lambda$.
+			\item \textbf{Service ($M$):} Exponential distribution with rate $\mu$.
+		\end{itemize}
+		
+		\begin{block}{Key Metric: Average Waiting Time ($W_q$)}
+			\begin{equation}
+				W_q = \frac{L_q}{\lambda} = \frac{P_0 (\lambda/\mu)^s \rho}{s! \lambda (1-\rho)^2}
+			\end{equation}
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{Methodology: AI-Augmented Model}
+		The Chatbot acts as an infinite-capacity node ($M/G/\infty$) upstream.
+		
+		\begin{alertblock}{Expected Changes}
+			\begin{enumerate}
+				\item \textbf{Reduced Effective Arrival ($\lambda'$):}
+				\begin{equation*}
+					\lambda' = \lambda (1 - P_{green})
+				\end{equation*}
+				\item \textbf{Increased Service Rate ($\mu'$):}
+				\begin{equation*}
+					\mu' > \mu \quad \text{(due to digital pre-documentation)}
+				\end{equation*}
+			\end{enumerate}
+		\end{alertblock}
+	\end{frame}
+	
+	\begin{frame}{Methodology: Software Architecture}
+		\begin{itemize}
+			\item \textbf{Backend:} React with Express or Node js (Lightweight/Scalable).
+			\item \textbf{Database:} MySQL (Logs, symptom profiles, audit).
+			\item \textbf{Deployment:} Vercel for Frontend and Render for backend
+		\end{itemize} 
+		
+		\begin{exampleblock}{Clinical Logic Source}
+			Strictly populated using \textbf{South African Triage Scale (SATS)} discriminators (e.g., Emergency Signs, TEWS logic).
+		\end{exampleblock}
+	\end{frame}
+	
+	\begin{frame}{Methodology: NLP Pipeline}
+		Handling unstructured inputs (e.g., "I have a running belly").
+		
+		\begin{enumerate}
+			\item \textbf{Tokenization:} Breaking text into units.
+			\item \textbf{Stemming:} Lancaster Stemmer (e.g., "bleeding" $\to$ "bleed").
+			\item \textbf{Vectorization:} Bag-of-Words (BoW) model.
+			\item \textbf{Intent Classification:} Deep Neural Network (DNN) with ReLU activation and Softmax output.
+		\end{enumerate}
+	\end{frame}
+	
+	\begin{frame}{Methodology: Simulation Data}
+		\begin{block}{Data Source}
+			Synthetic patient arrival data generated based on statistical distributions (Poisson) observed in Ghanaian hospital studies.
+		\end{block}
+		
+		\begin{itemize}
+			\item \textbf{Reference Data:} AngloGold Ashanti Hospital study \citep{Afrane2014}.
+			\item \textbf{Parameters:} $\lambda \approx 53$ patients/hr; $s=5$ doctors.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Methodology: Ethics and Assumptions}
+		\begin{itemize}
+			\item \textbf{Human-in-the-Loop:} Chatbot is a Decision Support System (DSS), not a replacement. "Red" cases trigger immediate hospital attendance.
+			\item \textbf{Privacy:} Anonymized logs, compliant with Ghana Data Protection Act.
+			\item \textbf{Assumption:} Patients possess basic literacy/access to smartphone or kiosk.
+		\end{itemize}
+	\end{frame}
+	
+	%====================================================
+	\section{Analysis and Results }
+	
+	\begin{frame}{Results: Triage Accuracy Metrics}
+		Evaluated against "Gold Standard" historical decisions.
+		
+		\begin{block}{Sensitivity (Recall)}
+			\begin{equation*}
+				Sensitivity = \frac{TruePositives_{Red}}{TruePositives_{Red} + FalseNegatives_{Red}}
+			\end{equation*}
+			Targeting \textbf{100\% sensitivity} for Critical cases (Fail-safe principle).
+		\end{block}
+		
+		\begin{block}{Inter-Rater Reliability}
+			\textbf{Cohen's Kappa ($\kappa$):} Recent studies suggest $\kappa \approx 0.695$ (Substantial Agreement) for AI triage \citep{Gottlieb2025}.
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{Results: Baseline Queue Simulation}
+		\textbf{Scenario:} Manual Triage at AngloGold Ashanti parameters.
+		
+		\begin{itemize}
+			\item $\lambda = 53$ patients/hr.
+			\item Effective Service Capacity (5 doctors).
+			\item Utilization $\rho \approx 0.78$.
+		\end{itemize}
+		
+		\begin{alertblock}{Outcome}
+			Calculated Average Waiting Time ($W_q$): \textbf{2.41 hours}.
+			\par aligns with empirical observations of congestion \citep{Afrane2014}.
+		\end{alertblock}
+	\end{frame}
+	
+	\begin{frame}{Results: AI-Augmented Scenario A}
+		\textbf{Mechanism:} Service Time Reduction via pre-documentation.
+		
+		\begin{itemize}
+			\item Chatbot pre-collects history/demographics.
+			\item Physical nurse service time ($1/\mu$) reduces by $\sim 20\%$.
+		\end{itemize}
+		
+		\begin{exampleblock}{Result}
+			Non-linear drop in waiting time. Pushes system away from the "knee" of the exponential curve.
+			\par \bcol{Potential reduction: $>$ 50\%}.
+		\end{exampleblock}
+	\end{frame}
+	
+	\begin{frame}{Results: AI-Augmented Scenario B}
+		\textbf{Mechanism:} Load Diversion (Load Balancing).
+		
+		\begin{itemize}
+			\item Diversion of "Green" (non-urgent) patients to Polyclinics.
+			\item Effective arrival rate drops: $53/hr \to \sim 37/hr$ (assuming 30\% diversion).
+		\end{itemize}
+		
+		\begin{block}{Result}
+			Server utilization drops significantly.
+			\par \textbf{Waiting time approaches negligible levels (minutes).}
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{Results: Clinical Pathway Mapping}
+		Standardization of the triage process ("Glass Box" Logic).
+		
+		\begin{table}[]
+			\scriptsize
+			\centering
+			\begin{tabular}{@{}lll@{}}
+				\toprule
+				\textbf{Symptom Input} & \textbf{SATS Discriminator} & \textbf{Output / Action} \\ \midrule
+				"Can't breathe, chest hurts" & Difficulty Breathing & \bcol[red]{RED}: Immediate ER \\
+				"Stomach pain, very bad" & Severe Pain & \bcol[orange]{YELLOW}: Urgent Care ($<$60m) \\
+				"Runny nose, cough" & None (Routine) & \bcol[green!60!black]{GREEN}: Polyclinic/Pharmacy \\ \bottomrule
+			\end{tabular}
+			\caption{Chatbot Pathway Logic Mapping}
+		\end{table}
+		
+		Traceable logic ensures accountability, unlike "Black Box" Neural Networks.
+	\end{frame}
+	
+	\begin{frame}{Results: Operational Efficiency}
+		\begin{itemize}
+			\item \textbf{Baseline:} Staff utilization $>88\%$ (Burnout zone).
+			\item \textbf{AI Model:} Utilization drops to manageable $60-70\%$.
+		\end{itemize}
+		
+		\begin{block}{Surge Capacity}
+			This "slack" is vital for safety, creating a buffer for mass casualty events. The chatbot acts as a digital \textbf{load balancer}.
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{Deep Analysis: The "Glass Box" Advantage}
+		\begin{itemize}
+			\item \textbf{Constraint Satisfaction:} SATS uses rigid rules (e.g., "If oxygen $<90\% \to$ RED").
+			\item \textbf{Safety:} Rigid rules are safer for triage than probabilistic guesses used in pure Deep Learning.
+			\item \textbf{Hybrid:} NLP (Probabilistic) for understanding $\to$ Decision Tree (Deterministic) for safety.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Deep Analysis: Cultural Linguistics}
+		\begin{block}{The Semantic Gap}
+			"Running belly" (Diarrhea) or "Waist pain" (Lower back pain).
+		\end{block}
+		
+		\begin{itemize}
+			\item Western-trained models fail on these idioms.
+			\item \textbf{Solution:} Training on localized corpora (Masakhane Project datasets) is a safety requirement, not just a feature \citep{Adelani2025}.
+		\end{itemize}
+	\end{frame}
+	
+	%====================================================
+	\section{Conclusion and Recommendations}
+	
+	\begin{frame}{Conclusion}
+		\begin{block}{Scientific Validity}
+			Integrating SATS protocols with Decision Tree algorithms creates a robust tool mirroring expert logic.
+		\end{block}
+		
+		\begin{block}{Operational Impact}
+			Mathematical modeling proves that reducing effective arrival rate ($\lambda$) and increasing service rate ($\mu$) addresses the root causes of overcrowding.
+		\end{block}
+		
+		\begin{block}{Addressing "No Bed Syndrome"}
+			Alleviates the syndrome by preventing misuse of tertiary resources and guiding non-urgent patients away from the emergency center.
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{Recommendations: Implementation}
+		\begin{enumerate}
+			\item \textbf{Pilot Implementation:} Deploy via kiosks at KNUST Hospital or KATH OPD entrances to collect real-world validation data.
+			\item \textbf{Voice Interaction:} Integrate ASR for local languages (Twi, Ga, Hausa) to ensure equity.
+			\item \textbf{Human-in-the-Loop:} Maintain "triage verification" by a nurse. The bot is a handover tool, not a doctor.
+		\end{enumerate}
+	\end{frame}
+	
+	\begin{frame}{Recommendations: Systemic Integration}
+		\begin{itemize}
+			\item \textbf{National Strategy:} Evaluate for integration with Ghana Health Service (GHS) database for real-time bed availability checks.
+			\item \textbf{Green Lanes:} Hospitals must establish "Fast Track" clinics for Green-triaged patients so diversion does not equal denial of care.
+		\end{itemize}
+	\end{frame}
+	
+	%====================================================
+
+	%====================================================
+	\section*{}
+	
+	\begin{frame}
+		\begin{center}
+			{\Huge Thank You}
+		\end{center}
+	\end{frame}
+	
+	%====================================================
+\end{document}

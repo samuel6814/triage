@@ -1,0 +1,120 @@
+% Curatio AI Triage — Detailed Beamer (Saturday deck)
+% Mirrors the interactive Curatio web presentation (17 slides + math deep dives)
+% Compile: pdflatex main.tex && pdflatex main.tex
+
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\input{preamble.tex}
+
+\title{Hospital Chatbot for Color Coded Clinical Pathways}
+\author{Quaigraine Samuel \and Twum Samuel}
+
+\begin{document}
+
+% ------------------------------------------------------------------
+\begin{frame}
+  \centering
+  \vfill
+  {\usebeamerfont{title}\usebeamercolor[fg]{title}%
+    Hospital Chatbot for Color Coded Clinical Pathways\par}
+  \vspace{2em}
+  {\usebeamerfont{author}\usebeamercolor[fg]{author}%
+    Quaigraine Samuel \\ Twum Samuel\par}
+  \vfill
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+\begin{frame}{System overview}
+  \textbf{Curatio} is an AI-assisted hospital triage chatbot that assigns a \textbf{single SATS colour} $C$ from:
+  \begin{itemize}
+    \item what the patient \textbf{says} (text or voice),
+    \item what vitals imply via \textbf{TEWS}, and
+    \item \textbf{Bayesian} reasoning when data are incomplete or the model is uncertain.
+  \end{itemize}
+
+  \vspace{0.4em}
+  \begin{center}
+    \resizebox{0.92\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=0.65cm and 0.5cm]
+      \node[flowbox, minimum width=1.9cm] (in) {Patient\\audio / text};
+      \node[flowbox, right=of in] (asr) {ASR +\\translate};
+      \node[flowbox, right=of asr] (bb) {Fine-tuned\\BioBERT};
+      \node[flowbox, below=0.75cm of asr] (tews) {TEWS\\(vitals)};
+      \node[flowbox, below=0.75cm of bb] (bayes) {Bayesian\\fallback};
+      \node[flowbox, right=1.1cm of bb] (fuse) {Fusion\\$f_{\mathrm{fusion}}$};
+      \node[flowbox, right=of fuse, fill=triageOrange!15] (out) {Colour $C$};
+      \draw[flowarr] (in) -- (asr);
+      \draw[flowarr] (asr) -- node[edgelabel, above] {$X$} (bb);
+      \draw[flowarr] (bb) -- node[edgelabel, above] {$\hat{\mathbf{y}}$} (fuse);
+      \draw[flowarr] (in.south) |- ++(0,-0.5) -| (tews.west);
+      \draw[flowarr] (tews) -- node[edgelabel, below] {$T$} (fuse.south);
+      \draw[flowarr] (bb.south) -- (bayes.north);
+      \draw[flowarr] (bayes.east) -| node[edgelabel, pos=0.25, right] {$\mathbf{P}$} (fuse.south);
+      \draw[flowarr] (fuse) -- (out);
+    \end{tikzpicture}}
+  \end{center}
+
+  \footnotesize Session state: $\mathbf{S}_s = (X,\, \mathbf{D},\, T,\, \mathbf{P},\, C,\, \text{flags})$
+\end{frame}
+
+\begin{frame}{Session mathematics (all layers)}
+  \begin{equation*}
+    \mathbf{D} = f_{\mathrm{NLP}}(X),\quad
+    T = f_{\mathrm{TEWS}}(\mathbf{v}),\quad
+    \mathbf{P} = f_{\mathrm{Bayes}}(E),\quad
+    C = f_{\mathrm{fusion}}(\mathbf{D}, T, \mathbf{P})
+  \end{equation*}
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \begin{block}{Symbols}
+      \footnotesize
+      \begin{tabular}{@{}ll@{}}
+        $X$ & English chief complaint \\
+        $\hat{\mathbf{y}}$ & 5-class acuity probabilities \\
+        $T$ & TEWS total score \\
+        $E$ & Evidence vector (entities + vitals) \\
+        $C$ & Final SATS colour \\
+        $\tau$ & Confidence threshold ($\approx 0.85$) \\
+      \end{tabular}
+    \end{block}
+
+    \column{0.48\textwidth}
+    \plain{Each layer produces an \textbf{auditable} signal. Fusion is a \textbf{safety checklist}, not an average --- the most urgent credible signal wins.}
+  \end{columns}
+\end{frame}
+
+\input{sections/01-clinical}
+\input{sections/02-pipeline-input}
+\input{sections/03-biobert}
+\input{sections/04-fusion-parallel}
+\input{sections/05-math-deep-dives}
+\input{sections/06-worked-example}
+\input{sections/07-protocols-demo}
+
+\begin{frame}{Summary}
+  \begin{enumerate}
+    \item \textbf{Clinical context:} SATS colours map to Ghana hospital departments at KATH.
+    \item \textbf{5-step pipeline:} Input $\to$ text/voice $\to$ BioBERT $\to$ fusion with TEWS \& Bayesian.
+    \item \textbf{BioBERT:} Fine-tuned on $\sim$80k chief complaints; 5-class acuity softmax + confidence gate.
+    \item \textbf{TEWS:} Deterministic vital scoring; piecewise $f_1\ldots f_6$.
+    \item \textbf{Bayesian:} Posterior $P(C_k\mid E)$ when vitals incomplete or NLP uncertain.
+    \item \textbf{Fusion:} $\mathrm{ord}(C) \geq \max\{\mathrm{ord}(C_{\mathrm{NLP}}), \mathrm{ord}(C_{\mathrm{TEWS}}), \mathrm{ord}(C_{\mathrm{Bayes}})\}$.
+  \end{enumerate}
+
+  \vspace{0.5em}
+  \centering
+  \textbf{Interactive demo:} \texttt{curatio/client} React presentation at \texttt{/dashboard}
+\end{frame}
+
+\begin{frame}
+  \centering
+  \Large Thank you\\
+  \vspace{0.8em}
+  \normalsize Questions?
+\end{frame}
+
+\end{document}

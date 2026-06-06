@@ -1,0 +1,261 @@
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\documentclass[11pt, aspectratio=169]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tipa}
+\DeclareUnicodeCharacter{025B}{\textepsilon}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+% Beamer Theme Configuration
+\usetheme{AnnArbor}
+\usecolortheme{wolverine} % AnnArbor pairs well with Wolverine for a professional yellow/blue look
+\setbeamertemplate{navigation symbols}{}
+\setbeamerfont{footnote}{size=\tiny}
+
+% Define Custom Triage Colors
+\definecolor{triageRed}{RGB}{220, 20, 60}
+\definecolor{triageOrange}{RGB}{255, 140, 0}
+\definecolor{triageYellow}{RGB}{255, 200, 0}
+\definecolor{triageGreen}{RGB}{34, 139, 34}
+
+% Title Page Information
+\title[Hospital Chatbot for Clinical Pathways]{Hospital Chatbot for Color-Coded Clinical Pathways}
+\subtitle{A Three-Layered Architecture}
+\author{Quaigriane Samuel | Twum Samuel}
+\date{\today}
+
+\begin{document}
+	
+	% --- SLIDE 1: Title ---
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	% --- SLIDE 2: Table of Contents ---
+	\begin{frame}{Presentation Outline}
+		\tableofcontents
+	\end{frame}
+	
+	% --- SLIDE 3: Introduction ---
+% --- SLIDE 3: Introduction ---
+\section{System Overview}
+\begin{frame}{The Triage Bottleneck}
+	\textbf{The Clinical Context:}
+	\begin{itemize}
+		\item Hospitals in LMIC's(Lower-to-Middle Income Countries) face a crisis of overcrowding, leading to dangerous bottlenecks across all levels of patient care.
+		\item A major structural driver is the influx of non-urgent patients occupying critical resources, making \textbf{accurate, hospital-wide triage} an absolute necessity to prevent fatal delays.
+	\end{itemize}
+	\vspace{0.2cm}
+	\textbf{The Solution:}
+	\begin{itemize}
+		\item A digital triage chatbot that acts as the patient's first point of contact. 
+		\item It seamlessly evaluates symptoms to \textbf{filter and route patients to their respective hospital departments} strictly based on the calculated severity of their illness.
+	\end{itemize}
+\end{frame}
+	
+	% --- SLIDE 4: Architecture Overview ---
+	\begin{frame}{The Three-Layered Architecture}
+		To safely evaluate patients in a pre-hospital setting, the system utilizes three interconnected computational layers:
+		\vspace{0.3cm}
+		\begin{enumerate}
+			\item \textbf{Natural Language Processing (NLP) Layer:} The Listener \& Data Extractor.
+			\item \textbf{Deterministic Algebraic Layer:} The Core Mathematical Safety Net (TEWS).
+			\item \textbf{Bayesian Probabilistic Layer:} The Predictive Detective \& Clinical Override.
+		\end{enumerate}
+		\vspace{0.3cm}
+		This three layered approach ensures the system is clinically safer, more robust to missing data, and highly responsive to natural human communication.
+	\end{frame}
+	
+	% --- SLIDE 5.1: Introduction to NLP & History ---
+	\section{Layer 1: Deep Attention NLP}
+	\begin{frame}{Layer 1: NLP in Healthcare (History \& Relevance)}
+		\textbf{What is Natural Language Processing (NLP)?}
+		\begin{itemize}
+			\item NLP is a branch of Artificial Intelligence that enables computers to understand, interpret, and manipulate human language.
+			\item \textbf{Relevance in Health:} It bridges the critical gap between unstructured patient narratives and structured clinical data required for medical algorithms.
+		\end{itemize}
+		\vspace{0.2cm}
+		\textbf{Historical Context:}
+		\begin{itemize}
+			\item NLP evolved from early 1950s machine-translation systems to logic-based algorithms in the 1980s.\footnote{K. Sparck Jones, "Natural Language Processing: A Historical Review," \textit{Linguistica Computazionale} (1994): 1-16.}
+			\item Historically, clinical NLP relied on rigid rule-based systems that struggled with human nuance. Today, modern \textit{multimodal models} combining unstructured free-text with structured data consistently outperform traditional triage systems.\footnote{J. Stewart et al., "Applications of NLP at ED triage: A narrative review," \textit{PLOS ONE} 18, no. 12 (2023).}
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 5.2: The Pre-Hospital Problem ---
+	\begin{frame}{Layer 1: The Pre-Hospital Data Problem}
+		\textbf{Relevance to this Project:}
+		\begin{itemize}
+			\item Patients do not speak in standardized medical ontologies. A patient will say \textit{"my chest is tight,"} not \textit{"I am experiencing respiratory distress."}
+			\item Furthermore, expecting a patient to input an accurate heart rate or blood pressure reading is an unrealistic expectation in a pre-hospital SMS/Web-based context in LMICs.
+		\end{itemize}
+		\vspace{0.2cm}
+		\textbf{The AI Solution:}
+		\begin{itemize}
+			\item We utilize a \textbf{Deep Attention NLP Model} to extract symptoms from natural dialogue, ensuring the system can accurately triage patients even when objective vital signs are missing or unmeasurable by the patient.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 5.3: The NLP Pipeline ---
+	\begin{frame}{Layer 1: The NLP Pipeline (Text to Clinical Meaning)}
+		The system converts raw patient text into computable variables through a strict mathematical pipeline:\footnote{D. Gligorijevic et al., "Deep Attention Model for Triage of Emergency Department Patients," \textit{arXiv preprint} (2018): 1-5.}
+		\vspace{0.2cm}
+		\begin{enumerate}
+			\item \textbf{Tokenization:} The raw text is broken down into individual, computable units called tokens (words or sub-words).
+			\item \textbf{Named Entity Recognition (NER):} The system classifies medically meaningful tokens (e.g., distinguishing a "Symptom" from a "Body Part").
+			\item \textbf{Contextual Embedding:} Tokens are mapped to dense vector spaces, allowing the AI to understand semantic relationships (e.g., knowing "hot" relates to "fever").
+			\item \textbf{Attention Scoring:} A softmax attention mechanism assigns mathematical weights to specific words based on clinical severity.
+			\item \textbf{Discriminator Detection:} High-weight tokens trigger specific SATS Clinical Discriminators to drive the final triage decision.
+		\end{enumerate}
+	\end{frame}
+	
+	% --- SLIDE 5.4: Ghanaian Context Example ---
+	\begin{frame}{Layer 1: Pipeline Execution in the Ghanaian Context}
+		\textbf{Scenario:} A patient in Kumasi describes their condition to the chatbot in Twi:
+		\begin{quote}
+		\textit{``Me ho y$\varepsilon$ me hye, me koko y$\varepsilon$ me ya, na me home te.''} \\
+			\small{(Translation: I have a fever, my chest hurts, and I am short of breath.)}
+		\end{quote}
+		
+		\vspace{0.1cm}
+		\textbf{How the Pipeline Processes This:}
+		\begin{itemize}
+			\item \textbf{Tokenization:} ["I", "have", "a", "fever", "chest", "pain", "and", "me", "home", "te"]
+			\item \textbf{NER \& Translation:} Recognizes "fever" (Condition), "chest pain" (Severe Symptom), and maps local colloquialisms ("me home te") to "Shortness of Breath".
+			\item \textbf{Attention Scoring:} The model assigns massive mathematical weight to \textbf{[chest pain]} and \textbf{[home te]}, largely ignoring "I" and "and".
+			\item \textbf{Discriminator Classification:} The system flags SATS Discriminators for suspected cardiac/respiratory distress, triggering an immediate \textcolor{triageRed}{\textbf{Red Pathway}} override.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 7: Deterministic Deep Dive 1 ---
+% --- SLIDE 7: Deterministic Deep Dive 1 ---
+\section{Layer 2: Deterministic Model}
+\begin{frame}{Layer 2: The Deterministic Model (TEWS)}
+	\textbf{The Objective Data Gap \& Clinical Workflow:}
+	\begin{itemize}
+		\item NLP perfectly extracts \textit{subjective} symptoms from the patient's narrative, but calculating an accurate Triage Early Warning Score (TEWS) requires \textit{objective} vital signs ($v_k$).
+		\item \textbf{Data Acquisition:} Patients cannot reliably self-report vitals. Therefore, these hard metrics are exclusively measured and inputted into the system by the \textbf{triage provider} upon arrival.
+	\end{itemize}
+	\vspace{0.1cm}
+	
+	\begin{block}{The Core Equation}
+		Once inputted by the provider, these vitals pass through a rigid \textbf{Deterministic Algebraic Model}:
+		\[
+		TEWS = \sum_{k=1}^{n} w_k \cdot f_k(v_k)
+		\]
+	\end{block}
+\end{frame}
+
+% --- SLIDE 8: Deterministic Deep Dive 2 ---
+\begin{frame}{Layer 2: Piecewise Function \& Color Mapping}
+	\textbf{Example: Piecewise Function for Heart Rate ($k=1$)}
+	\begin{itemize}
+		\item The function mathematically evaluates the provider-inputted vital signs against strict clinical thresholds, completely removing human calculation errors:
+	\end{itemize}
+	\[
+	f_1(v_1) = \begin{cases}
+		3 & \text{if } v_1 \ge 130 \text{ (Extreme Tachycardia)} \\
+		2 & \text{if } 111 \le v_1 \le 129 \\
+		0 & \text{if } 51 \le v_1 \le 100 \text{ (Normal Baseline)} \\
+		2 & \text{if } v_1 \le 40 \text{ (Severe Bradycardia)}
+	\end{cases}
+	\]
+	\vspace{0.1cm}
+	\textbf{Algorithmic Color Mapping:}
+	\begin{itemize}
+		\item \textbf{\textcolor{triageRed}{TEWS 7+}} $\rightarrow$ \textbf{Red} (Immediate Resuscitation)
+		\item \textbf{\textcolor{triageOrange}{TEWS 5--6}} $\rightarrow$ \textbf{Orange} ($<10$ mins)
+		\item \textbf{\textcolor{triageYellow}{TEWS 3--4}} $\rightarrow$ \textbf{Yellow} ($<60$ mins)
+		\item \textbf{\textcolor{triageGreen}{TEWS 0--2}} $\rightarrow$ \textbf{Green} (Divert to Polyclinic / Non-Urgent)
+	\end{itemize}
+\end{frame}
+
+% --- SLIDE 9: Bayesian Deep Dive 1 ---
+\section{Layer 3: Bayesian Model}
+\begin{frame}{Layer 3: The Bayesian Probabilistic Model}
+	\textbf{The Flaw in Deterministic Logic:}
+	If an active heart attack patient has temporarily normal resting vitals, the Deterministic TEWS math will dangerously score them as \textbf{\textcolor{triageGreen}{Green (0)}}.
+	\vspace{0.1cm}
+	
+	\textbf{The Mathematical Solution (Bayes' Theorem):}
+	To calculate the hidden probability of a severe disease ($D$) based on the NLP-extracted symptoms ($S$), the system uses a Bayesian Belief Network:
+	\begin{block}{The Bayesian Equation}
+		\[
+		P(D \mid S) = \frac{P(S \mid D) \cdot P(D)}{P(S)}
+		\]
+	\end{block}
+	\begin{itemize}
+		\item $P(D \mid S)$: \textbf{Posterior} (The probability the patient has the severe disease given their symptoms).
+		\item $P(S \mid D)$: \textbf{Likelihood} (The probability these exact symptoms occur in patients who actually have the disease).
+		\item $P(D)$: \textbf{Prior} (The baseline prevalence of the disease in the hospital's population).
+	\end{itemize}
+\end{frame}
+
+% --- SLIDE 10: Bayesian Deep Dive 2 ---
+\begin{frame}{Layer 3: Execution of the Clinical Override}
+	\textbf{Real-World Execution Scenario:}
+	\begin{itemize}
+		\item \textbf{User Input:} \textit{"I am 70, freezing cold, confused, and haven't peed all day."}
+		\item \textbf{Deterministic Score:} Vitals measured as normal $\rightarrow$ \textcolor{triageGreen}{\textbf{Green Pathway}}.
+	\end{itemize}
+	\vspace{0.1cm}
+	
+	\textbf{The Bayesian Calculation ($D$ = Septic Shock, $S$ = Confusion, Anuria, Cold):}
+	\begin{itemize}
+		\item The network retrieves the historical Likelihood $P(S \mid D)$ and Prior $P(D)$ for Sepsis.
+		\item The math evaluates to a high Posterior Probability: $P(Septic Shock \mid S) = \mathbf{0.92}$ (\textbf{92\%}).
+	\end{itemize}
+	\vspace{0.1cm}
+	
+	\textbf{System Action (SATS Discriminator):}
+	\begin{itemize}
+		\item Because the probability of a critical condition is exceptionally high, the Bayesian layer triggers a \textbf{Clinical Override}, bypassing the TEWS score and instantly upgrading the patient from Green to \textcolor{triageRed}{\textbf{Red}}.
+	\end{itemize}
+\end{frame}
+
+	% --- SLIDE 11: Under/Over Triage ---
+	\section{System Safety \& Statistics}
+	\begin{frame}{System Safety: Under-Triage vs. Over-Triage}
+		\textbf{Minimizing Under-Triage (Risk: Near-Zero)}
+		\begin{itemize}
+			\item Under-triage is a fatal clinical error. Our hybrid architecture relies on \textit{double-redundancy}. For a critical patient to be missed, \textbf{both} the Deterministic and Bayesian engines must fail simultaneously.
+			\item Recent validations of similar 3-tier triage tools report under-triage rates as low as \textbf{2.7\%} (well below the global safety threshold of 10\%).\footnote{R. Mitchell et al., "Validation of the Interagency Integrated Triage Tool... in Papua New Guinea," \textit{The Lancet Regional Health} 13 (2021): 100194.}
+		\end{itemize}
+		\vspace{0.2cm}
+		\textbf{Accepting Over-Triage (Operational Trade-off)}
+		\begin{itemize}
+			\item The Bayesian model's hyper-vigilance increases over-triage (typically \textbf{30\%-48\%}). However, over-triage is an operational inefficiency, not a clinical danger, and is easily absorbed by successfully diverting the "Green Tag" masses.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 12: AI vs Human Performance ---
+	\begin{frame}{Outperforming Human Triage}
+		Manual triage relies on stressed, cognitively overloaded nurses who frequently make subjective mathematical errors. Hybrid AI systems drastically outperform humans in rigorous clinical studies:
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item \textbf{Resource Prediction:} Deep Attention NLP models evaluating unstructured nurse notes achieved an AUC of \textbf{88\%}, outperforming human triage nurses by \textbf{16\%} in predicting actual hospital resource utilization.\footnote{D. Gligorijevic et al., "Deep Attention Model," \textit{arXiv} (2018).}
+			\item \textbf{Acuity Accuracy:} Optimized machine learning triage models combining boosting algorithms (like CaB) reach global accuracy levels of \textbf{83.3\%} across large hospital datasets, eliminating human calculation fatigue.\footnote{A. Ahmed et al., "Machine Learning Approach for Developing an E-Triage Tool," \textit{Expert Systems with Applications} (2022).}
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 13: Conclusion ---
+	\section{Conclusion}
+	\begin{frame}{Conclusion}
+		\begin{quote}
+			``By replacing subjective human estimation with a rigorous, three-layered AI architecture, we transform triage from a bottleneck into a high-speed, mathematically guaranteed safety net.''
+		\end{quote}
+		\vspace{0.4cm}
+		\begin{itemize}
+			\item \textbf{NLP Layer:} Understands the patient.
+			\item \textbf{Deterministic Layer:} Secures the baseline vitals.
+			\item \textbf{Bayesian Layer:} Predicts covert deterioration. 
+		\end{itemize}
+		\vspace{0.2cm}
+		This chatbot does not just digitize a form; it automates clinical reasoning to definitively solve ED overcrowding in resource-constrained environments.
+	\end{frame}
+	
+\end{document}

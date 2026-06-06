@@ -1,0 +1,189 @@
+% =============================================================================
+\section{Mathematics Deep Dives}
+% =============================================================================
+
+\begin{frame}{TEWS: heart rate scoring $f_1(HR)$}
+  \begin{equation*}
+    f_1(v_1) = \begin{cases}
+      3 & \text{if HR} \geq 130 \\
+      2 & \text{if } 111 \leq \mathrm{HR} \leq 129 \\
+      0 & \text{if } 51 \leq \mathrm{HR} \leq 100 \\
+      2 & \text{if HR} \leq 40 \\
+      1 & \text{otherwise (borderline)}
+    \end{cases}
+  \end{equation*}
+
+  \examplebox{
+    \textbf{HR = 125 bpm:}\\
+    125 $\geq$ 130? No. \quad 111 $\leq$ 125 $\leq$ 129? \textbf{Yes} $\Rightarrow f_1(125) = 2$ points.
+  }
+
+  Every score traceable to a SATS table row --- auditable for clinical review.
+\end{frame}
+
+\begin{frame}{TEWS: respiratory rate scoring $f_2(RR)$}
+  \begin{equation*}
+    f_2(v_2) = \begin{cases}
+      3 & \text{if RR} \geq 30 \\
+      2 & \text{if } 21 \leq \mathrm{RR} \leq 29 \\
+      0 & \text{if } 9 \leq \mathrm{RR} \leq 14 \\
+      1 & \text{otherwise}
+    \end{cases}
+  \end{equation*}
+
+  \examplebox{
+    \textbf{RR = 26/min:}\\
+    26 $\geq$ 30? No. \quad 21 $\leq$ 26 $\leq$ 29? \textbf{Yes} $\Rightarrow f_2(26) = 2$ points.
+  }
+\end{frame}
+
+\begin{frame}{TEWS: partial scoring when vitals missing}
+  \begin{equation*}
+    T_{\mathrm{partial}} = \sum_{k \in \mathcal{K}_{\mathrm{obs}}} w_k \, f_k(v_k), \quad
+    \mathcal{K}_{\mathrm{obs}} = \{k : v_k \text{ measured}\}
+  \end{equation*}
+
+  \examplebox{
+    Only HR and RR measured; temp, AVPU, mobility, trauma unknown.\\
+    Sum only observed $f_k$; set \texttt{tews\_incomplete = true}.\\
+    Fusion \textbf{cannot} assign Green on partial data --- escalates to Bayesian.
+  }
+
+  \footnotesize
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    TEWS total & Colour & Ghana routing \\
+    \midrule
+    $T > 7$ & Red & Resuscitation Room \\
+    $5 \leq T \leq 6$ & Orange & Majors ED \\
+    $3 \leq T \leq 4$ & Yellow & Majors ED \\
+    $T \leq 2$ & Green & Minors / OPD \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{TEWS worked example}
+  \begin{equation*}
+    f_1(125) = 2,\quad f_2(26) = 2,\quad f_{3:6} = 0
+    \;\Rightarrow\; T = 4 \;\Rightarrow\; C_{\mathrm{TEWS}} = \text{Yellow}
+  \end{equation*}
+
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{@{}llll@{}}
+      \toprule
+      Vital & Value & $f_k$ & Points \\
+      \midrule
+      HR & 125 bpm & $f_1(125)$ & 2 \\
+      RR & 26/min & $f_2(26)$ & 2 \\
+      Mobility, Temp, AVPU, trauma & Normal & 0 each & 0 \\
+      \midrule
+      \multicolumn{3}{r}{\textbf{Total $T$}} & \textbf{4} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Bayesian: evidence vector $E$}
+  \begin{equation*}
+    E = \bigl[\text{entity}_1, \ldots, \text{entity}_r,\, v_{k_1}, \ldots, v_{k_s}\bigr]
+  \end{equation*}
+
+  Combines NLP-extracted clinical entities with whatever vitals were measured.
+
+  \examplebox{
+    NLP entities: \texttt{chest\_pain}, \texttt{radiating\_pain}\\
+    Vitals: HR = 125, RR = 26 (temperature missing)\\
+    $E = [\text{chest\_pain},\ \text{radiating\_pain},\ \mathrm{HR{=}125},\ \mathrm{RR{=}26}]$
+  }
+\end{frame}
+
+\begin{frame}{Bayesian: posterior and decision}
+  \begin{equation*}
+    P(C_k \mid E) = \frac{P(E \mid C_k)\, P(C_k)}{\sum_{j} P(E \mid C_j)\, P(C_j)},
+    \qquad
+    C_{\mathrm{Bayes}} = \arg\max_{k} P(C_k \mid E)
+  \end{equation*}
+
+  \begin{itemize}
+    \item \textbf{Prior} $P(C_k)$ --- baseline urgency from hospital epidemiology
+    \item \textbf{Likelihood} $P(E \mid C_k)$ --- how well symptoms fit each colour band
+    \item \textbf{Posterior} --- updated belief after seeing evidence $E$
+  \end{itemize}
+
+  \plain{When TEWS is blind (missing vitals), Bayesian uses whatever evidence exists to estimate risk.}
+\end{frame}
+
+\begin{frame}{Fusion: urgency ordering}
+  \begin{equation*}
+    \mathrm{ord}(\text{Red}) = 4 > \mathrm{ord}(\text{Orange}) = 3 >
+    \mathrm{ord}(\text{Yellow}) = 2 > \mathrm{ord}(\text{Green}) = 1
+  \end{equation*}
+
+  \examplebox{
+    Language suggests Orange ($\mathrm{ord} = 3$), TEWS suggests Yellow ($\mathrm{ord} = 2$).\\
+    $\max(3, 2) = 3 \Rightarrow C = \sats{triageOrange}{Orange}$.\\
+    Language wins --- chest pain cannot wait for mild vital derangement alone.
+  }
+\end{frame}
+
+\begin{frame}{Fusion: safety rule}
+  \begin{equation*}
+    \mathrm{ord}(C) \geq \max\bigl\{
+      \mathrm{ord}(C_{\mathrm{disc}}),\,
+      \mathrm{ord}(C_{\mathrm{TEWS}}),\,
+      \mathrm{ord}(C_{\mathrm{Bayes}})
+    \bigr\}
+  \end{equation*}
+
+  Final colour $C$ is \textbf{never less urgent} than any layer suggested.
+
+  \examplebox{
+    TEWS alone $\to$ Yellow; BioBERT + Bayesian $\to$ Orange.\\
+    Safety rule: $\mathrm{ord}(C) \geq 3 \Rightarrow C = \sats{triageOrange}{Orange}$.
+  }
+\end{frame}
+
+\begin{frame}{Fusion: Algorithm 1 checklist}
+  \begin{enumerate}
+    \item Life-threatening words? $\to$ \sats{triageRed}{Red}
+    \item Very urgent words (chest pain)? $\to$ \sats{triageOrange}{Orange}
+    \item $T > 7$? Red \quad|\quad $5 \leq T \leq 6$? Orange \quad|\quad $3 \leq T \leq 4$? Yellow
+    \item Missing vitals? $\to \arg\max_k P(C_k \mid E)$
+    \item Serious disease? $\to$ Red / Orange override
+    \item Else $\to$ \sats{triageGreen}{Green}
+  \end{enumerate}
+
+  \vspace{0.4em}
+  \footnotesize
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Language ($\mathbf{D}$) & TEWS ($T$) & Final $C$ \\
+    \midrule
+    $d_{\mathrm{chest}} > \tau$ (Orange) & $T=4$ (Yellow) & \sats{triageOrange}{Orange} \\
+    Low $\mathbf{D}$ & $T \geq 7$ (Red) & \sats{triageRed}{Red} \\
+    Ambiguous $\mathbf{D}$ & Incomplete vitals & $\arg\max P(C_k \mid E)$ \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Design note: spec vs.\ implementation}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \begin{block}{Mathematical spec}
+      \small
+      Discriminator vector $\mathbf{D}$ with SATS pattern scores $d_j = \sigma(w_j^\top h_{[\mathrm{CLS}]} + b_j)$
+    \end{block}
+
+    \column{0.48\textwidth}
+    \begin{block}{Fine-tuned model}
+      \small
+      5-class acuity classifier on \texttt{chief\_complaint\_raw} $\to$ mapped to SATS colours for fusion
+    \end{block}
+  \end{columns}
+
+  \vspace{0.5em}
+  Both feed fusion as a language-layer urgency signal. Confidence $< \tau$ triggers Bayesian regardless of architecture detail.
+
+  \plain{The web presentation documents this gap transparently --- mathematics describes the intended safety architecture; BioBERT provides the deployed NLP signal.}
+\end{frame}

@@ -1,0 +1,45 @@
+% Shared preamble for Curatio Saturday slides
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows.meta,positioning,calc}
+\usepackage{hyperref}
+\usepackage{newunicodechar}
+\newunicodechar{ɛ}{e}
+
+\usetheme{AnnArbor}
+\usecolortheme{wolverine}
+\setbeamertemplate{navigation symbols}{}
+
+% Curatio / SATS palette
+\definecolor{curatioGreen}{RGB}{22,101,52}
+\definecolor{triageRed}{RGB}{220,20,60}
+\definecolor{triageOrange}{RGB}{255,140,0}
+\definecolor{triageYellow}{RGB}{255,200,0}
+\definecolor{triageGreen}{RGB}{34,139,34}
+\definecolor{triageBlue}{RGB}{30,64,175}
+
+\setbeamercolor{structure}{fg=curatioGreen}
+\setbeamercolor{title}{fg=curatioGreen}
+\setbeamercolor{frametitle}{fg=curatioGreen}
+
+\newcommand{\bcol}[2][blue!70!black]{\textcolor{#1}{#2}}
+\newcommand{\sats}[1]{\textbf{\textcolor{#1}{#1}}}
+\newcommand{\plain}[1]{\begin{block}{In plain English}\small #1\end{block}}
+\newcommand{\examplebox}[1]{\begin{exampleblock}{Worked example}\small #1\end{exampleblock}}
+
+\setbeamertemplate{footline}{}
+
+\tikzset{
+  flowbox/.style={rectangle, draw=curatioGreen!60, rounded corners=3pt,
+    fill=curatioGreen!6, minimum height=0.8cm, minimum width=1.7cm,
+    align=center, font=\scriptsize, inner sep=4pt},
+  flowarr/.style={-{Stealth[length=2mm]}, thick, draw=curatioGreen!70!black},
+  edgelabel/.style={font=\tiny, fill=white, inner sep=1pt}
+}

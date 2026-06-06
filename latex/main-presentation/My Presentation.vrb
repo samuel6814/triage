@@ -1,0 +1,14 @@
+\frametitle{Some Tips}
+\begin{enumerate}
+			\item Working with Tables, Figures and Equations is the same for beamer.
+			\item Bullet your points: Each point should be powerful enough to explain itself.
+			\item If possible, use pictures to introduce the background.
+			\item Capture literature as part of the background.
+			\item Ensure proper spacing by using
+			\begin{verbatim}
+				\medskip, \bikskip, \vspace{2cm}, \qquad, \quad
+			\end{verbatim}
+			\item Colours could be used to highlight some equations
+			\begin{equation}\label{key} \bcol[red]{2+ \sin x = 2000} \qquad \bcol[green]{2+ \sin x = 2000}\qquad \bcol{2+ \sin x = 2000}
+		\end{equation}
+	\end{enumerate}

@@ -1,0 +1,9 @@
+\frametitle{Service API sequence}
+\footnotesize
+	\begin{verbatim}
+POST /speech/recognize  -> transcript, language_code
+POST /translate         -> english_text
+POST /nlp/analyze       -> entities, discriminators D
+POST /triage/compute    -> TEWS T, posteriors P, colour C
+	\end{verbatim}
+	Each call reads/writes fields in the session record; \texttt{/triage/compute} runs $f_{\text{fusion}}$.
