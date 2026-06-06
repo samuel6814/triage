@@ -144,6 +144,22 @@ const Body = styled.div`
     color: #1e293b;
   }
 
+  .formula {
+    margin: 0.75rem 0;
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .symbols {
+    margin-top: 0.5rem;
+    font-size: 0.92rem;
+    color: #475569;
+  }
+
   .why {
     margin-top: 1rem;
     padding: 0.85rem 1.1rem;
@@ -153,6 +169,27 @@ const Body = styled.div`
     color: #166534;
   }
   .why strong { color: #166534; }
+
+  .sayLive {
+    margin-top: 1rem;
+    padding: 0.85rem 1.1rem;
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    border-radius: 0 10px 10px 0;
+    color: #1e3a5f;
+    font-size: 0.95rem;
+  }
+  .sayLive strong { color: #1d4ed8; }
+
+  .phase {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #166534;
+    margin-bottom: 0.5rem;
+  }
 
   &::-webkit-scrollbar { width: 6px; }
   &::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
