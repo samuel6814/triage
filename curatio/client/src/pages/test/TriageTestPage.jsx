@@ -208,6 +208,10 @@ const EXAMPLES = [
   { label: 'Routine', text: 'contraception advice, intermittent' },
 ];
 
+// Empty in local dev so requests stay relative and hit the Vite proxy.
+// In production set VITE_API_URL to the deployed API origin (e.g. the Render URL).
+const API_BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+
 const TriageTestPage = () => {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -223,7 +227,7 @@ const TriageTestPage = () => {
     setResult(null);
 
     try {
-      const res = await fetch('/api/triage/predict', {
+      const res = await fetch(`${API_BASE}/api/triage/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.trim() }),

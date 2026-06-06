@@ -43,6 +43,19 @@ def resolve_model_path() -> Path:
     return DEFAULT_MODEL_PATH.resolve()
 
 
+def resolve_model_source() -> tuple[str, bool]:
+    """Return (source, is_local).
+
+    Prefer MODEL_ID (a Hugging Face Hub repo id, e.g. "user/curatio-biobert")
+    when set, which lets the deployed service pull weights from the Hub instead
+    of bundling the 414MB file. Falls back to a local MODEL_PATH for dev.
+    """
+    model_id = os.getenv("MODEL_ID", "").strip()
+    if model_id:
+        return model_id, False
+    return str(resolve_model_path()), True
+
+
 def load_model():
     """Load tokenizer + classification pipeline once."""
     global _pipeline, _model_path
@@ -50,17 +63,21 @@ def load_model():
     if _pipeline is not None:
         return _pipeline
 
-    _model_path = resolve_model_path()
-    if not (_model_path / "model.safetensors").exists() and not (
-        _model_path / "pytorch_model.bin"
-    ).exists():
-        raise FileNotFoundError(
-            f"Model weights not found at {_model_path}. "
-            "Set MODEL_PATH in curatio/server/.env"
-        )
+    source, is_local = resolve_model_source()
+    _model_path = source
 
-    tokenizer = AutoTokenizer.from_pretrained(str(_model_path))
-    model = AutoModelForSequenceClassification.from_pretrained(str(_model_path))
+    if is_local:
+        local_dir = Path(source)
+        if not (local_dir / "model.safetensors").exists() and not (
+            local_dir / "pytorch_model.bin"
+        ).exists():
+            raise FileNotFoundError(
+                f"Model weights not found at {local_dir}. "
+                "Set MODEL_PATH (local dir) or MODEL_ID (Hugging Face Hub repo id)."
+            )
+
+    tokenizer = AutoTokenizer.from_pretrained(source)
+    model = AutoModelForSequenceClassification.from_pretrained(source)
 
     device = -1  # CPU; use 0 for CUDA if available
     try:
@@ -136,10 +153,18 @@ def predict(text: str) -> dict:
 
 
 def health_info() -> dict:
-    path = resolve_model_path()
-    weights_ok = (path / "model.safetensors").exists() or (path / "pytorch_model.bin").exists()
+    source, is_local = resolve_model_source()
+    if is_local:
+        local_dir = Path(source)
+        weights_ok = (local_dir / "model.safetensors").exists() or (
+            local_dir / "pytorch_model.bin"
+        ).exists()
+    else:
+        # Hub source: weights are fetched on load; treat as available.
+        weights_ok = True
     return {
-        "model_path": str(path),
+        "model_path": source,
+        "model_source": "local" if is_local else "huggingface_hub",
         "weights_found": weights_ok,
         "model_loaded": _pipeline is not None,
     }
