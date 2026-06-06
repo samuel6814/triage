@@ -5,6 +5,7 @@ import MathSection from '../../../components/presentation/MathSection';
 import PlainEnglish from '../../../components/presentation/PlainEnglish';
 import DataTable from '../../../components/presentation/DataTable';
 import ColourBadge from '../../../components/presentation/ColourBadge';
+import InfoTooltip from '../../../components/presentation/InfoTooltip';
 import { FusionDiagram } from '../../../components/presentation/FlowDiagram';
 import {
   FUSION_FUNCTION,
@@ -58,21 +59,26 @@ const FusionDeepDiveSlide = () => {
 
       <MathSection
         title="Fusion mathematics"
+        info="fusionController"
         equations={[
           {
             latex: FUSION_FUNCTION,
+            label: 'Master controller',
+            info: 'fusionController',
             explanation: <p>Three inputs → one colour via ordered rules.</p>,
             example: fusionFunctionDeepExample,
           },
           {
             latex: FUSION_ORD,
             label: 'Urgency ordering',
+            info: 'urgencyOrder',
             explanation: <p>Red=4 down to Green=1 — higher rank wins conflicts.</p>,
             example: fusionOrdExample,
           },
           {
             latex: FUSION_SAFETY,
             label: 'Safety rule',
+            info: 'safetyRule',
             explanation: <p>Final C never less urgent than any layer suggested.</p>,
             example: fusionSafetyExample,
           },

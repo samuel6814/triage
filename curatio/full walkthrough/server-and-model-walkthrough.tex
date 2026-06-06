@@ -1,0 +1,534 @@
+% ============================================================================
+%  Curatio — Server & Model Integration Walkthrough
+%  Compile with:  pdflatex "server-and-model-walkthrough.tex"  (run twice for TOC)
+%  Needs: amsmath, amssymb, xcolor, tcolorbox, enumitem, booktabs, listings, hyperref
+% ============================================================================
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+
+% ---- Theme colours (match the Curatio app) --------------------------------
+\definecolor{forest}{HTML}{166534}
+\definecolor{vibrant}{HTML}{22C55E}
+\definecolor{deepforest}{HTML}{064E3B}
+\definecolor{slate}{HTML}{1E293B}
+\definecolor{mutel}{HTML}{475569}
+\definecolor{sand}{HTML}{F4F7F5}
+\definecolor{codebg}{HTML}{F1F5F9}
+
+\hypersetup{linkcolor=forest, urlcolor=forest, citecolor=forest}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  framerule=0.4pt,
+  rulecolor=\color{forest!40},
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  literate={_}{\_}{1},
+}
+
+\titleformat{\section}{\Large\bfseries\color{forest}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{deepforest}}{\thesubsection}{0.6em}{}
+\setlist{nosep, leftmargin=1.4em, topsep=2pt}
+
+\newtcolorbox{idea}{
+  enhanced, breakable, colback=vibrant!7, colframe=vibrant!70!black,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=forest,
+  title={THE IDEA}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{flowbox}{
+  enhanced, breakable, colback=slate!4, colframe=slate!55,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=slate,
+  title={REQUEST FLOW}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{filebox}[1]{
+  enhanced, breakable, colback=sand, colframe=forest!60,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\ttfamily\small, coltitle=forest,
+  title={#1}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{qabox}{
+  enhanced, breakable, colback=slate!5, colframe=deepforest,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=deepforest,
+  title={LIKELY EXAMINER QUESTIONS}, attach title to upper={\par\smallskip}}
+
+\newcommand{\route}[1]{{\small\texttt{\textcolor{mutel}{#1}}}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{forest}{Curatio}}
+\fancyhead[R]{\small\textcolor{mutel}{Server \& Model Walkthrough}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ============================================================================
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+{\Huge\bfseries\color{forest} Curatio}\\[0.4cm]
+{\LARGE\bfseries How the Server and the BioBERT Model Work Together}\\[1cm]
+{\large A plain-English guide to the API layer, the ML service, and the fine-tuned model.}\\[2cm]
+{\large Final Year Project}\\[0.3cm]
+{\large \today}\\[2cm]
+\begin{tcolorbox}[width=0.88\textwidth, colback=sand, colframe=forest, arc=4pt]
+\small\centering
+This document explains the \textbf{runtime architecture}: what happens when a patient types a chief
+complaint in the browser, how the Node.js API forwards it to Python, how BioBERT runs inference,
+and what JSON comes back. Read this before your demo or viva if someone asks ``how does the backend
+actually work?''
+\end{tcolorbox}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ===========================================================================
+\section{The big picture in one minute}
+
+Curatio is \textbf{not} one monolithic program. At runtime there are three cooperating pieces:
+
+\begin{enumerate}
+  \item \textbf{Client} (React/Vite) --- the web UI in the browser. It collects text and displays
+        the prediction. It never loads the 414\,MB model.
+  \item \textbf{API server} (Node.js/Express on port 5000) --- a thin \emph{gateway}: CORS,
+        JSON validation, health checks, and forwarding requests to the ML service.
+  \item \textbf{ML service} (Python/FastAPI on port 8001) --- loads BioBERT once at startup, runs
+        tokenisation + inference, maps acuity to SATS colour, and flags low-confidence cases.
+\end{enumerate}
+
+\begin{idea}
+\textbf{Why split Node and Python?}
+\begin{itemize}
+  \item BioBERT lives in the \textbf{Python/Hugging Face} ecosystem (PyTorch, \texttt{transformers}).
+  \item The web stack is \textbf{JavaScript/React} --- natural for HTTP, CORS, and deployment to
+        Render/Vercel.
+  \item The API is a \textbf{proxy}: it keeps the browser simple (one URL) while the heavy ML work
+        stays in a dedicated Python process that can be scaled or redeployed independently.
+\end{itemize}
+\end{idea}
+
+\subsection{Architecture diagram}
+
+\begin{center}
+\begin{tcolorbox}[width=0.95\textwidth, colback=white, colframe=forest, arc=4pt, boxrule=0.8pt]
+\small
+\begin{tabular}{@{}c@{\quad$\longrightarrow$\quad}c@{\quad$\longrightarrow$\quad}c@{\quad$\longrightarrow$\quad}c@{}}
+\textbf{Browser} &
+\textbf{Express API} &
+\textbf{FastAPI ML} &
+\textbf{BioBERT weights} \\[-2pt]
+{\footnotesize React SPA} &
+{\footnotesize \route{curatio/server}} &
+{\footnotesize \route{curatio/server/ml}} &
+{\footnotesize local dir or HF Hub} \\
+\end{tabular}
+
+\vspace{0.6em}
+\hrule height 0.4pt
+\vspace{0.4em}
+
+\textbf{Local dev:}\quad
+\texttt{localhost:5173} $\to$ proxy \texttt{/api} $\to$ \texttt{:5000} $\to$ \texttt{:8001} $\to$ \texttt{MODEL\_PATH}
+
+\vspace{0.3em}
+
+\textbf{Production:}\quad
+Vercel $\to$ Render $\to$ Hugging Face Space $\to$ \texttt{MODEL\_ID} on the Hub
+\end{tcolorbox}
+\end{center}
+
+% ===========================================================================
+\section{Starting the stack locally}
+
+From \route{curatio/server}, one command starts \textbf{both} processes:
+
+\begin{lstlisting}
+npm run dev
+\end{lstlisting}
+
+This uses \texttt{concurrently} to run:
+\begin{itemize}
+  \item \textbf{api} --- \texttt{nodemon index.js} $\to$ Express on \texttt{http://localhost:5000}
+  \item \textbf{ml} --- \texttt{uvicorn app:app --reload --port 8001} $\to$ FastAPI on \texttt{http://127.0.0.1:8001}
+\end{itemize}
+
+The client (\route{curatio/client}) runs separately:
+
+\begin{lstlisting}
+npm run dev    # Vite on http://localhost:5173
+\end{lstlisting}
+
+Vite proxies any path starting with \texttt{/api} to port 5000, so the browser can call
+\texttt{/api/triage/predict} without CORS issues during development.
+
+% ===========================================================================
+\section{End-to-end: one prediction request}
+
+This is the path when someone submits ``central crushing chest pain'' on the \textbf{Test BioBERT
+Triage} page.
+
+\subsection{Step 1 --- Browser sends JSON}
+
+\begin{filebox}{Client: TriageTestPage.jsx}
+\begin{lstlisting}
+POST /api/triage/predict
+Content-Type: application/json
+
+{ "text": "central crushing chest pain, radiating to left arm" }
+\end{lstlisting}
+\end{filebox}
+
+\begin{itemize}
+  \item Locally, \texttt{VITE\_API\_URL} is empty, so the URL is relative and hits the Vite proxy.
+  \item In production, \texttt{VITE\_API\_URL} is set to the Render API origin (e.g.\
+        \texttt{https://curatio-api.onrender.com}).
+\end{itemize}
+
+\subsection{Step 2 --- Express validates and forwards}
+
+\begin{filebox}{Server: routes/triage.js}
+Express receives the body, checks that \texttt{text} is a non-empty string, then \textbf{does not}
+run any ML itself. It forwards the same JSON to the Python service:
+
+\begin{lstlisting}
+POST ${ML_SERVICE_URL}/predict
+{ "text": "central crushing chest pain, radiating to left arm" }
+\end{lstlisting}
+
+\texttt{ML\_SERVICE\_URL} defaults to \texttt{http://127.0.0.1:8001} locally; in production it
+points to your Hugging Face Space URL.
+\end{filebox}
+
+The Express layer also:
+\begin{itemize}
+  \item Applies \textbf{CORS} --- only allows origins listed in \texttt{CLIENT\_URL} (plus localhost
+        in dev).
+  \item Exposes \texttt{GET /api/health} (API alive) and \texttt{GET /api/triage/health} (proxies
+        to ML \texttt{/health}).
+  \item Returns \texttt{503} with a helpful message if Python is not running.
+\end{itemize}
+
+\subsection{Step 3 --- FastAPI receives and calls \texttt{predict()}}
+
+\begin{filebox}{ML service: ml/app.py}
+On startup, the \texttt{lifespan} hook calls \texttt{load\_model()} once --- BioBERT is loaded into
+memory before the first request.
+
+\begin{lstlisting}
+@app.post("/predict")
+def predict_endpoint(body: PredictRequest):
+    return predict(body.text)
+\end{lstlisting}
+
+\texttt{PredictRequest} enforces \texttt{text} length 1--2000 characters (Pydantic validation).
+\end{filebox}
+
+\subsection{Step 4 --- Inside \texttt{predict()}: what the model actually does}
+
+\begin{filebox}{ML service: ml/predict.py}
+\begin{enumerate}
+  \item \textbf{Load pipeline} (singleton) --- first call loads tokenizer + model; later calls reuse
+        the in-memory pipeline.
+  \item \textbf{Tokenise} --- \texttt{pipe(text, truncation=True, max\_length=128)}. Only the first
+        128 tokens are kept (matches training and presentation slides).
+  \item \textbf{Forward pass} --- 12 transformer layers produce logits for 5 classes
+        (\texttt{LABEL\_0} \ldots \texttt{LABEL\_4}).
+  \item \textbf{Softmax} --- Hugging Face \texttt{text-classification} pipeline returns a score
+        (probability) for every class.
+  \item \textbf{Map labels to acuity} --- \texttt{LABEL\_k} $\to$ acuity level \texttt{k+1} (levels
+        1--5).
+  \item \textbf{Pick winner} --- highest probability = predicted acuity; that value = \textbf{confidence}.
+  \item \textbf{SATS mapping} --- level 1 $\to$ Red, 2 $\to$ Orange, 3 $\to$ Yellow, 4--5 $\to$ Green.
+  \item \textbf{Confidence gate} --- if \texttt{confidence < CONFIDENCE\_THRESHOLD} (default 0.85),
+        set \texttt{bayesian\_candidate: true}.
+\end{enumerate}
+\end{filebox}
+
+\begin{idea}
+This is \textbf{only the NLP layer} from your presentation (Step 4 / BioBERT). The live test page
+returns BioBERT's language-based triage. Full Curatio fusion (TEWS + Bayesian + safety rules) is
+the \emph{research design} shown in slides; the deployed test endpoint implements the
+\textbf{fine-tuned classifier} part so you can demo real inference.
+\end{idea}
+
+\subsection{Step 5 --- JSON response travels back}
+
+Python returns a dict $\to$ Express passes it through unchanged $\to$ React displays it.
+
+Example response:
+
+\begin{lstlisting}
+{
+  "text": "central crushing chest pain, radiating to left arm",
+  "predicted_acuity_level": 2,
+  "predicted_class_index": 1,
+  "confidence": 0.94,
+  "probabilities": [
+    { "level": 2, "class_index": 1, "probability": 0.94 },
+    { "level": 3, "class_index": 2, "probability": 0.04 },
+    ...
+  ],
+  "sats_colour": "Orange",
+  "bayesian_candidate": false
+}
+\end{lstlisting}
+
+\begin{itemize}
+  \item \texttt{predicted\_acuity\_level} --- the winning class (1 = most urgent).
+  \item \texttt{confidence} --- $\max_c \hat{y}_c$ from the presentation (softmax peak).
+  \item \texttt{bayesian\_candidate} --- \texttt{true} when confidence $< 0.85$; in the full system
+        this would trigger the Bayesian fallback at fusion.
+  \item \texttt{probabilities} --- full distribution for transparency / debugging.
+\end{itemize}
+
+% ===========================================================================
+\section{Where the model weights live}
+
+The ML service resolves the model source at startup:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Environment} & \textbf{Variable} & \textbf{Behaviour} \\
+\midrule
+Local dev & \texttt{MODEL\_PATH} & Load from disk under \route{fine-tuned-biobert/...} \\
+Production & \texttt{MODEL\_ID} & Download from Hugging Face Hub at startup \\
+Fallback & (default path) & Same local folder if \texttt{MODEL\_PATH} unset \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{filebox}{predict.py --- resolve\_model\_source()}
+\begin{lstlisting}
+if MODEL_ID is set:
+    source = "your-username/curatio-biobert-triage"   # Hub repo
+else:
+    source = local MODEL_PATH directory               # model.safetensors on disk
+\end{lstlisting}
+\end{filebox}
+
+Weights are loaded via Hugging Face \texttt{AutoTokenizer} and
+\texttt{AutoModelForSequenceClassification.from\_pretrained(source)}. The service builds a
+\texttt{text-classification} pipeline with \texttt{top\_k=None} so \textbf{all five} class
+probabilities are returned (needed for confidence and for demo tables).
+
+Device: CPU by default (\texttt{device=-1}); uses CUDA if PyTorch sees a GPU.
+
+% ===========================================================================
+\section{File map: who owns what}
+
+\begin{center}
+\begin{tabular}{@{}p{0.32\textwidth}p{0.58\textwidth}@{}}
+\toprule
+\textbf{File} & \textbf{Responsibility} \\
+\midrule
+\route{server/index.js} &
+Express app: CORS, JSON middleware, mounts \texttt{/api/triage}, \texttt{/api/health}. \\[4pt]
+\route{server/routes/triage.js} &
+Proxy routes: \texttt{POST /predict}, \texttt{GET /health} $\to$ \texttt{ML\_SERVICE\_URL}. \\[4pt]
+\route{server/ml/app.py} &
+FastAPI app: lifespan loads model; HTTP endpoints \texttt{/health}, \texttt{/predict}. \\[4pt]
+\route{server/ml/predict.py} &
+Core logic: load model, run pipeline, map acuity/SATS, confidence gate. \\[4pt]
+\route{server/ml/Dockerfile} &
+Container for Hugging Face Spaces (uvicorn on port 7860). \\[4pt]
+\route{client/vite.config.js} &
+Dev proxy: \texttt{/api} $\to$ \texttt{localhost:5000}. \\[4pt]
+\route{client/.../TriageTestPage.jsx} &
+UI that calls \texttt{/api/triage/predict} and renders probabilities. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{Health checks and failure modes}
+
+\subsection{Health endpoints}
+
+\begin{itemize}
+  \item \texttt{GET /api/health} --- Express only: \texttt{\{ status: "ok", service: "curatio-server" \}}.
+  \item \texttt{GET /api/triage/health} --- Express forwards to ML \texttt{/health}.
+  \item \texttt{GET /health} (ML) --- reports \texttt{model\_path}, \texttt{model\_source},
+        \texttt{weights\_found}, \texttt{model\_loaded}.
+\end{itemize}
+
+Use these before a live demo to warm cold-started services (Render free tier, HF Spaces sleep).
+
+\subsection{Common errors}
+
+\begin{center}
+\begin{tabular}{@{}llp{0.42\textwidth}@{}}
+\toprule
+\textbf{HTTP} & \textbf{Cause} & \textbf{Fix} \\
+\midrule
+400 & Empty \texttt{text} & Client validation / user input \\
+503 & ML not running & \texttt{npm run dev} from \route{curatio/server} \\
+503 & Weights missing & Set \texttt{MODEL\_PATH} or upload Hub + \texttt{MODEL\_ID} \\
+CORS error & Wrong origin & Set \texttt{CLIENT\_URL} on Render to Vercel URL \\
+Slow first request & Cold start & Hit \texttt{/health} 1--2 min before demo \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{Production deployment (how the pieces connect)}
+
+Deploy order: \textbf{Hub model $\to$ HF Space $\to$ Render API $\to$ Vercel client}.
+
+\begin{enumerate}
+  \item Upload \texttt{model.safetensors} to Hugging Face Hub $\to$ \texttt{MODEL\_ID}.
+  \item Deploy \route{server/ml/} as a Docker Space $\to$ \texttt{ML\_SERVICE\_URL}.
+  \item Deploy \route{server/} to Render with \texttt{ML\_SERVICE\_URL} and \texttt{CLIENT\_URL}.
+  \item Deploy \route{client/} to Vercel with \texttt{VITE\_API\_URL} = Render URL.
+\end{enumerate}
+
+Full step-by-step commands live in \route{curatio/DEPLOYMENT.md}.
+
+\begin{idea}
+In production the browser \textbf{never} talks to Python directly. It only sees the Render API.
+That keeps the ML service private, lets you rotate models without redeploying the client, and
+matches standard microservice practice.
+\end{idea}
+
+% ===========================================================================
+\section{How this connects to your presentation maths}
+
+\begin{center}
+\begin{tabular}{@{}p{0.28\textwidth}p{0.62\textwidth}@{}}
+\toprule
+\textbf{Presentation concept} & \textbf{Where it happens in code} \\
+\midrule
+Token limit 128 &
+\texttt{predict.py}: \texttt{max\_length=128}, \texttt{truncation=True} \\[4pt]
+12 encoder layers &
+Inside loaded BioBERT weights (not reimplemented in app code) \\[4pt]
+Softmax over 5 levels &
+Hugging Face pipeline; scores in \texttt{probabilities[]} \\[4pt]
+Confidence $\max \hat{y}_c$ &
+\texttt{confidence = best["probability"]} \\[4pt]
+Gate if $< \tau$ &
+\texttt{bayesian\_candidate = confidence < CONFIDENCE\_THRESHOLD} \\[4pt]
+Acuity $\to$ SATS colour &
+\texttt{SATS\_BY\_ACUITY} dict in \texttt{predict.py} \\[4pt]
+TEWS / Bayesian / Fusion &
+Designed in slides; not in this HTTP predict path (future full pipeline) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+When an examiner asks ``does the server \emph{implement} fusion?'', the honest answer is:
+\textbf{the deployed predict endpoint runs BioBERT inference plus a confidence flag}. Fusion,
+TEWS, and Bayesian are documented and demonstrated in the presentation; extending the API to run
+the full \texttt{f\_fusion} controller would be the next engineering step.
+
+% ===========================================================================
+\section{Environment variables cheat sheet}
+
+\begin{center}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Variable} & \textbf{Set on} & \textbf{Example} & \textbf{Purpose} \\
+\midrule
+\texttt{MODEL\_PATH} & ML (local) & path to fine-tuned folder & Load weights from disk \\
+\texttt{MODEL\_ID} & ML (prod) & \texttt{user/curatio-biobert-triage} & Pull from Hub \\
+\texttt{ML\_SERVICE\_URL} & Express & \texttt{http://127.0.0.1:8001} & Where to forward predict \\
+\texttt{PORT} & Express & 5000 (Render injects) & API listen port \\
+\texttt{CLIENT\_URL} & Express & Vercel URL & CORS allow-list \\
+\texttt{CONFIDENCE\_THRESHOLD} & ML (+ Express copy) & 0.85 & Bayesian candidate flag \\
+\texttt{VITE\_API\_URL} & Client build & Render URL & Production API origin \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{What to say in the viva (30-second version)}
+
+\begin{quote}
+\emph{``When a nurse or patient submits a chief complaint, the React client POSTs JSON to our
+Express API on Render. Express doesn't run the model --- it validates the text and forwards the
+request to a separate Python FastAPI service that loads our fine-tuned BioBERT once at startup.
+The model tokenises the text to 128 tokens, runs a forward pass through twelve transformer layers,
+applies softmax over five acuity classes, and returns the predicted level, full probabilities, a
+SATS colour mapping, and a flag if confidence is below 0.85. That flag corresponds to the Bayesian
+fallback in our fusion design. Locally, both processes start with one \texttt{npm run dev}; in
+production the model weights live on the Hugging Face Hub so we don't bundle 414 megabytes in the
+API container.''}
+\end{quote}
+
+% ===========================================================================
+\section{Likely examiner questions}
+
+\begin{qabox}
+\textbf{Q: Why not run BioBERT inside Node.js?}\\
+A: The model is PyTorch + Hugging Face \texttt{transformers}. Python is the standard runtime for
+that stack. Node handles HTTP/CORS/deployment ergonomics; Python handles inference. They communicate
+over a simple REST JSON contract.
+
+\medskip
+\textbf{Q: What if the ML service crashes?}\\
+A: Express catches the connection error and returns HTTP 503 with ``ML service unavailable'' so the
+UI can show a clear message instead of hanging.
+
+\medskip
+\textbf{Q: Is the model loaded on every request?}\\
+A: No. \texttt{load\_model()} uses a module-level singleton (\texttt{\_pipeline}). FastAPI's
+lifespan loads it at startup; subsequent requests reuse the same in-memory pipeline.
+
+\medskip
+\textbf{Q: How do you know the server uses \emph{your} fine-tuned weights?}\\
+A: \texttt{MODEL\_PATH} or \texttt{MODEL\_ID} points explicitly to the fine-tuned checkpoint
+(trained on $\sim$80k merged chief complaints). The \texttt{/health} endpoint reports which source
+was loaded.
+
+\medskip
+\textbf{Q: Does the API implement TEWS or Bayesian?}\\
+A: Not in the current \texttt{/predict} endpoint --- that runs the BioBERT NLP layer and sets
+\texttt{bayesian\_candidate} when confidence is low. TEWS and Bayesian fusion are specified in the
+system design and presentation; the test page demonstrates the language model path end-to-end.
+\end{qabox}
+
+% ===========================================================================
+\section{Quick reference: sequence diagram}
+
+\begin{flowbox}
+\begin{enumerate}
+  \item User clicks \textbf{Predict} in browser.
+  \item \texttt{fetch("/api/triage/predict", \{ text \})}
+  \item Vite proxy (dev) or Vercel $\to$ Render (prod)
+  \item Express \texttt{routes/triage.js} validates \texttt{text}
+  \item Express \texttt{fetch(ML\_SERVICE\_URL + "/predict")}
+  \item FastAPI \texttt{predict\_endpoint} $\to$ \texttt{predict(text)}
+  \item BioBERT pipeline: tokenise $\to$ encode $\to$ softmax $\to$ map acuity/SATS
+  \item JSON response $\uparrow$ Express $\uparrow$ browser $\to$ UI shows level, colour, bars
+\end{enumerate}
+\end{flowbox}
+
+\vfill
+\noindent\rule{\textwidth}{0.4pt}\\[4pt]
+{\small\textcolor{mutel}{See also: \route{curatio/DEPLOYMENT.md} (deploy steps),
+\route{presentation-walkthrough.tex} (slide-by-slide defence script). Compile this file with
+\texttt{pdflatex} twice for the table of contents.}}
+
+\end{document}

@@ -2,6 +2,7 @@ import React from 'react';
 import { SlideContainer, LeadText } from '../../../components/presentation/SlideLayout';
 import MathSection from '../../../components/presentation/MathSection';
 import PlainEnglish from '../../../components/presentation/PlainEnglish';
+import InfoTooltip from '../../../components/presentation/InfoTooltip';
 import {
   BAYES_POSTERIOR,
   BAYES_ARGMAX,
@@ -22,8 +23,11 @@ const BayesianFallbackSlide = () => (
 
     <MathSection
       title="Bayes' rule — colour posterior"
+      info="bayesPosterior"
       equations={[{
         latex: BAYES_POSTERIOR,
+        label: "Bayes' rule",
+        info: 'bayesPosterior',
         explanation: (
           <p>Prior × likelihood, normalised — updates guess using hospital history + symptoms.</p>
         ),
@@ -34,8 +38,11 @@ const BayesianFallbackSlide = () => (
 
     <MathSection
       title="Decision when evidence is weak"
+      info="bayesArgmax"
       equations={[{
         latex: BAYES_ARGMAX,
+        label: 'argmax decision',
+        info: 'bayesArgmax',
         explanation: <p>Pick the colour with the highest posterior probability.</p>,
         example: bayesArgmaxExample,
       }]}
@@ -45,8 +52,11 @@ const BayesianFallbackSlide = () => (
 
     <MathSection
       title="Disease-level override"
+      info="bayesDisease"
       equations={[{
         latex: BAYES_DISEASE,
+        label: 'Disease probability',
+        info: 'bayesDisease',
         explanation: <p>Serious disease suspected → upgrade even if vitals look mild.</p>,
         example: bayesDiseaseExample,
       }]}
@@ -54,7 +64,7 @@ const BayesianFallbackSlide = () => (
       flipMinHeight={200}
     />
 
-    <PlainEnglish title="When does Bayesian run?">
+    <PlainEnglish title={<>When does Bayesian run? <InfoTooltip topic="bayesWhenRuns" /></>}>
       <ul>
         <li>Missing vitals — partial TEWS only</li>
         <li>BioBERT confidence &lt; τ (~0.85)</li>

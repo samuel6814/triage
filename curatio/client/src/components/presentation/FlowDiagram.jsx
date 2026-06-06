@@ -1,5 +1,7 @@
+import React from 'react';
 import styled from 'styled-components';
 import { SATS_COLORS } from './satsColors';
+import InfoTooltip from './InfoTooltip';
 
 const DiagramWrap = styled.div`
   width: 100%;
@@ -156,34 +158,76 @@ export const VoiceStepsDiagram = () => (
   </DiagramWrap>
 );
 
-export const BioBERTFlowDiagram = () => (
-  <DiagramWrap>
-    <Svg viewBox="0 0 620 80" width="620" height="80">
-      <defs>
-        <marker id="arrowhead5" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-          <polygon points="0 0, 8 3, 0 6" fill="#64748b" />
-        </marker>
-      </defs>
-      {[
-        { x: 10, label: 'Text', sub: 'chief complaint' },
-        { x: 120, label: 'Tokens', sub: '128 max' },
-        { x: 230, label: 'Encoder', sub: '12 layers' },
-        { x: 340, label: '[CLS]', sub: '768-dim' },
-        { x: 450, label: 'Softmax', sub: '5 levels' },
-      ].map((step, i, arr) => (
-        <g key={step.label}>
-          <Box x={step.x} y={18} w={95} h={44} label={step.label} sublabel={step.sub} />
-          {i < arr.length - 1 && (
-            <line
-              x1={step.x + 95} y1={40} x2={arr[i + 1].x} y2={40}
-              stroke="#64748b" strokeWidth={1.5} markerEnd="url(#arrowhead5)"
-            />
-          )}
-        </g>
-      ))}
-    </Svg>
-  </DiagramWrap>
-);
+const FlowStepsRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  padding: 0.5rem 0;
+`;
+
+const FlowStepBox = styled.div`
+  min-width: 95px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1.5px solid #166534;
+  background: #f0fdf4;
+  text-align: center;
+
+  .label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .sub {
+    margin-top: 2px;
+    font-size: 0.62rem;
+    color: #64748b;
+  }
+`;
+
+const FlowStepArrow = styled.span`
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+`;
+
+export const BioBERTFlowDiagram = () => {
+  const steps = [
+    { label: 'Text', sub: 'chief complaint', info: 'chiefComplaint' },
+    { label: 'Tokens', sub: '128 max', info: 'tokens128' },
+    { label: 'Encoder', sub: '12 layers', info: 'encoderLayers' },
+    { label: '[CLS]', sub: '768-dim', info: 'cls768' },
+    { label: 'Softmax', sub: '5 levels', info: 'acuityFiveLevels' },
+  ];
+
+  return (
+    <DiagramWrap>
+      <FlowStepsRow>
+        {steps.map((step, i) => (
+          <React.Fragment key={step.label}>
+            <FlowStepBox>
+              <div className="label">
+                {step.label}
+                <InfoTooltip topic={step.info} />
+              </div>
+              <div className="sub">{step.sub}</div>
+            </FlowStepBox>
+            {i < steps.length - 1 && <FlowStepArrow aria-hidden="true">→</FlowStepArrow>}
+          </React.Fragment>
+        ))}
+      </FlowStepsRow>
+    </DiagramWrap>
+  );
+};
 
 /** Step 1 — patient enters symptoms as audio OR typed text */
 export const PatientInputForkDiagram = () => (

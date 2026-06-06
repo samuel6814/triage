@@ -2,6 +2,7 @@ import React from 'react';
 import { SlideContainer, LeadText } from '../../../components/presentation/SlideLayout';
 import DataTable from '../../../components/presentation/DataTable';
 import PlainEnglish from '../../../components/presentation/PlainEnglish';
+import InfoTooltip from '../../../components/presentation/InfoTooltip';
 import {
   datasetSizes,
   acuityDistribution,
@@ -18,7 +19,7 @@ const DataExplorationSlide = () => (
 
     <DataTable
       columns={[
-        { key: 'dataset', label: 'Dataset' },
+        { key: 'dataset', label: <>Dataset <InfoTooltip topic="datasetRoles" /></> },
         { key: 'rows', label: 'Rows' },
         { key: 'role', label: 'Role' },
       ]}
@@ -27,7 +28,7 @@ const DataExplorationSlide = () => (
 
     <DataTable
       columns={[
-        { key: 'level', label: 'Acuity level' },
+        { key: 'level', label: <>Acuity level <InfoTooltip topic="acuityDistribution" /></> },
         { key: 'count', label: 'Count (train)' },
         { key: 'pct', label: '% of train' },
       ]}
@@ -47,8 +48,8 @@ const DataExplorationSlide = () => (
 
     <PlainEnglish title="Key findings">
       <ul>
-        <li>{confidenceStats.fullConfidencePct}% of predictions have confidence 1.0</li>
-        <li>{confidenceStats.partialConfidenceCount.toLocaleString()} rows have confidence between 0.6 and 0.99 — candidates for Bayesian fallback</li>
+        <li>{confidenceStats.fullConfidencePct}% of predictions have confidence 1.0 <InfoTooltip topic="confidence100" /></li>
+        <li>{confidenceStats.partialConfidenceCount.toLocaleString()} rows have confidence between 0.6 and 0.99 — candidates for Bayesian fallback <InfoTooltip topic="bayesianCandidates" /></li>
         <li>Fine-tuning bridges PubMed English to real hospital chief-complaint phrasing</li>
         <li>Limitation: some urgent cases can be overconfidently misclassified — fusion with TEWS/Bayesian mitigates this</li>
       </ul>
