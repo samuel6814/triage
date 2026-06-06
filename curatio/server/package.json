@@ -2,6 +2,9 @@
   "name": "curatio-server",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "concurrently -n api,ml -c green,blue \"nodemon index.js\" \"cd ml && ../.venv/bin/python -m uvicorn app:app --reload --host 127.0.0.1 --port 8001\"",

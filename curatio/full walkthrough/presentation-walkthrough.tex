@@ -1,0 +1,963 @@
+% ============================================================================
+%  Curatio — Full Presentation Walkthrough & Speaker Script
+%  Compile with:  pdflatex "presentation-walkthrough.tex"  (run twice for TOC)
+%  Needs: amsmath, amssymb, xcolor, tcolorbox, enumitem, booktabs, hyperref
+% ============================================================================
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+% ---- Theme colours (match the Curatio app) --------------------------------
+\definecolor{forest}{HTML}{166534}
+\definecolor{vibrant}{HTML}{22C55E}
+\definecolor{deepforest}{HTML}{064E3B}
+\definecolor{slate}{HTML}{1E293B}
+\definecolor{mutel}{HTML}{475569}
+\definecolor{sand}{HTML}{F4F7F5}
+\definecolor{satRed}{HTML}{DC143C}
+\definecolor{satOrange}{HTML}{FF8C00}
+\definecolor{satYellow}{HTML}{D4A500}
+\definecolor{satGreen}{HTML}{228B22}
+\definecolor{satBlue}{HTML}{1E90FF}
+
+\hypersetup{linkcolor=forest, urlcolor=forest, citecolor=forest}
+
+% ---- Section styling -------------------------------------------------------
+\titleformat{\section}{\Large\bfseries\color{forest}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{deepforest}}{\thesubsection}{0.6em}{}
+\setlist{nosep, leftmargin=1.4em, topsep=2pt}
+
+% ---- Coloured callout boxes ------------------------------------------------
+\newtcolorbox{saybox}{
+  enhanced, breakable, colback=forest!6, colframe=forest,
+  boxrule=0.8pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\color{white}, coltitle=white,
+  title={SAY THIS}, attach title to upper={\par\medskip}}
+
+\newtcolorbox{onscreen}{
+  enhanced, breakable, colback=slate!4, colframe=slate!55,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=slate,
+  title={ON SCREEN}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{idea}{
+  enhanced, breakable, colback=vibrant!7, colframe=vibrant!70!black,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=forest,
+  title={THE IDEA (so you understand it)}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{demo}{
+  enhanced, breakable, colback=satOrange!8, colframe=satOrange!85!black,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=satOrange!60!black,
+  title={LIVE DEMO --- flip the card}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{qabox}{
+  enhanced, breakable, colback=slate!5, colframe=deepforest,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=deepforest,
+  title={LIKELY QUESTIONS}, attach title to upper={\par\smallskip}}
+
+% Inline coloured SATS chips
+\newcommand{\chip}[2]{\textcolor{#1}{\textbf{#2}}}
+\newcommand{\transition}[1]{\medskip\noindent\textit{\textcolor{mutel}{Transition: #1}}\medskip}
+\newcommand{\route}[1]{{\small\texttt{\textcolor{mutel}{#1}}}}
+
+% Slide header helper:  \slide{n}{title}{route}
+\newcommand{\slide}[3]{%
+  \subsection{Slide #1 --- #2}%
+  \noindent\route{Route: #3}\par\smallskip}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{forest}{Curatio}}
+\fancyhead[R]{\small\textcolor{mutel}{Presentation Walkthrough \& Speaker Script}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ============================================================================
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+{\Huge\bfseries\color{forest} Curatio}\\[0.4cm]
+{\LARGE\bfseries A Hospital Triage Chatbot for Colour-Coded Clinical Pathways}\\[1cm]
+{\Large\itshape Full Presentation Walkthrough \&\ Speaker Script}\\[0.6cm]
+{\large What every slide shows, what it means, and \textbf{exactly what to say}.}\\[2cm]
+{\large Final Year Project}\\[0.3cm]
+{\large \today}\\[2cm]
+\begin{tcolorbox}[width=0.85\textwidth, colback=sand, colframe=forest, arc=4pt]
+\small\centering
+This document mirrors the live web presentation at \texttt{/dashboard}. Each section matches one
+slide \emph{in click order}. Read the \textbf{SAY THIS} boxes aloud (or paraphrase) and follow the
+\textbf{LIVE DEMO} cues to flip the interactive formula cards on screen.
+\end{tcolorbox}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ===========================================================================
+\section{How to use this script}
+
+\begin{itemize}
+  \item \textbf{Structure.} There are \textbf{17 slides} in the live app, in a fixed click order.
+        This document has one subsection per slide, in that same order.
+  \item \textbf{The coloured boxes.}
+    \begin{itemize}
+      \item \textbf{ON SCREEN} --- what the audience is looking at, so you can point at it.
+      \item \textbf{THE IDEA} --- the concept in plain terms, so \emph{you} fully understand it.
+      \item \textbf{SAY THIS} --- a natural spoken script. Read it or make it your own.
+      \item \textbf{LIVE DEMO} --- when to click a ``flip / See worked example'' card on the slide.
+      \item \textbf{LIKELY QUESTIONS} --- what an examiner may ask, with a ready answer.
+    \end{itemize}
+  \item \textbf{Golden rule.} You do not need to recite formulas. Your job is to explain
+        \emph{what each formula does} and \emph{why it makes the system safer}. The maths is on the
+        screen as evidence of rigour.
+\end{itemize}
+
+\subsection*{Pre-flight checklist (5 minutes before you start)}
+\begin{enumerate}
+  \item Start the app and open the home page; click \textbf{Presentation} to land on \route{/dashboard}.
+  \item Confirm the formula \emph{flip cards} animate when clicked (test one).
+  \item Have the \textbf{Test Model} page (\route{/test}) open in a second tab in case you want a live prediction.
+  \item Full-screen the browser; hide the bookmarks bar.
+\end{enumerate}
+
+\subsection*{Suggested timing (about 12--15 minutes)}
+\begin{itemize}
+  \item Foundations (slides 1--2): 2 min.
+  \item The 5-step pipeline (slides 3--10): 6--7 min.
+  \item Parallel safety branches \&\ deep maths (slides 11--15): 3--4 min.
+  \item Worked example + Red protocol + close (slides 16--17): 2 min.
+\end{itemize}
+
+% ===========================================================================
+\section{The 60-second big picture (memorise this)}
+
+\begin{idea}
+Curatio is a \textbf{chatbot that triages patients}. A patient describes their symptoms (by typing or
+by voice). The system reads that, optionally reads their vital signs, and outputs a \textbf{single SATS
+colour} --- Red, Orange, Yellow, Green or Blue --- that tells the hospital \emph{how fast} the patient
+must be seen and \emph{which department} they go to. It is built and validated around
+\textbf{Komfo Anokye Teaching Hospital (KATH)} in Kumasi, Ghana.
+\end{idea}
+
+\noindent The decision is produced by \textbf{four cooperating layers}, which the formal model writes as one
+``session state'':
+\[
+\mathbf{S}_s = (X,\; \mathbf{D},\; T,\; \mathbf{P},\; C,\; \text{flags})
+\]
+\[
+\mathbf{D} = f_{\mathrm{NLP}}(X),\quad
+T = f_{\mathrm{TEWS}}(\mathbf{v}),\quad
+\mathbf{P} = f_{\mathrm{Bayes}}(E),\quad
+C = f_{\mathrm{fusion}}(\mathbf{D}, T, \mathbf{P})
+\]
+
+\begin{itemize}
+  \item $X$ --- the patient's complaint as English text.
+  \item $\mathbf{D} = f_{\mathrm{NLP}}(X)$ --- \textbf{BioBERT} reads the language and estimates urgency.
+  \item $T = f_{\mathrm{TEWS}}(\mathbf{v})$ --- a deterministic \textbf{vital-signs} score (no AI).
+  \item $\mathbf{P} = f_{\mathrm{Bayes}}(E)$ --- a \textbf{Bayesian} fallback for when data is missing or uncertain.
+  \item $C = f_{\mathrm{fusion}}(\dots)$ --- a \textbf{fusion} step that combines everything into the final colour, always erring on the side of caution.
+\end{itemize}
+
+\begin{saybox}
+``Curatio is an AI triage assistant. A patient tells our chatbot what's wrong --- in text or in their
+own language by voice --- and Curatio turns that into a colour-coded urgency level that routes them to
+the right part of the hospital. Under the hood it combines four layers: a fine-tuned medical language
+model called BioBERT, a vital-signs score called TEWS, a Bayesian fallback for uncertainty, and a
+fusion rule that always picks the \emph{safer} answer when those layers disagree. We built it for the
+South African Triage Scale as used at Komfo Anokye Teaching Hospital in Kumasi.''
+\end{saybox}
+
+\subsection*{Opening lines (use these to start)}
+\begin{saybox}
+``Good [morning/afternoon] everyone. Emergency departments are overwhelmed, and the first, most critical
+decision is \emph{triage} --- deciding who is seen first. My project, \textbf{Curatio}, is a chatbot that
+performs that first triage step automatically and explainably. Over the next few minutes I'll walk you
+through exactly how a patient's words become a safe, colour-coded clinical decision. Let's start with
+what triage actually is.''
+\end{saybox}
+
+% ===========================================================================
+\section{Part I --- Foundations}
+
+% ---------------------------------------------------------------------------
+\slide{1}{What is Triage?}{/dashboard}
+
+\begin{onscreen}
+A lead paragraph defining triage; an \emph{urgency bar}; and a table of the five SATS colours with their
+target times and clinical meaning; plus a ``plain English'' traffic-light analogy.
+\end{onscreen}
+
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Colour} & \textbf{Target time} & \textbf{Clinical meaning}\\
+\midrule
+\chip{satRed}{Red}       & 0 min      & Immediate resuscitation --- life-threatening\\
+\chip{satOrange}{Orange} & $<$ 10 min & Very urgent --- high dependency\\
+\chip{satYellow}{Yellow} & $<$ 60 min & Urgent --- needs physician review\\
+\chip{satGreen}{Green}   & $<$ 4 hours& Non-urgent --- routine care\\
+\chip{satBlue}{Blue}     & $<$ 2 hours& Deceased on arrival --- dignity protocol\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}
+Triage = sorting patients by \emph{urgency}, not by arrival order, so the sickest are seen first. SATS
+(South African Triage Scale) is a validated, widely-used colour system. It is the clinical standard our
+whole system speaks in.
+\end{idea}
+
+\begin{saybox}
+``Triage is the process of sorting patients by clinical urgency, so the sickest are seen first --- not
+just whoever arrived first. We use the \textbf{South African Triage Scale}, which has been validated at
+Komfo Anokye Teaching Hospital. Think of it as a traffic light for the emergency department: each colour
+tells staff how quickly a patient must be seen and which area they go to. \chip{satRed}{Red} means
+resuscitate \emph{now}; \chip{satOrange}{Orange}, within ten minutes; \chip{satYellow}{Yellow}, within an
+hour; \chip{satGreen}{Green}, routine care. Importantly, this is a \emph{decision-support} tool --- it
+supports clinical staff, it does not replace their judgment.''
+\end{saybox}
+
+\transition{``So those are the colours. The next question is: what does each colour actually \emph{do} inside a Ghanaian hospital?''}
+
+% ---------------------------------------------------------------------------
+\slide{2}{Colour $\rightarrow$ Pathways $\rightarrow$ Departments}{/dashboard/pathways}
+
+\begin{onscreen}
+A flow diagram from colour to pathway, and a table mapping each colour to a Ghana destination and the
+automated ``system action''.
+\end{onscreen}
+
+\begin{center}\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Colour} & \textbf{Pathway} & \textbf{Ghana destination} & \textbf{System action}\\
+\midrule
+\chip{satRed}{Red}       & RED Protocol    & Resuscitation Room       & Code Red; bypass registration \& payment\\
+\chip{satOrange}{Orange} & ORANGE Protocol & Majors (ED)              & 10-min countdown; cardiology alert\\
+\chip{satYellow}{Yellow} & YELLOW Protocol & Majors (ED)              & Standing orders (e.g.\ malaria test)\\
+\chip{satGreen}{Green}   & GREEN Protocol  & Minors / OPD / Polyclinic& Divert non-urgent cases from the ER\\
+\chip{satBlue}{Blue}     & BLUE Protocol   & Mortuary                 & Silent dignity protocol; notify social workers\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}
+The colour is not just a label --- it triggers a concrete \emph{workflow}: where the patient physically
+goes, and what the system does automatically (alarms, countdowns, diverting non-urgent patients away
+from the ER to reduce congestion).
+\end{idea}
+
+\begin{saybox}
+``Each colour maps to a real clinical pathway and a specific department. A \chip{satRed}{Red} patient
+triggers a Code Red and is rushed to the Resuscitation Room --- they even bypass registration and
+payment, because seconds matter. \chip{satOrange}{Orange} starts a ten-minute countdown and alerts
+cardiology. \chip{satYellow}{Yellow} patients wait in Majors but can have standing orders started, like a
+malaria test, so no time is wasted. And critically, \chip{satGreen}{Green} patients are diverted to the
+outpatient or polyclinic queue --- this is how Curatio reduces overcrowding in the emergency room.
+Curatio performs this routing automatically based on the colour it assigns.''
+\end{saybox}
+
+\transition{``Now that you know the outputs, let me show you how a patient actually enters the system.''}
+
+% ===========================================================================
+\section{Part II --- The five-step pipeline}
+
+\begin{idea}
+Slides 3--10 follow one patient through the pipeline: \textbf{(1) input $\rightarrow$ (2) text example
+$\rightarrow$ (3) voice $\rightarrow$ (4) BioBERT $\rightarrow$ (5) fusion}. A progress stepper at the top
+of each slide shows where you are. Keep saying ``Step $n$ of 5'' so the audience never gets lost.
+\end{idea}
+
+% ---------------------------------------------------------------------------
+\slide{3}{How Data Enters the System (Step 1 of 5)}{/dashboard/pipeline/input}
+
+\begin{onscreen}
+A ``Step 1 of 5'' badge, the pipeline stepper, a fork diagram (\emph{typed text} vs \emph{voice note}),
+and a roadmap of the whole journey.
+\end{onscreen}
+
+\begin{idea}
+There are two ways a patient can give input --- \textbf{typing} or \textbf{voice} --- but both converge
+into the same downstream pipeline. Voice matters because patients in Ghana may speak Twi or another local
+language, not English.
+\end{idea}
+
+\begin{saybox}
+``Every triage session begins with the patient describing their symptoms to our chatbot. They can do this
+in two ways: they can \textbf{type} a message --- for example, `I have chest pain' --- or they can send a
+\textbf{voice note}, often in Twi or another local Ghanaian language. Two ways in, but one shared pipeline
+afterwards. Over the next slides we'll follow that path: a text example, then the speech-and-translation
+step, then our BioBERT model, then fusion into a final colour. Vital signs and the Bayesian fallback join
+later, at the fusion stage.''
+\end{saybox}
+
+\transition{``Let's look at what the simplest case --- typed text --- actually looks like to the system.''}
+
+% ---------------------------------------------------------------------------
+\slide{4}{Example Text Input (Step 2 of 5)}{/dashboard/pipeline/text-example}
+
+\begin{onscreen}
+A chat mock-up showing the message \texttt{``thunderclap headache, worsening with movement''}; the raw
+JSON the system stores; and the nurse's ground-truth label: \chip{satOrange}{Acuity Level 2 --- Highly urgent}.
+\end{onscreen}
+
+\begin{idea}
+When a patient types, the message is stored verbatim as raw text and becomes the model input we call
+\textbf{Text $X$} (capped at 128 tokens). This example is a \emph{real row} from our training data, which
+makes the demo credible.
+\end{idea}
+
+\begin{saybox}
+``If the patient types, we store their message directly as raw text. Here's a real example from our
+dataset: `thunderclap headache, worsening with movement.' A `thunderclap' headache is a classic red-flag
+phrase for a possible brain bleed, so the nurse ground-truth label here is \chip{satOrange}{Level 2,
+highly urgent}. This text becomes what we call \textbf{Text X} --- the input to our model, limited to 128
+tokens. If the patient had used voice instead, we'd first need to transcribe and translate it, which is
+the very next step.''
+\end{saybox}
+
+\transition{``So what happens when the input isn't clean English text, but a voice note in Twi?''}
+
+% ---------------------------------------------------------------------------
+\slide{5}{Speech \& Translation (Step 3 of 5)}{/dashboard/pipeline/voice}
+
+\begin{onscreen}
+The audio$\rightarrow$translate diagram and a math card for the voice pipeline, with a
+\textbf{``See worked example''} flip button. Two ``walkthrough'' chips contrast the typed path vs the voice path.
+\end{onscreen}
+
+\[
+X = g_{\mathrm{trans}}\!\bigl(g_{\mathrm{ASR}}(\text{audio})\bigr)
+\]
+
+\begin{idea}
+Read the formula \emph{inside-out}: take the audio, run \textbf{ASR} (automatic speech recognition,
+$g_{\mathrm{ASR}}$) to get words, then run \textbf{translation} ($g_{\mathrm{trans}}$) into medical
+English. The result is the same $X$ that typed text produces. BioBERT only understands English, so this
+step is what makes the system usable for non-English speakers.
+\end{idea}
+
+\begin{demo}
+Click \textbf{``See worked example''} on the voice formula. It shows patient TG-001 saying a Twi phrase,
+$g_{\mathrm{ASR}}$ transcribing it to Twi text, $g_{\mathrm{trans}}$ translating it to ``I have chest pain,
+I feel unwell'', and that English string becoming $X$.
+\end{demo}
+
+\begin{saybox}
+``If the patient sends audio, we transcribe and translate it. Read the formula from the inside out: the
+audio goes through $g_{\mathrm{ASR}}$ --- speech-to-text, basically ears writing the words down --- and
+then through $g_{\mathrm{trans}}$, a medical interpreter that converts the local language into English.
+The output is exactly the same Text $X$ that a typed message produces. [\emph{Flip the card}.] Here a
+patient speaks in Twi, we transcribe it, translate it to `I have chest pain, I feel unwell', and that
+becomes $X$. The key point: BioBERT only reads English, so everyone's input is normalised to English
+before it reaches the model.''
+\end{saybox}
+
+\transition{``Now both paths have produced Text X. This is where the intelligence happens --- our fine-tuned BioBERT.''}
+
+% ---------------------------------------------------------------------------
+\slide{6}{Fine-Tuned BioBERT Layer (Step 4 of 5)}{/dashboard/pipeline/biobert}
+
+\begin{onscreen}
+A BioBERT flow diagram and three flip-cards (the NLP chain, the softmax, and the confidence gate), plus a
+table mapping predicted acuity to SATS colour.
+\end{onscreen}
+
+\begin{align*}
+&X \xrightarrow{\tau} (t_i) \xrightarrow{E} H^{(0)} \xrightarrow{L\times} H^{(L)} \xrightarrow{\text{head}} \hat{\mathbf{y}} \\[4pt]
+&\hat{\mathbf{y}} = \mathrm{softmax}(W h_{\mathrm{[CLS]}} + \mathbf{b}),\qquad \hat{y}_c = P(\text{acuity}=c\mid X)\\[4pt]
+&\text{confidence} = \max_c \hat{y}_c,\quad \text{if confidence} < \tau \Rightarrow \text{Bayesian fallback}
+\end{align*}
+
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Predicted acuity} & \textbf{SATS colour} & \textbf{Meaning}\\
+\midrule
+Level 1--2 & \chip{satRed}{Red} / \chip{satOrange}{Orange} & Highly urgent symptoms\\
+Level 3    & \chip{satYellow}{Yellow}                     & Moderate urgency\\
+Level 4--5 & \chip{satGreen}{Green}                       & Non-urgent / routine\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}
+BioBERT is a language model \emph{pre-trained on biomedical text} (PubMed), which we then \emph{fine-tuned}
+on our triage data. It reads Text $X$ and outputs five probabilities $\hat{\mathbf{y}}$ --- one per acuity
+level. The biggest one wins, and its value is the \textbf{confidence}. If confidence is below a threshold
+$\tau \approx 0.85$, we don't blindly trust it --- we flag it for the Bayesian fallback.
+\end{idea}
+
+\begin{demo}
+Flip the three cards in turn: (1) the NLP chain shows ``thunderclap headache'' tokenised and classified to
+Level 2 with $\hat{\mathbf{y}} = [0.01, 0.94, 0.03, 0.01, 0.01]$; (2) the softmax card shows those numbers
+as percentages (94\% on Level 2); (3) the confidence card shows a high-confidence pass (0.94) vs a
+borderline glaucoma case at 0.854 that gets flagged.
+\end{demo}
+
+\begin{saybox}
+``Now the intelligence. Text $X$ passes through our fine-tuned BioBERT. BioBERT is a language model that
+was pre-trained on millions of medical abstracts, so it already understands clinical English. We then
+fine-tuned it on our own triage data so it learned \emph{our hospital's phrasing}. It answers one
+question: `how urgent does this sound?' [\emph{Flip card 1}] The text is broken into tokens, passed
+through twelve layers, and classified --- here `thunderclap headache' comes out as Level 2 with 94\%
+probability. [\emph{Flip card 2}] The softmax just turns the raw scores into percentages that add up to
+100\%; the highest wins. [\emph{Flip card 3}] And this is the safety valve: we take the confidence ---
+the highest probability --- and if it's below about 0.85, we don't trust BioBERT alone; we flag the case
+for our Bayesian fallback. That predicted level then maps to a SATS colour, and goes to fusion in Step 5.''
+\end{saybox}
+
+\begin{qabox}
+\textit{``Why BioBERT and not regular BERT or ChatGPT?''} --- BioBERT is pre-trained on biomedical
+literature, so it understands clinical terminology far better than general BERT, and unlike a large
+hosted LLM it is small, runs locally/offline, is deterministic, and is auditable --- all important for a
+hospital in a low-connectivity setting.
+\end{qabox}
+
+\transition{``Let me open the hood for one slide and show what `passes through BioBERT' actually means mathematically.''}
+
+% ---------------------------------------------------------------------------
+\slide{7}{BioBERT: Inside the Model}{/dashboard/math/biobert-inference}
+
+\begin{onscreen}
+Four math cards for one forward pass: input embedding, self-attention, the transformer layer ($\times 12$),
+and the [CLS] summary + classify. Each flips to a worked example on ``crushing chest pain''.
+\end{onscreen}
+
+\begin{align*}
+&\textbf{Embed: } && E(t_i) = E_{\text{word}}(t_i) + E_{\text{pos}}(i) + E_{\text{seg}}(t_i)\\
+&\textbf{Attention: } && \mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\Bigl(\tfrac{QK^\top}{\sqrt{d_k}}\Bigr)V\\
+&\textbf{Summarise: } && h_{\mathrm{[CLS]}} = H^{(L)}_{1,:}\in\mathbb{R}^{768}
+\end{align*}
+
+\begin{idea}
+This slide is for the technically curious examiner. The story in four beats: \textbf{(1) Embedding} turns
+each word into a vector that also encodes its position; \textbf{(2) Self-attention} lets the model weigh
+which words matter --- clinical words like ``crushing'' and ``chest'' get high weight, filler words like
+``the'' get almost none; \textbf{(3)} this repeats through \textbf{12 transformer layers}; \textbf{(4)} a
+special \texttt{[CLS]} token collects a 768-number summary of the whole sentence, which the classifier
+reads to produce the urgency.
+\end{idea}
+
+\begin{demo}
+Flip the \textbf{self-attention} card --- it shows that for ``crushing chest pain'', attention weights are
+\texttt{crushing}=0.38, \texttt{chest}=0.35, \texttt{pain}=0.22, and filler words $<0.05$. This is the
+most intuitive one to show.
+\end{demo}
+
+\begin{saybox}
+``For those who want the detail, here's what actually happens inside. First, each word becomes a vector
+that also remembers its position in the sentence. Then comes the key mechanism --- \textbf{self-attention}
+--- where the model decides which words matter most. [\emph{Flip the attention card}.] Look: for `crushing
+chest pain', the model puts almost all its weight on the clinical words --- crushing, chest, pain --- and
+basically ignores filler words. That happens twelve times, in twelve layers, each one building a deeper
+understanding. Finally, a special summary token called \texttt{[CLS]} compresses the whole sentence into
+768 numbers, and that summary --- not the individual words --- is what the classifier reads to decide
+urgency. So it's really one forward pass: read the sentence, summarise it, output an urgency percentage.''
+\end{saybox}
+
+\transition{``That's how it thinks. The natural next question is: how did it \emph{learn} to think that way?''}
+
+% ---------------------------------------------------------------------------
+\slide{8}{BioBERT: How It Was Trained}{/dashboard/math/biobert-training}
+
+\begin{onscreen}
+Two loss cards (pre-training MLM loss, fine-tuning cross-entropy loss), a hyper-parameter table, a 4-box
+training-loop diagram, and a note that vitals were excluded.
+\end{onscreen}
+
+\[
+\mathcal{L}_{\mathrm{MLM}} = -\!\!\sum_{i\in\mathcal{M}}\!\log P(t_i\mid H^{(L)};\theta)
+\qquad\qquad
+\mathcal{L} = -\sum_{i=1}^{N}\log P(y_i\mid X_i;\theta)
+\]
+
+\begin{center}\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Hyper-parameter} & \textbf{Value}\\
+\midrule
+Base model    & \texttt{Yuvrajxms09/biobert-triage-classifier}\\
+Merge         & \texttt{train.csv} $\bowtie$ \texttt{chief\_complaints.csv} ($\sim$80k rows)\\
+Epochs        & 3 (13{,}500 steps)\\
+Best \texttt{eval\_loss} & 0.001812\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}
+Two stages. \textbf{Pre-training} is ``fill-in-the-blank'' on PubMed --- the MLM loss rewards the model
+for guessing a masked word like ``chest'' from context; this is how it learned medical English in general.
+\textbf{Fine-tuning} is our part: we minimise the cross-entropy loss $\mathcal{L}$ between the model's
+predicted acuity and the \emph{nurse's} label across 80k complaints. The training loop is just:
+\emph{forward $\rightarrow$ measure loss $\rightarrow$ back-propagate $\rightarrow$ repeat} for 3 epochs.
+We deliberately trained on \emph{language only}, no vitals.
+\end{idea}
+
+\begin{demo}
+Flip the fine-tuning card: one row --- ``contraception advice, intermittent'', nurse label Level 5 ---
+the model predicts Level 5 at 97\%, so the loss it adds is $-\log(0.97)\approx0.03$, a tiny error.
+\end{demo}
+
+\begin{saybox}
+``How did BioBERT learn? In two stages. First, \textbf{pre-training}: before we ever touched it, it was
+trained to fill in blanks in medical sentences --- given `the patient presented with severe blank pain',
+predict `chest'. After millions of these, it understands medical language. Then \textbf{we fine-tuned} it
+on our task: for 80,000 real chief complaints, it guessed an acuity level, we compared it to the nurse's
+label, and we nudged the weights to reduce the error. [\emph{Flip the card}.] For instance, for
+`contraception advice' the nurse said Level 5, the model said Level 5 at 97\% confidence, so the error is
+tiny. We ran this for three epochs and the validation loss dropped to about 0.0018. One deliberate choice:
+we trained on \emph{language alone} --- no vital signs --- so the model learns urgency purely from how the
+complaint is phrased. The vitals come in separately, which keeps the two signals independent.''
+\end{saybox}
+
+\transition{``So how well does it actually do at scale? Let me show you the data and the findings.''}
+
+% ---------------------------------------------------------------------------
+\slide{9}{Data Exploration \& Findings}{/dashboard/math/data-exploration}
+
+\begin{onscreen}
+Three tables --- dataset sizes, the acuity distribution of the training set, and example predictions ---
+plus a ``key findings'' list.
+\end{onscreen}
+
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Dataset} & \textbf{Rows} & \textbf{Role}\\
+\midrule
+\texttt{train.csv} & 80{,}000 & Labels + vitals (80k acuity labels)\\
+\texttt{test.csv} & 20{,}000 & Held-out evaluation (no labels)\\
+\texttt{chief\_complaints.csv} & 100{,}000 & Raw symptom text input\\
+\texttt{triage\_predictions\_results.csv} & 100{,}000 & Model inference output\\
+\bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Acuity} & \textbf{Count} & \textbf{\%}\\
+\midrule
+Level 1 & 3{,}222  & 4.0\%\\
+Level 2 & 13{,}439 & 16.8\%\\
+Level 3 & 28{,}921 & 36.2\%\\
+Level 4 & 23{,}020 & 28.8\%\\
+Level 5 & 11{,}398 & 14.2\%\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}
+We worked with about 100k records. The acuity distribution is realistic --- most patients are
+mid-urgency (Level 3), few are critical (Level 1). Two headline findings: \textbf{99.6\%} of predictions
+come out at full confidence (1.0), and \textbf{361} rows sit in the uncertain 0.6--0.99 band --- those are
+exactly the cases the Bayesian fallback exists for. Be honest about the limitation: a model this confident
+can occasionally be \emph{confidently wrong}, which is precisely why fusion with TEWS and Bayesian exists.
+\end{idea}
+
+\begin{saybox}
+``We trained and evaluated on roughly 100,000 patient records. The distribution is clinically realistic
+--- about a third are Level 3, moderate urgency, and only 4\% are the most critical Level 1. Two findings
+stand out. First, 99.6\% of our predictions come out at full confidence. Second --- and more interesting
+--- 361 rows land in a borderline confidence band; for example, two glaucoma complaints at around 0.85.
+Those are the cases we hand to the Bayesian fallback rather than trusting blindly. And I want to be honest
+about the limitation: a very confident model can sometimes be confidently \emph{wrong}, especially on
+rare phrasings. That's the whole reason the next layers --- vitals and Bayesian --- exist: to catch what
+the language model alone might miss.''
+\end{saybox}
+
+\transition{``Which brings us to the heart of the system: fusion --- how we combine the language model with everything else.''}
+
+% ---------------------------------------------------------------------------
+\slide{10}{Fusion $\rightarrow$ Triage Colour (Step 5 of 5)}{/dashboard/pipeline/fusion}
+
+\begin{onscreen}
+The fusion pipeline diagram, the master fusion-function card (flippable), and an example output chip
+\chip{satOrange}{C = Orange $\rightarrow$ Majors (ED)}.
+\end{onscreen}
+
+\[
+C = f_{\mathrm{fusion}}(\mathbf{D},\, T,\, \mathbf{P},\; \text{flags})
+\]
+
+\begin{idea}
+Fusion is the master controller. The single most important sentence on this slide: \textbf{fusion is a
+safety checklist, not an average}. When the layers disagree, it always takes the \emph{more urgent}
+signal. So a strong language signal can override mild vitals --- the system fails safe.
+\end{idea}
+
+\begin{demo}
+Flip the fusion card: a chest-pain patient where BioBERT says Orange (94\%), TEWS says only Yellow ($T=4$),
+and Bayesian says Orange ($P=0.89$) --- fusion outputs \chip{satOrange}{Orange}, because symptoms beat
+mild vitals.
+\end{demo}
+
+\begin{saybox}
+``This is the heart of the system. Fusion takes the three signals --- BioBERT's language reading, the
+TEWS vitals score, and the Bayesian estimate --- and combines them into one final colour $C$. The crucial
+thing to understand is that fusion is \textbf{not an average} --- it's a \textbf{safety checklist}. When
+the layers disagree, it always picks the \emph{more urgent} answer. [\emph{Flip the card}.] Here's a
+chest-pain patient: the language model says Orange, but the vitals alone only say Yellow. A naive average
+would split the difference and under-triage them. Fusion instead enforces Orange --- the safer call ---
+and sends them to Majors with a cardiology alert. The next few slides show the two parallel branches that
+feed this fusion step: the vitals score, and the Bayesian fallback.''
+\end{saybox}
+
+\transition{``Let's look at the first parallel branch --- turning vital signs into a number.''}
+
+% ===========================================================================
+\section{Part III --- The parallel safety branches \& the deep maths}
+
+% ---------------------------------------------------------------------------
+\slide{11}{Parallel Path: Vitals $\rightarrow$ TEWS}{/dashboard/pipeline/tews}
+
+\begin{onscreen}
+Three flip-cards (TEWS summation, colour-from-vitals lookup, a numeric example) and a band table mapping
+$T$ to a colour.
+\end{onscreen}
+
+\[
+T = f_{\mathrm{TEWS}}(\mathbf{v}) = \sum_{k=1}^{6} w_k\, f_k(v_k),\qquad w_k = 1
+\qquad\qquad
+C_{\mathrm{TEWS}}(T)=\begin{cases}
+\text{Red} & T>7\\ \text{Orange} & 5\le T\le 6\\ \text{Yellow} & 3\le T\le 4\\ \text{Green} & T\le 2
+\end{cases}
+\]
+
+\begin{idea}
+TEWS = Triage Early Warning Score. It's \textbf{pure arithmetic, no AI}: six vital signs (heart rate,
+respiratory rate, mobility, temperature, consciousness/AVPU, trauma) each score points; you add them up to
+get $T$; $T$ maps to a colour band. Because it's deterministic, it's fully auditable --- every point
+traces to a clinical table.
+\end{idea}
+
+\begin{demo}
+Flip the cards for our running patient: HR\,=\,125 scores 2, RR\,=\,26 scores 2, everything else 0, so
+$T=4$ $\rightarrow$ \chip{satYellow}{Yellow} from vitals alone.
+\end{demo}
+
+\begin{saybox}
+``The first parallel branch is vital signs. We use TEWS --- the Triage Early Warning Score. Unlike
+BioBERT, there is \textbf{no AI here at all}; it's deliberate, transparent arithmetic. Six vitals --- heart
+rate, breathing rate, mobility, temperature, consciousness, and trauma --- each contribute points, and we
+add them into a total $T$. [\emph{Flip the card}.] For our patient, a heart rate of 125 scores 2 points, a
+breathing rate of 26 scores another 2, the rest are normal, so $T=4$. We then look $T$ up in the band
+table: 3 to 4 means \chip{satYellow}{Yellow}. The reason we keep this deterministic is \emph{auditability}
+--- a clinician can check every single point against a standard table.''
+\end{saybox}
+
+\transition{``If an examiner wants the full vitals mathematics, the next slide has every piecewise function.''}
+
+% ---------------------------------------------------------------------------
+\slide{12}{TEWS: Full Mathematics}{/dashboard/math/tews}
+
+\begin{onscreen}
+Six flip-cards: the total, the heart-rate function $f_1$, the respiratory function $f_2$,
+score-to-colour, a worked example, and the ``missing vitals'' partial score. Plus a band-to-Ghana-routing
+table.
+\end{onscreen}
+
+\[
+f_1(\mathrm{HR})=\begin{cases}3 & \mathrm{HR}\ge130\\ 2 & 111\le \mathrm{HR}\le129\\ 0 & 51\le \mathrm{HR}\le100\\ 2 & \mathrm{HR}\le40\\ 1 & \text{otherwise}\end{cases}
+\qquad
+T_{\mathrm{partial}}=\!\!\sum_{k\in\mathcal{K}_{\mathrm{obs}}}\!\! w_k f_k(v_k)
+\]
+
+\begin{idea}
+This is the ``show your rigour'' slide. The piecewise functions are just clinical lookup tables written
+formally. The genuinely important one is \textbf{$T_{\mathrm{partial}}$}: if some vitals are missing
+(common in a busy ER), we only sum the \emph{observed} ones and set a \texttt{tews\_incomplete} flag ---
+and on incomplete data the system refuses to assign a reassuring Green, deferring instead to the Bayesian
+estimate.
+\end{idea}
+
+\begin{demo}
+Flip $f_1$: for HR\,=\,125, check top-down --- $\ge130$? no; $111\!-\!129$? yes $\rightarrow$ 2 points.
+Then flip ``Missing vitals'': with only HR and RR measured, $T_{\mathrm{partial}}=4$ and the system will
+not assign Green on partial data.
+\end{demo}
+
+\begin{saybox}
+``For completeness, here's the full TEWS mathematics. Each vital has a piecewise function --- which is
+really just the official clinical lookup table written as maths. [\emph{Flip $f_1$}.] For a heart rate of
+125, you read top to bottom: is it 130 or more? No. Is it between 111 and 129? Yes --- so 2 points. The one
+I want to highlight is \textbf{partial scoring}. In a real, busy emergency department, you often don't have
+every vital. So we only add up the vitals we actually measured, and we raise an `incomplete' flag. And our
+safety rule says: on incomplete data, we will \emph{not} hand out a reassuring Green --- instead we defer
+to the Bayesian estimate. Every score here is traceable to a SATS table row, so it's auditable for clinical
+review.''
+\end{saybox}
+
+\transition{``That deferral I keep mentioning --- to Bayesian --- is the second parallel branch. Let's see it.''}
+
+% ---------------------------------------------------------------------------
+\slide{13}{Parallel Path: Bayesian Fallback}{/dashboard/pipeline/bayesian-fallback}
+
+\begin{onscreen}
+Three flip-cards --- Bayes' rule for the colour posterior, the argmax decision, and the disease-level
+override --- plus a ``when does Bayesian run?'' list.
+\end{onscreen}
+
+\[
+P(C_k\mid E)=\frac{P(E\mid C_k)\,P(C_k)}{\sum_j P(E\mid C_j)\,P(C_j)}
+\qquad
+C_{\mathrm{Bayes}}=\arg\max_k P(C_k\mid E)
+\]
+
+\begin{idea}
+Bayes' rule updates a \emph{prior} belief using \emph{evidence}. In plain terms: start with how common
+each colour is at this hospital (the prior $P(C_k)$), then adjust by how well the patient's evidence $E$
+fits each colour (the likelihood $P(E\mid C_k)$), and normalise. The colour with the highest resulting
+probability wins. There's also a \textbf{disease override}: if a specific dangerous disease (e.g.\ heart
+attack) is strongly suspected, upgrade to Red/Orange even if vitals look calm.
+\end{idea}
+
+\begin{demo}
+Flip the posterior card: for chest pain with partial vitals, priors of 5/15/30/50\% become posteriors of
+8/89/2/1\% --- \chip{satOrange}{Orange} wins at 89\%. Then flip the override card: $P(\text{MI}\mid
+\text{crushing chest pain})\approx0.82 > \tau_B = 0.75$ $\rightarrow$ upgrade to Red/Orange.
+\end{demo}
+
+\begin{saybox}
+``The second branch is our Bayesian fallback --- this is what runs when BioBERT is uncertain or vitals are
+missing. Bayes' rule is just a principled way of updating a belief with evidence. We start with a prior ---
+how common each colour normally is at this hospital --- and we update it using the patient's evidence: the
+symptoms and whatever vitals we have. [\emph{Flip the card}.] For a chest-pain patient with only partial
+vitals, Green started as the most likely at 50\%, but once we factor in the evidence, \chip{satOrange}{Orange}
+jumps to 89\% and wins. We pick the highest --- that's the argmax. And there's a critical safety feature:
+a \textbf{disease-level override}. [\emph{Flip the override card}.] If the symptoms strongly suggest
+something dangerous like a heart attack --- here an 82\% probability --- we upgrade to Red or Orange even if
+the vital signs look mild. That's the layer that catches the `looks fine on paper but is actually
+critical' patient.''
+\end{saybox}
+
+\transition{``The deep-maths version of that branch is next, if you want the full evidence model.''}
+
+% ---------------------------------------------------------------------------
+\slide{14}{Bayesian: Full Mathematics}{/dashboard/math/bayesian}
+
+\begin{onscreen}
+Flip-cards for Bayes' rule, the \emph{evidence vector} $E$, the argmax, and the disease override pair.
+\end{onscreen}
+
+\[
+E=\bigl[\text{entity}_1,\dots,\text{entity}_r,\; v_{k_1},\dots,v_{k_s}\bigr]
+\qquad
+P(D\mid S)=\frac{P(S\mid D)\,P(D)}{P(S)}
+\]
+
+\begin{idea}
+The new piece here is \textbf{what evidence $E$ actually is}: it's the medical entities BioBERT's NLP
+extracted from the text (e.g.\ \texttt{chest\_pain}, \texttt{radiating\_pain}) \emph{plus} whatever vitals
+were measured (e.g.\ HR\,=\,125). So Bayesian doesn't ignore the language --- it reuses the extracted facts.
+$P(D\mid S)$ is the same Bayes' rule applied at the \emph{disease} level rather than the colour level.
+\end{idea}
+
+\begin{demo}
+Flip the ``evidence vector'' card: $E=[\texttt{chest\_pain}, \texttt{radiating\_pain}, \mathrm{HR}{=}125,
+\mathrm{RR}{=}26]$ --- showing language and vitals combined into one evidence list.
+\end{demo}
+
+\begin{saybox}
+``Here's the full Bayesian model. The one extra concept worth pointing out is the \textbf{evidence vector
+$E$}. [\emph{Flip the evidence card}.] It combines two sources: the medical entities our NLP pulled out of
+the patient's words --- like `chest pain' and `radiating pain' --- together with the vital signs we
+measured. So the Bayesian layer isn't a separate guess in the dark; it reuses everything the language
+model already understood, plus the vitals. The prior is our first guess from hospital history; the
+likelihood is how well the symptoms fit each colour; Bayes combines them into an updated probability. And
+the disease override is simply the same rule applied to specific diseases instead of colours.''
+\end{saybox}
+
+\transition{``Now we can show the full fusion algorithm that ties all three layers together.''}
+
+% ---------------------------------------------------------------------------
+\slide{15}{Fusion: Full Mathematics}{/dashboard/math/fusion}
+
+\begin{onscreen}
+The fusion diagram, three flip-cards (the fusion function, the urgency ordering, the safety rule), the
+``Algorithm 1'' checklist, and a conflict-resolution table.
+\end{onscreen}
+
+\[
+\mathrm{ord}(\text{Red})=4 > \mathrm{ord}(\text{Orange})=3 > \mathrm{ord}(\text{Yellow})=2 > \mathrm{ord}(\text{Green})=1
+\]
+\[
+\mathrm{ord}(C)\;\ge\;\max\bigl\{\mathrm{ord}(C_{\mathrm{disc}}),\,\mathrm{ord}(C_{\mathrm{TEWS}}),\,\mathrm{ord}(C_{\mathrm{Bayes}})\bigr\}
+\]
+
+\begin{idea}
+This formalises ``fail safe''. We give each colour a rank (Red\,=\,4 down to Green\,=\,1). The
+\textbf{safety rule} says the final colour's rank must be \emph{at least} the highest rank any layer
+suggested --- so the patient can never be downgraded below the most urgent opinion. The
+\textbf{Algorithm 1} checklist is the order of decisions: life-threatening words $\rightarrow$ Red; very
+urgent words $\rightarrow$ Orange; then the TEWS bands; then missing-vitals $\rightarrow$ Bayesian argmax;
+then disease override; else Green.
+\end{idea}
+
+\begin{demo}
+Flip ``urgency ordering'': TEWS says Yellow (ord 2), language says Orange (ord 3); $\max(2,3)=3$
+$\rightarrow$ final \chip{satOrange}{Orange}. The higher rank always wins.
+\end{demo}
+
+\begin{saybox}
+``This slide makes `fail safe' precise. We rank the colours --- Red is 4, down to Green is 1. The
+\textbf{safety rule} is one line but it's the ethical core of the whole project: the final colour must be
+\emph{at least as urgent} as the most urgent thing any layer detected. [\emph{Flip the ordering card}.] So
+if vitals say Yellow but the language says Orange, we take the maximum --- Orange. A patient is never
+downgraded into a less urgent queue. The checklist on the right is the exact decision order: check for
+life-threatening language first, then very-urgent language, then the vitals bands, then --- if vitals are
+missing --- the Bayesian estimate, then the disease override, and only if nothing fires do we assign
+Green. It's a transparent, ordered set of rules, not a black box.''
+\end{saybox}
+
+\transition{``Let's put every layer together on one real patient, start to finish.''}
+
+% ===========================================================================
+\section{Part IV --- Bringing it together}
+
+% ---------------------------------------------------------------------------
+\slide{16}{End-to-End Worked Example}{/dashboard/math/worked-example}
+
+\begin{onscreen}
+Three layer cards (BioBERT / TEWS / Bayesian), two flip math cards, and a highlighted result banner:
+\chip{satOrange}{ORANGE --- Majors (ED)} with cardiology alert, 10-minute countdown, bed in Majors.
+\end{onscreen}
+
+\[
+\underbrace{d_{\text{chest}}>\tau}_{\text{language}} + \underbrace{T=4}_{\text{TEWS alone = Yellow}} + \underbrace{P(\text{Orange}\mid E)\approx0.89}_{\text{Bayesian}} \;\Rightarrow\; C=\text{Orange}
+\]
+
+\begin{idea}
+This is the payoff slide --- it shows the layers \emph{disagreeing} and fusion resolving them safely.
+Language says Orange, vitals alone say only Yellow, Bayesian says Orange at 89\%. Fusion takes the safer
+Orange. This single example proves the central thesis: combining layers beats any one layer alone.
+\end{idea}
+
+\begin{demo}
+Flip the ``Fusion resolution'' card to walk the audience through each term of the equation above, then
+land on the Orange result banner.
+\end{demo}
+
+\begin{saybox}
+``Let me bring it all together with one real Kumasi patient: central crushing chest pain. Watch the three
+layers. BioBERT reads the language and says \chip{satOrange}{Orange} --- this sounds very urgent. But the
+vital signs alone only score $T=4$, which is \chip{satYellow}{Yellow} --- on paper they look okay-ish. The
+Bayesian layer, using both the symptoms and the partial vitals, says Orange at 89\%. [\emph{Flip the
+card}.] So two layers say Orange, one says Yellow. A simple average would under-triage this patient ---
+and chest pain is exactly where you can't afford that. Fusion enforces the safer answer:
+\chip{satOrange}{Orange}. That triggers a cardiology alert, a ten-minute countdown, and a bed in Majors.
+\emph{This} is the whole point of the project --- no single layer is trusted alone; together they fail
+safe.''
+\end{saybox}
+
+\transition{``Finally, let me show what happens at the most extreme end --- a Red, life-threatening case.''}
+
+% ---------------------------------------------------------------------------
+\slide{17}{Resuscitation (Red)}{/dashboard/pathways/resus}
+
+\begin{onscreen}
+A red alert banner --- ``TARGET RESPONSE TIME: 0 MINUTES (IMMEDIATE)'' --- and a numbered 3-step
+emergency protocol.
+\end{onscreen}
+
+\begin{enumerate}
+  \item \textbf{Secure Airway \& Vitals} --- assess airway; attach continuous cardiac, SpO$_2$, and NIBP monitoring.
+  \item \textbf{Establish Access} --- two large-bore IVs or IO access; draw stat labs (VBG, lactate, cardiac enzymes).
+  \item \textbf{Targeted Intervention} --- ACLS/ATLS protocols by cause (defibrillation, epinephrine, massive transfusion).
+\end{enumerate}
+
+\begin{idea}
+This closes the loop: a colour isn't abstract --- \chip{satRed}{Red} launches a concrete, time-zero
+clinical protocol. It shows the system is grounded in real emergency-medicine workflow, not just an ML
+score.
+\end{idea}
+
+\begin{saybox}
+``And to close the loop --- this is what a \chip{satRed}{Red} actually launches. Target response time: zero
+minutes, immediate. The protocol is concrete: first secure the airway and get the patient on continuous
+monitoring; second, establish two large-bore IV lines and draw the critical labs; third, begin the
+targeted intervention --- ACLS or ATLS depending on the cause. The point I want to leave you with is that
+Curatio's output isn't an abstract number --- every colour maps to a real, standardised clinical action.''
+\end{saybox}
+
+\subsection*{Closing statement}
+\begin{saybox}
+``To summarise: Curatio takes a patient's own words --- typed or spoken in their language --- and turns
+them into a safe, explainable, colour-coded triage decision. It does this by combining a fine-tuned medical
+language model, a transparent vital-signs score, and a Bayesian safety net, all fused by a rule that always
+errs toward the safer outcome. It's designed for a real hospital --- Komfo Anokye in Kumasi --- to help
+clinicians see the sickest patients first and divert non-urgent cases away from a crowded emergency room.
+Thank you --- I'm happy to take questions.''
+\end{saybox}
+
+% ===========================================================================
+\section{Appendix A --- Formula cheat-sheet}
+
+\begin{tabular}{@{}p{0.30\textwidth}p{0.64\textwidth}@{}}
+\toprule
+\textbf{Formula} & \textbf{Say it as\dots}\\
+\midrule
+$\mathbf{S}_s=(X,\mathbf{D},T,\mathbf{P},C,\text{flags})$ & ``Everything we know about this session in one bundle.''\\
+$X=g_{\mathrm{trans}}(g_{\mathrm{ASR}}(\text{audio}))$ & ``Transcribe the audio, then translate it to English.''\\
+$\hat{\mathbf{y}}=\mathrm{softmax}(Wh_{\mathrm{[CLS]}}+\mathbf{b})$ & ``Turn the model's scores into five urgency percentages.''\\
+$\text{confidence}=\max_c\hat{y}_c$ & ``How sure the model is; if it's low, call the fallback.''\\
+$T=\sum_{k=1}^6 w_k f_k(v_k)$ & ``Add up points from six vital signs.''\\
+$P(C_k\mid E)=\frac{P(E\mid C_k)P(C_k)}{\sum_j P(E\mid C_j)P(C_j)}$ & ``Update our guess about the colour using the evidence.''\\
+$\mathrm{ord}(C)\ge\max\{\dots\}$ & ``The final colour is never less urgent than any layer said.''\\
+\bottomrule
+\end{tabular}
+
+% ===========================================================================
+\section{Appendix B --- Question bank (rehearse these)}
+
+\begin{qabox}
+\textbf{Q: Is this replacing nurses?} \\
+No --- it's decision \emph{support}. It standardises and speeds up the first triage step; the clinician
+always remains in control and can override.
+
+\medskip
+\textbf{Q: What if the AI is wrong?} \\
+That's exactly why there are three independent layers and a fail-safe fusion rule. The system is built so
+that an error in one layer (say an over-confident BioBERT) is caught by the vitals score or the Bayesian
+override, and fusion always defaults to the \emph{more} urgent colour.
+
+\medskip
+\textbf{Q: Why is the vitals score not AI?} \\
+Deliberately. TEWS must be transparent and auditable --- a clinician can verify every point against a
+standard table. Mixing a deterministic clinical score with the learned language model gives us the best of
+both: rigour and nuance.
+
+\medskip
+\textbf{Q: How does it handle local languages?} \\
+The voice pipeline transcribes speech (ASR) and translates it (e.g.\ Twi $\rightarrow$ English) before the
+model sees it, so non-English speakers are first-class users.
+
+\medskip
+\textbf{Q: How big is the model / can it run offline?} \\
+It's a fine-tuned BioBERT (\textasciitilde110M parameters, a \textasciitilde414\,MB weights file). It runs
+on CPU and can be deployed locally --- important for low-connectivity hospital settings.
+
+\medskip
+\textbf{Q: What were the main limitations?} \\
+Confident misclassification on rare phrasings, dependence on translation quality for voice, and the need
+for real-world clinical validation. Fusion with TEWS/Bayesian mitigates the first; the latter two are
+future work.
+\end{qabox}
+
+\end{document}

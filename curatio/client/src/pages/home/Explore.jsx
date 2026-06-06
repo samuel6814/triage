@@ -3,17 +3,32 @@ import styled from 'styled-components';
 import { gsap } from 'gsap';
 import { Search, ArrowRight, Activity, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+
 // ==========================================
 // 1. STYLED COMPONENTS
 // ==========================================
 
-const ExploreWrapper = styled.div`
+const PageWrapper = styled.div`
+  width: 100%;
   min-height: 100vh;
-  padding: 120px 8% 100px;
-  background: #fafafc;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f7f5; /* Hero forest-tint background */
+  overflow-x: hidden;
+`;
+
+const ExploreWrapper = styled.main`
+  flex: 1;
+  padding: 140px 8% 60px;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 120px 5% 40px;
+  }
 `;
 
 const HeaderSection = styled.div`
@@ -27,7 +42,7 @@ const HeaderSection = styled.div`
 const Title = styled.h1`
   font-size: 3.5rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: #166534; /* Forest green — matches Hero */
   margin-bottom: 1rem;
   letter-spacing: -1px;
 
@@ -38,7 +53,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 1.1rem;
-  color: #666;
+  color: #1e293b;
   max-width: 600px;
   line-height: 1.6;
 `;
@@ -55,12 +70,16 @@ const SearchContainer = styled.div`
   display: flex;
   align-items: center;
   background: white;
-  border: 1px solid #e4e4e7;
+  border: 1px solid rgba(34, 197, 94, 0.15); /* Soft green-tinted border */
   border-radius: 100px;
   padding: 0.5rem 1rem 0.5rem 1.5rem;
   width: 100%;
   max-width: 500px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  box-shadow: 0 10px 40px -10px rgba(22, 101, 52, 0.1); /* Forest green shadow */
+
+  &:focus-within {
+    border-color: rgba(34, 197, 94, 0.4);
+  }
 `;
 
 const SearchInput = styled.input`
@@ -91,12 +110,13 @@ const FilterPill = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid ${props => props.active ? 'transparent' : '#e4e4e7'};
-  background: ${props => props.active ? '#1a1a2e' : 'white'};
-  color: ${props => props.active ? 'white' : '#64748b'};
+  border: 1px solid ${props => props.active ? 'transparent' : 'rgba(22, 101, 52, 0.15)'};
+  background: ${props => props.active ? '#166534' : 'white'};
+  color: ${props => props.active ? '#ffffff' : '#166534'};
 
   &:hover {
-    background: ${props => props.active ? '#1a1a2e' : '#f4f4f5'};
+    background: ${props => props.active ? '#166534' : '#f0fdf4'};
+    border-color: ${props => props.active ? 'transparent' : '#bbf7d0'};
   }
 `;
 
@@ -181,7 +201,7 @@ const TimeIndicator = styled.div`
 `;
 
 const ActionArrow = styled.div`
-  background: #f8fafc;
+  background: #f0fdf4;
   padding: 8px;
   border-radius: 50%;
   display: flex;
@@ -190,7 +210,7 @@ const ActionArrow = styled.div`
   transition: background 0.2s;
 
   ${PathwayCard}:hover & {
-    background: #e2e8f0;
+    background: #dcfce7;
   }
 `;
 
@@ -297,7 +317,9 @@ const Explore = () => {
   }, [searchTerm, activeCategory]);
 
   return (
-    <ExploreWrapper>
+    <PageWrapper>
+      <Navbar />
+      <ExploreWrapper>
       <HeaderSection>
         <Title>Clinical Pathways</Title>
         <Subtitle>
@@ -350,7 +372,7 @@ const Explore = () => {
                   Target Wait: {pathway.waitTime}
                 </TimeIndicator>
                 <ActionArrow>
-                  <ArrowRight size={16} color="#1a1a2e" />
+                  <ArrowRight size={16} color="#166534" />
                 </ActionArrow>
               </CardFooter>
             </PathwayCard>
@@ -363,7 +385,9 @@ const Explore = () => {
           </div>
         )}
       </Grid>
-    </ExploreWrapper>
+      </ExploreWrapper>
+      <Footer />
+    </PageWrapper>
   );
 };
 
