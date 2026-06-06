@@ -1,0 +1,28 @@
+/* Prevent global resets from breaking KaTeX layout */
+.katex,
+.katex * {
+  font-family: KaTeX_Main, 'Times New Roman', serif;
+}
+
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+.katex .base {
+  display: inline-block;
+}
+
+/* Presentation fullscreen — scale math with slide content */
+:fullscreen {
+  --presentation-zoom: 1.18;
+}
+
+:fullscreen .katex {
+  font-size: calc(1em * var(--presentation-zoom, 1.18));
+}
+
+:fullscreen .katex-display {
+  padding: 0.35rem 0;
+}

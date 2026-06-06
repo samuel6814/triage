@@ -1,0 +1,212 @@
+% =============================================================================
+\section{BioBERT NLP Layer}
+% =============================================================================
+
+\begin{frame}{Step 4: Fine-tuned BioBERT overview}
+  English text $X$ passes through our fine-tuned BioBERT model $\to$ acuity prediction $\hat{\mathbf{y}}$.
+
+  \vspace{0.3em}
+  \begin{equation*}
+    X \xrightarrow{\tau} (t_i) \xrightarrow{E} H^{(0)} \xrightarrow{L \times} H^{(L)} \xrightarrow{\mathrm{head}} \hat{\mathbf{y}}
+  \end{equation*}
+
+  \footnotesize
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    \textbf{Predicted acuity} & \textbf{Maps to SATS} \\
+    \midrule
+    Level 1--2 & Red / Orange (highly urgent) \\
+    Level 3 & Yellow (moderate) \\
+    Level 4--5 & Green (non-urgent / routine) \\
+    \bottomrule
+  \end{tabular}
+
+  \plain{Fine-tuning taught BioBERT our hospital's phrasing. It answers ``how urgent does this sound?'' --- that answer goes to fusion with vitals and Bayesian when needed.}
+\end{frame}
+
+\begin{frame}{Step 4: Softmax classification}
+  \begin{equation*}
+    \hat{\mathbf{y}} = \mathrm{softmax}(W h_{\mathrm{[CLS]}} + \mathbf{b}), \quad
+    \hat{y}_c = P(\text{acuity} = c \mid X)
+  \end{equation*}
+
+  \examplebox{
+    \textbf{Chief complaint:} thunderclap headache, worsening with movement\\
+    \begin{tabular}{@{}lrr@{}}
+      \toprule
+      Level & Meaning & Probability \\
+      \midrule
+      1 & Most urgent & 1\% \\
+      2 & Highly urgent & \textbf{94\%} \\
+      3 & Moderate & 3\% \\
+      4--5 & Routine & 2\% \\
+      \bottomrule
+    \end{tabular}\\
+    Prediction = Level 2 $\to$ maps to \sats{triageOrange}{Orange}
+  }
+
+  \plain{Softmax converts raw scores into percentages over 5 acuity levels --- highest wins.}
+\end{frame}
+
+\begin{frame}{Step 4: Confidence gate}
+  \begin{equation*}
+    \text{confidence} = \max_c \hat{y}_c, \quad
+    \text{if confidence} < \tau \Rightarrow \text{flag for Bayesian fallback}
+  \end{equation*}
+  where $\tau \approx 0.85$.
+
+  \examplebox{
+    \textbf{High confidence (passes):} $\max(\hat{\mathbf{y}}) = 0.94 > \tau = 0.85$ $\to$ trust BioBERT.\\[0.3em]
+    \textbf{Borderline (flagged):} Patient TG-7OKLDLKAQ --- glaucoma complaint:\\
+    Level 2: 85.4\%, Level 3: 14.1\% $\Rightarrow$ confidence $0.854$ --- fusion may call Bayesian fallback.
+  }
+
+  \plain{When the model is unsure, we do not silently trust it --- fusion escalates to Bayesian reasoning.}
+\end{frame}
+
+\begin{frame}{BioBERT: inside the model --- embeddings}
+  \begin{equation*}
+    E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(t_i)
+  \end{equation*}
+
+  Each token gets three vectors summed: word identity, position in sentence, segment (question vs.\ answer).
+
+  \examplebox{
+    \textbf{Input:} ``crushing chest pain radiating to left arm''\\
+    Tokens: [crush, \#\#ing, chest, pain, radiate, \#\#ing, left, arm]\\
+    Each token $\to$ 768-dim vector after embedding layer.
+  }
+\end{frame}
+
+\begin{frame}{BioBERT: self-attention}
+  \begin{equation*}
+    \mathrm{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+  \end{equation*}
+
+  \examplebox{
+    \textbf{Query token ``crushing''} attends most strongly to:
+    \begin{itemize}
+      \item ``crushing'' --- 0.38
+      \item ``chest'' --- 0.35
+      \item ``pain'' --- 0.22
+    \end{itemize}
+    Clinical co-occurrence drives urgency detection.
+  }
+\end{frame}
+
+\begin{frame}{BioBERT: transformer layers and [CLS]}
+  \begin{align*}
+    Z^{(\ell)} &= \mathrm{LayerNorm}\!\Bigl(H^{(\ell-1)} + \mathrm{MultiHead}(H^{(\ell-1)})\Bigr) \\
+    H^{(\ell)} &= \mathrm{LayerNorm}\!\Bigl(Z^{(\ell)} + \mathrm{FFN}(Z^{(\ell)})\Bigr)
+  \end{align*}
+
+  \vspace{0.3em}
+  After $L=12$ layers:
+  \begin{equation*}
+    h_{\mathrm{[CLS]}} = H^{(L)}_{1,:} \in \mathbb{R}^{768}
+    \qquad
+    \hat{\mathbf{y}} = \mathrm{softmax}(W h_{\mathrm{[CLS]}} + \mathbf{b})
+  \end{equation*}
+
+  \examplebox{
+    ``crushing chest pain'' $\to$ Level 2: 91\%, Level 3: 6\%, others: 3\%\\
+    Confidence $0.91 \to$ \sats{triageOrange}{Orange} at fusion.
+  }
+\end{frame}
+
+\begin{frame}{BioBERT: how it was trained --- pre-training}
+  \begin{equation*}
+    \mathcal{L}_{\mathrm{MLM}} = -\sum_{i \in \mathcal{M}} \log P(t_i \mid H^{(L)}; \theta)
+  \end{equation*}
+
+  \textbf{Masked Language Modelling} on PubMed medical English teaches BioBERT clinical vocabulary.
+
+  \examplebox{
+    ``The patient presented with severe \underline{\hspace{1cm}} pain''\\
+    Masked token predicted: \textbf{chest}\\
+    Model learns co-occurrence of medical terms before ever seeing triage labels.
+  }
+\end{frame}
+
+\begin{frame}{BioBERT: fine-tuning on hospital data}
+  \begin{equation*}
+    \mathcal{L} = -\sum_{i=1}^{N} \log P(y_i \mid X_i; \theta)
+  \end{equation*}
+
+  Minimise cross-entropy vs.\ nurse-assigned acuity labels on $\sim$80,000 chief complaints.
+  \textbf{Vitals excluded} --- model learns urgency from language alone.
+
+  \examplebox{
+    Row: ``contraception advice, intermittent'' $\to$ nurse label Level 5\\
+    $P(\text{Level 5} \mid X) = 0.97 \Rightarrow \mathcal{L} \mathrel{+}= -\log(0.97) \approx 0.03$
+  }
+
+  \footnotesize
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    \textbf{Setting} & \textbf{Value} \\
+    \midrule
+    Base model & \texttt{Yuvrajxms09/biobert-triage-classifier} \\
+    Data merge & train.csv $\bowtie$ chief\_complaints.csv ($\sim$80k rows) \\
+    Epochs & 3 (13,500 steps) \\
+    Best eval\_loss & \textbf{0.001812} \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Data exploration and findings}
+  Training and inference on \textbf{$\sim$100,000} patient records from fine-tuned BioBERT CSVs.
+
+  \footnotesize
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Dataset sizes}
+    \begin{tabular}{@{}ll@{}}
+      \toprule
+      File & Rows \\
+      \midrule
+      train.csv & 80,000 \\
+      test.csv & 20,000 \\
+      chief\_complaints.csv & 100,000 \\
+      triage\_predictions\_results.csv & 100,000 \\
+      \bottomrule
+    \end{tabular}
+
+    \column{0.48\textwidth}
+    \textbf{Acuity distribution (train)}
+    \begin{tabular}{@{}lrr@{}}
+      \toprule
+      Level & Count & \% \\
+      \midrule
+      1 & 3,222 & 4.0\% \\
+      2 & 13,439 & 16.8\% \\
+      3 & 28,921 & 36.2\% \\
+      4 & 23,020 & 28.8\% \\
+      5 & 11,398 & 14.2\% \\
+      \bottomrule
+    \end{tabular}
+  \end{columns}
+
+  \vspace{0.4em}
+  \textbf{Confidence:} 99.6\% of predictions at confidence 1.0; \textbf{361} rows at 0.6--0.99 (Bayesian candidates).
+
+  \plain{Some urgent cases are overconfidently misclassified --- fusion with TEWS/Bayesian mitigates this.}
+\end{frame}
+
+\begin{frame}{Example predictions from CSV}
+  \footnotesize
+  \begin{tabular}{@{}p{2.2cm}p{4.5cm}ll@{}}
+    \toprule
+    \textbf{Patient ID} & \textbf{Complaint} & \textbf{Pred.} & \textbf{Conf.} \\
+    \midrule
+    TG-UXRGA9UCO & thunderclap headache, worsening with movement & Level 2 & 1.00 \\
+    TG-B19DBBS2G & contraception advice, intermittent & Level 5 & 1.00 \\
+    TG-7OKLDLKAQ & acute angle closure glaucoma in known patient & Level 2 & 0.854 \\
+    TG-2MIQ3DLS7 & acute angle closure glaucoma with nausea & Level 2 & 0.855 \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.5em}
+  \normalsize
+  Glaucoma cases at $\sim$0.85 confidence illustrate why the $\tau \approx 0.85$ gate and Bayesian fallback exist.
+\end{frame}

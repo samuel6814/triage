@@ -1,0 +1,98 @@
+% =============================================================================
+\section{Fusion and Parallel Paths}
+% =============================================================================
+
+\begin{frame}{Step 5: Fusion $\to$ triage colour}
+  \begin{equation*}
+    C = f_{\mathrm{fusion}}(\mathbf{D},\, T,\, \mathbf{P},\; \text{flags})
+  \end{equation*}
+
+  Fusion combines BioBERT ($\hat{\mathbf{y}}$), TEWS ($T$), and Bayesian ($\mathbf{P}$) into one SATS colour $C$.
+
+  \examplebox{
+    \textbf{Chest pain patient at KATH:}
+    \begin{tabular}{@{}lll@{}}
+      \toprule
+      Input & Value & Suggests \\
+      \midrule
+      BioBERT $\hat{\mathbf{y}}$ & Level 2, 94\% conf & \sats{triageOrange}{Orange} \\
+      TEWS $T$ & 4 & \sats{triageYellow}{Yellow} \\
+      Bayesian $P$ & $P(\mathrm{Orange}\mid E) = 0.89$ & \sats{triageOrange}{Orange} \\
+      \bottomrule
+    \end{tabular}\\
+    $\Rightarrow C = \sats{triageOrange}{Orange}$ (symptoms beat mild vitals)
+  }
+
+  \plain{$f_{\mathrm{fusion}}$ is a \textbf{safety checklist}, not an average --- always picks the more urgent credible signal.}
+\end{frame}
+
+\begin{frame}{Parallel path: vitals $\to$ TEWS}
+  Six vitals summed with weights $w_k = 1$ --- deterministic, no AI.
+
+  \begin{equation*}
+    T = f_{\mathrm{TEWS}}(\mathbf{v}) = \sum_{k=1}^{6} w_k \, f_k(v_k), \quad w_k = 1
+  \end{equation*}
+
+  \begin{equation*}
+    C_{\mathrm{TEWS}}(T) = \begin{cases}
+      \text{Red} & T > 7 \\
+      \text{Orange} & 5 \leq T \leq 6 \\
+      \text{Yellow} & 3 \leq T \leq 4 \\
+      \text{Green} & T \leq 2
+    \end{cases}
+  \end{equation*}
+
+  \examplebox{
+    HR = 125 bpm $\to f_1(125) = 2$; \quad RR = 26/min $\to f_2(26) = 2$; \quad $f_{3:6} = 0$\\
+    $T = 4 \Rightarrow C_{\mathrm{TEWS}} = \sats{triageYellow}{Yellow}$\\
+    Fusion may still upgrade to Orange if language/Bayesian say so.
+  }
+\end{frame}
+
+\begin{frame}{Parallel path: Bayesian fallback}
+  Bayesian reasoning runs when:
+  \begin{itemize}
+    \item vitals are missing (partial TEWS),
+    \item BioBERT confidence $< \tau \approx 0.85$, or
+    \item language and vitals strongly disagree.
+  \end{itemize}
+
+  \begin{equation*}
+    P(C_k \mid E) = \frac{P(E \mid C_k)\, P(C_k)}{\sum_{j} P(E \mid C_j)\, P(C_j)},
+    \qquad
+    C_{\mathrm{Bayes}} = \arg\max_{k} P(C_k \mid E)
+  \end{equation*}
+
+  \examplebox{
+    \textbf{Chest pain, partial vitals at KATH:}
+    \footnotesize
+    \begin{tabular}{@{}lrrr@{}}
+      \toprule
+      Colour & Prior $P(C_k)$ & $P(E\mid C_k)$ & $P(C_k\mid E)$ \\
+      \midrule
+      Red & 5\% & Low & 8\% \\
+      Orange & 15\% & High & \textbf{89\%} \\
+      Yellow & 30\% & Medium & 2\% \\
+      Green & 50\% & Very low & 1\% \\
+      \bottomrule
+    \end{tabular}
+  }
+\end{frame}
+
+\begin{frame}{Disease override rule}
+  \begin{equation*}
+    P(D \mid S) = \frac{P(S \mid D)\, P(D)}{P(S)}
+  \end{equation*}
+
+  \begin{equation*}
+    \text{If } P(D \mid S) > \tau_B \text{ then } C_{\mathrm{Bayes}} = \text{Red (or Orange per protocol)}
+  \end{equation*}
+
+  \examplebox{
+    Symptoms: crushing central chest pain, radiating to left arm\\
+    $P(\mathrm{MI} \mid S) \approx 0.82 > \tau_B = 0.75$\\
+    $\Rightarrow$ upgrade to Red/Orange even if $T = 2$ (Green vitals alone)
+  }
+
+  \plain{Serious disease suspicion can override mild vital scores --- clinical safety first.}
+\end{frame}

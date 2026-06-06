@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.Python
+
+# Environment
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# IDE / editor
+.cursor/
+.vscode/
+*.swp
+*~
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.nav
+*.snm
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+
+# Duplicate CSVs inside the exported model folder (originals kept in "csv files/")
+fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_biobert_triage/train.csv
+fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_biobert_triage/chief_complaints.csv
+fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_biobert_triage/triage_predictions_results.csv
+
+# Training checkpoints (final model.safetensors kept via Git LFS)
+**/checkpoint-*/
+**/optimizer.pt
+**/rng_state.pth
+**/scheduler.pt
+**/scaler.pt
+**/training_args.bin
+**/trainer_state.json
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,81 @@
+% =============================================================================
+\section{Clinical Protocols and Demo}
+% =============================================================================
+
+\begin{frame}{Resuscitation protocol (\sats{triageRed}{Red})}
+  \textbf{Target response time: 0 minutes (immediate)}
+
+  \begin{enumerate}
+    \item \textbf{Secure airway \& vitals}
+    \begin{itemize}
+      \item Airway patency; continuous cardiac, SpO$_2$, NIBP monitoring
+    \end{itemize}
+    \item \textbf{Establish access}
+    \begin{itemize}
+      \item Two large-bore IVs or IO access
+      \item Stat labs: VBG, lactate, cardiac enzymes
+    \end{itemize}
+    \item \textbf{Targeted intervention}
+    \begin{itemize}
+      \item ACLS / ATLS protocols as indicated
+      \item Defibrillation, epinephrine, massive transfusion, etc.
+    \end{itemize}
+  \end{enumerate}
+
+  \plain{Red bypasses registration and payment --- Code Red activated immediately upon fusion assignment.}
+\end{frame}
+
+\begin{frame}{Curatio interactive presentation (built deliverable)}
+  \textbf{Web app:} \texttt{curatio/client} --- React + Vite presentation at \texttt{/dashboard}
+
+  \vspace{0.3em}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{17 slides covering:}
+    \footnotesize
+    \begin{itemize}
+      \item SATS intro \& Ghana pathways
+      \item 5-step input pipeline
+      \item BioBERT inference \& training
+      \item Data exploration (80k CSV stats)
+      \item TEWS \& Bayesian parallel paths
+      \item Fusion mathematics
+      \item End-to-end worked example
+      \item Resuscitation protocol
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Interactive features:}
+    \footnotesize
+    \begin{itemize}
+      \item KaTeX formula rendering
+      \item Flip cards: formula $\leftrightarrow$ worked example
+      \item Collapsible sidebar navigation
+      \item Arrow keys: $\leftarrow\!\rightarrow$ slides, $\uparrow\!\downarrow$ scroll
+      \item Fullscreen mode with zoom
+      \item Pre-computed stats from fine-tuned BioBERT CSVs
+    \end{itemize}
+  \end{columns}
+
+  \vspace{0.4em}
+  \texttt{npm run dev} in \texttt{curatio/client} $\to$ open \texttt{/dashboard}
+\end{frame}
+
+\begin{frame}{Project deliverables summary}
+  \footnotesize
+  \begin{tabular}{@{}p{3.2cm}p{8.5cm}@{}}
+    \toprule
+    \textbf{Component} & \textbf{Description} \\
+    \midrule
+    Fine-tuned BioBERT & 5-class acuity on chief complaints; eval\_loss 0.001812 \\
+    CSV datasets & 100k records: train, test, complaints, predictions \\
+    Mathematics spec & TEWS piecewise, Bayesian posterior, fusion safety rules \\
+    Curatio web UI & Interactive presentation mirroring this Beamer deck \\
+    Ghana routing & SATS colours $\to$ KATH departments and protocols \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.5em}
+  \normalsize
+  This Beamer deck (\texttt{slides\_saturday/}) is the static companion to the live web demo.
+\end{frame}

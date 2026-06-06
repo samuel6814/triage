@@ -1,0 +1,174 @@
+\documentclass[aspectratio=169]{beamer}
+
+% Theme selection
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{amssymb}
+
+% Define custom colors
+\definecolor{orange}{RGB}{255,140,0}
+\definecolor{blue_dead}{RGB}{0,0,139} % Dark blue for "Dead"
+\definecolor{green_triage}{RGB}{0,128,0}
+
+% Meta Information
+\title[Hospital Chatbot]{Hospital Chatbot for Patient Color-Coded Clinical Pathways}
+\subtitle{AI-Driven Triage and Navigation for Resource-Constrained Settings}
+\author{Project Synopsis}
+\institute[]{Department of Mathematics}
+\date{\today}
+
+\begin{document}
+	
+	% Slide 1: Title
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	% Slide 2: Introduction
+	\begin{frame}{1. Introduction}
+		\begin{block}{Context: Color-Coded Triage}
+			Hospitals utilize standardized \textbf{color-coded triage systems} to classify patients by clinical severity. This ensures that critical resources are allocated to those who need them most.
+		\end{block}
+		
+		\vspace{0.2cm}
+		
+		\begin{columns}[t]
+			\begin{column}{0.48\textwidth}
+				\textbf{The Triage Spectrum:}
+				\begin{itemize}
+					\item \textcolor{red}{\textbf{Red:}} Emergency (Immediate resuscitation).
+					\item \textcolor{orange}{\textbf{Orange:}} Very Urgent (Potentially life-threatening).
+					\item \textcolor{yellow}{\textbf{Yellow:}} Urgent (Serious but stable).
+					\item \textcolor{green_triage}{\textbf{Green:}} Non-Urgent (Minor/Routine).
+					\item \textcolor{blue_dead}{\textbf{Blue:}} Dead (Certified death on arrival).
+				\end{itemize}
+			\end{column}
+			\begin{column}{0.48\textwidth}
+				\begin{exampleblock}{The Innovation}
+					An \textbf{AI-powered chatbot} acts as a "Virtual Triage Nurse," available 24/7. It assesses symptoms to assign these colors and directs patients to the correct department (e.g., Mortuary for Blue, Resuscitation for Red), streamlining flow before they even reach the desk.
+				\end{exampleblock}
+			\end{column}
+		\end{columns}
+	\end{frame}
+	
+	% Slide 3: Problem Statement
+	\begin{frame}{2. Problem Statement}
+		\begin{columns}[t]
+			\begin{column}{0.48\textwidth}
+				\begin{block}{The LMIC Context}
+					In many \textbf{low- and middle-income countries}, healthcare systems face:
+					\begin{itemize}
+						\item \textbf{Severe Staff Shortages:} Low physician-to-patient ratios lead to bottlenecks.
+						\item \textbf{Overcrowded Waiting Rooms:} Patients waiting hours without initial assessment.
+						\item \textbf{Resource Misallocation:} Highly skilled staff spending time on minor cases while emergencies wait.
+					\end{itemize}
+				\end{block}
+			\end{column}
+			
+			\begin{column}{0.48\textwidth}
+				\begin{alertblock}{Critical Consequences}
+					\begin{enumerate}
+						\item \textbf{Undetected Deterioration:} "Yellow" patients turning "Orange" or "Red" while waiting unnoticed in the general queue.
+						\item \textbf{System Congestion:} Non-urgent ("Green") cases clogging the Emergency Department instead of visiting Outpatient Clinics.
+						\item \textbf{Patient Confusion:} Lack of clarity on where to go leads to anxiety and patients leaving without care (LWBS).
+					\end{enumerate}
+				\end{alertblock}
+			\end{column}
+		\end{columns}
+		
+		
+	
+	\end{frame}
+	
+	\begin{frame}{2.Problem Statement - Continued}
+			\vspace{0.2cm}
+		\textbf{Core Gap:} Lack of an automated, accessible system to identify a patient's \textbf{color code} and guide them immediately upon arrival.
+	\end{frame}
+	
+	% Slide 4: Objectives
+	\begin{frame}{3. Objectives}
+		\begin{block}{General Objective}
+			To develop an \textbf{AI-powered hospital chatbot} that assigns standardized triage colors (Red, Orange, Yellow, Green, Blue) and navigates patients through specific clinical pathways to reduce delays.
+		\end{block}
+		
+		\vspace{0.09cm}
+		\textbf{Specific Objectives:}
+		\begin{itemize}
+			\item \textbf{Algorithm Development:} Create logic based on validated protocols (e.g., SATS/TEWS) to calculate urgency colors accurately.
+			\item \textbf{Pathway Mapping:} Define distinct workflows for each color:
+			\begin{itemize} \footnotesize
+				\item \emph{Red/Orange:} Immediate alert to ER staff.
+				\item \emph{Yellow:} Direction to Urgent Care Zone.
+				\item \emph{Green:} Direction to Pharmacy/OPD.
+				\item \emph{Blue:} Protocol for sensitivity and transfer to Mortuary.
+			\end{itemize}
+			\item \textbf{Accuracy Evaluation:} Compare chatbot color assignments against human nurse triage to assess \textbf{sensitivity} and safety.
+			
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{3. Objectives - Continued}
+		\begin{itemize}
+			\item \textbf{Impact Measurement:} Assess reduction in \textbf{Time to Provider} and overall waiting room congestion.
+		\end{itemize}
+		
+	\end{frame}
+	
+	% Slide 5: Methodology
+	\begin{frame}{4. Methodology}
+		\begin{columns}[t]
+			\begin{column}{0.48\textwidth}
+				\begin{block}{Study Design \& Setting}
+					\begin{itemize}
+						\item \textbf{Design:} Mixed-methods approach.
+						\begin{itemize} \footnotesize
+							\item Phase 1: Agile Development of the Chatbot.
+							\item Phase 2: Comparative Accuracy Assessment.
+						\end{itemize}
+						\item \textbf{Setting:} District or Regional Hospital in an LMIC setting utilizing standard color-coded triage.
+					\end{itemize}
+				\end{block}
+			\end{column}
+			
+			\begin{column}{0.48\textwidth}
+				\begin{block}{Data Collection \& Analysis}
+					\begin{itemize}
+						\item \textbf{Algorithm Validation:} Retrospective testing using historical patient vitals to check if the AI predicts the same color as the doctors did.
+						\item \textbf{Usability Testing:} Surveys (SUS Scale) with patients to ensure the chatbot is easy to use for non-tech-savvy users.
+						\item \textbf{Key Metrics:}
+						\begin{itemize} \footnotesize
+							\item Sensitivity (catching sick patients).
+							\item Reduction in Waiting Times.
+							\item Rate of "Left Without Being Seen".
+						\end{itemize}
+					\end{itemize}
+				\end{block}
+			\end{column}
+		\end{columns}
+	\end{frame}
+	
+	% Slide 6: Significance
+	\begin{frame}{5. Significance}
+		Implementation of the ``Virtual Triage Nurse'' aims to transform hospital flow:
+		
+		\vspace{0.3cm}
+		
+		\begin{enumerate}
+			\item \textbf{Decongest the Emergency Department:} \\
+			By accurately routing \textcolor{green_triage}{\textbf{Green}} patients to clinics and \textcolor{blue_dead}{\textbf{Blue}} cases to appropriate facilities, the ER beds remain open for true emergencies.
+			
+			\item \textbf{Improve Patient Safety:} \\
+			Immediate flagging of \textcolor{red}{\textbf{Red}}/\textcolor{orange}{\textbf{Orange}} patients ensures they bypass the queue, reducing mortality associated with waiting delays.
+			
+			\item \textbf{Standardize Care Delivery:} \\
+			Providing consistent, algorithmic assessment 24/7 removes human variability and fatigue from the initial sorting process.
+		\end{enumerate}
+	\end{frame}
+	
+\end{document}

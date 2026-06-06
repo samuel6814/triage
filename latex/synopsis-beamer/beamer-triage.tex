@@ -1,0 +1,242 @@
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\documentclass[11pt, aspectratio=169]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+% Beamer Theme Configuration
+\usetheme{Madrid}
+\usecolortheme{whale}
+\setbeamertemplate{navigation symbols}{}
+
+% Title Page Information
+\title[Hospital Chatbot for Clinical Pathways]{Hospital Chatbot for Color-Coded Clinical Pathways}
+\subtitle{}
+\author{Synopsis Presentation}
+\date{\today}
+
+\begin{document}
+	
+	% --- SLIDE 1: Title ---
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	% --- SLIDE 2: Table of Contents ---
+	\begin{frame}{Contents}
+		\tableofcontents
+	\end{frame}
+	
+	% --- SLIDE 3: Introduction ---
+	\section{Introduction}
+	\begin{frame}{1. Introduction (Background of Study)}
+		\begin{quote}
+			``Triage is not just about sorting; it is about the right patient getting the right care at the right time.'' \\
+			-- \textit{South African Triage Group}
+		\end{quote}
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item In high-functioning systems, triage is a \textbf{continuous, dynamic status} that dictates the patient's entire hospital journey.
+			\item Standardized scales use discrete color codes to classify clinical severity. Common scales include:
+			\begin{itemize}
+				\item \textbf{SATS (South African Triage Scale):} A widely used standard for assessing both adults and older children [1].
+				\item \textbf{ETAT (Emergency Triage Assessment and Treatment):} Guidelines specifically designed by the WHO for triaging sick children [2].
+			\end{itemize}
+			\item These colors are not just labels; they are \textbf{triggers for specific Clinical Pathways} with strict time limits.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 4: The Color Codes ---
+	\begin{frame}{1. Introduction: The Triage Color Codes}
+		\begin{block}{Standardized Clinical Severity}
+			\begin{itemize}
+				\item \textbf{\textcolor{red}{Red}}: Emergency (Immediate life-saving care needed)
+				\item \textbf{\textcolor{orange}{Orange}}: Very Urgent (Care needed within 10 minutes)
+				\item \textbf{\textcolor{yellow!90!black}{Yellow}}: Urgent (Care needed within 60 minutes)
+				\item \textbf{\textcolor{green!60!black}{Green}}: Non-Urgent (Can wait safely or be redirected)
+				\item \textbf{\textcolor{blue}{Blue}}: Dead (Deceased on arrival)
+			\end{itemize}
+		\end{block}
+		
+		\vspace{0.3cm}
+		\textbf{The LMIC Challenge:}
+		In many resource-constrained settings, the utility of this color often ends at the front desk. The hospital ``forgets'' the priority level once the patient leaves the triage area [4].
+	\end{frame}
+	
+	% --- SLIDE 5: Problem Statement ---
+	\section{Problem Statement}
+	\begin{frame}{2. Problem Statement: Systemic Bottlenecks}
+		Current hospital workflows suffer from a critical failure known as \textbf{Acuity Discontinuity}. 
+		\vspace{0.2cm}
+		\begin{block}{What is Acuity Discontinuity?}
+			It occurs when the hospital ``forgets'' how sick a patient is. A patient might be marked as high-priority at the front door, but they lose that priority and join a normal queue when transferred to another department.
+		\end{block}
+		\vspace{0.2cm}
+		This creates four major problems:
+		\begin{enumerate}
+			\item \textbf{Long Waiting Lines:} Patients get sicker while waiting just to be seen.
+			\item \textbf{Human Error:} Nurses manually computing the \textbf{Triage Early Warning Score (TEWS)} in their heads make subjective mathematical mistakes.
+			\item \textbf{Hidden Deterioration:} Waiting patients get worse, but the system doesn't notice.
+			\item \textbf{Lost Information:} Priority levels aren't shared across departments.
+		\end{enumerate}
+	\end{frame}
+	
+	% --- SLIDE 6: Objectives (General) ---
+	\section{Objectives}
+	\begin{frame}{3. Objectives}
+		\begin{block}{General Objective}
+			To design a robust, logic-based digital framework and computational engine that automates the continuous management of clinical pathways. This core routing system must be built and functioning \textbf{first}, with a chatbot later serving as the user-friendly frontend interface.
+		\end{block}
+	\end{frame}
+	
+	% --- SLIDE 7: Objectives (Specific) ---
+	\begin{frame}{3. Specific Objectives}
+		\begin{itemize}
+			\item \textbf{1. Automate Acuity Computation (Core Engine):} Build a mathematical engine to objectively calculate the TEWS danger scores, entirely removing human math errors.
+			\item \textbf{2. Connected Routing:} Define strict logistical rules so the priority color remains digitally attached to the patient across all hospital departments.
+			\item \textbf{3. Watchful Timers:} Engineer digital stopwatches to alert staff to re-check patients who wait too long.
+			\item \textbf{4. Fast Check-in Interface:} \textit{After the engine is built}, design a chatbot frontend to quickly collect patient symptoms upon arrival.
+			\item \textbf{5. Test Success:} Use computer simulation models to prove this automated routing system is faster than manual paperwork.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 8: Methodology (Phase 1) ---
+	\section{Methodology}
+	\begin{frame}{4. Methodology: The Computational Engine (Phase 1)}
+		The foundation of this framework is a \textbf{universally integratable System Architecture}. The triage process is formally modeled as a robust mathematical engine, independent of any specific frontend.
+		\vspace{0.2cm}
+		
+		\textbf{Step 1: The Automatic Danger Score (TEWS)} \\
+		An integrated frontend interface (such as our chatbot) extracts a vector of vital signs $V_i = [HR, RR, SBP, T, AVPU]$. The universal backend engine evaluates these using a weighted summation function:
+		
+		\[
+		\textcolor{blue}{TEWS(P_i)} = \sum_{k=1}^{n} \textcolor{orange}{w_k} \cdot \textcolor{purple}{f_k}(\textcolor{green!60!black}{v_k})
+		\]
+		
+		\vspace{0.1cm}
+		\end{frame}
+		
+		
+		\begin{frame}{4. Methodology: The Computational Engine (Phase 1)}
+		\textbf{Detailed Breakdown of the Equation:}
+		\begin{itemize}
+			\item \textbf{\textcolor{blue}{$TEWS(P_i)$}:} The final Danger Score calculated for a specific Patient ($P_i$).
+			\item \textbf{\textcolor{green!60!black}{$v_k$}:} The raw value of a specific vital sign (e.g., Heart Rate of 120 bpm).
+			\item \textbf{\textcolor{purple}{$f_k$}:} A mathematical function that measures how far that specific vital sign ($v_k$) deviates from a normal, healthy baseline.
+			\item \textbf{\textcolor{orange}{$w_k$}:} The clinical weight or importance of that vital sign.
+			\item \textbf{$\sum_{k=1}^{n}$}: The system adds up these calculations for all $n$ vital signs collected.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 9: Methodology (Phase 1 Cont) ---
+	\begin{frame}{4. Methodology: Instant Color Sorting}
+		\textbf{Step 2: Assigning the Clinical Color} \\
+		The system maps the computed \textcolor{blue}{TEWS} score into a discrete clinical color using a strict piecewise function, entirely removing human bias:
+		\vspace{0.1cm}
+		
+		\[
+		C(\textcolor{blue}{TEWS}) = \begin{cases}
+			\text{\textbf{\textcolor{red}{Red (Emergency)}}} & \text{if } \textcolor{blue}{TEWS} > 7 \\
+			\text{\textbf{\textcolor{orange}{Orange (Very Urgent)}}} & \text{if } 5 \le \textcolor{blue}{TEWS} \le 6 \\
+			\text{\textbf{\textcolor{yellow!90!black}{Yellow (Urgent)}}} & \text{if } 3 \le \textcolor{blue}{TEWS} \le 4 \\
+			\text{\textbf{\textcolor{green!60!black}{Green (Non-Urgent)}}} & \text{if } \textcolor{blue}{TEWS} \le 2
+		\end{cases}
+		\]
+		
+		\vspace{0.1cm}
+		\textbf{Detailed Breakdown:}
+		\begin{itemize}
+			\item \textbf{$C(\textcolor{blue}{TEWS})$}: The Category or Color assigned based on the Danger Score.
+			\item \textbf{Logic Constraints ($\le, >$)}: These strict numerical boundaries act as an automated digital filter. If a score is 5, it cannot be subjectively argued as Yellow; the math strictly categorizes it as Orange.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 10: Methodology (Phase 2) ---
+	\begin{frame}{4. Methodology: Digital GPS \& Routing (Phase 2)}
+		Once the color is set, the system acts like a hospital GPS. It strictly controls where the patient is allowed to go based on their color:
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item \textbf{\textcolor{red}{Red Pathway}:} The system forces a direct route to the emergency room, skipping all registration and payment desks to save time.
+			\item \textbf{\textcolor{yellow!90!black}{Yellow Pathway}:} The system sends the patient to the waiting room but simultaneously sends automatic digital requests to the Lab to prepare tests in advance.
+			\item \textbf{\textcolor{green!60!black}{Green Pathway}:} The system redirects healthy, non-urgent cases away from the ER and into regular outpatient clinics to prevent overcrowding.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 11: Methodology (Phase 3 & 4) ---
+	\begin{frame}{4. Methodology: Timers \& Validation (Phases 3 \& 4)}
+		\textbf{Phase 3: The Digital Stopwatch}
+		\begin{itemize}
+			\item The system constantly tracks elapsed waiting time: 
+			\[
+			\textcolor{red}{\Delta t} = \textcolor{blue}{t_{current}} - \textcolor{green!60!black}{t_0}
+			\]
+			\begin{itemize}
+				\item \textbf{\textcolor{red}{$\Delta t$}:} The total time the patient has spent waiting.
+				\item \textbf{\textcolor{blue}{$t_{current}$}:} The actual current time on the system's clock.
+				\item \textbf{\textcolor{green!60!black}{$t_0$}:} The exact timestamp when the patient was initially triaged.
+			\end{itemize}
+			\item If $\textcolor{red}{\Delta t}$ approaches their safety limit ($T_{max}$ e.g., 60 mins for Yellow), an alarm triggers.
+			\item This forces staff to collect new vitals. The engine instantly \textbf{recalculates the TEWS}, allowing for dynamic color upgrades if they worsen.
+		\end{itemize}
+		\vspace{0.1cm}
+		\textbf{Phase 4: Integration \& Validation}
+		\begin{itemize}
+			\item \textbf{Universal Integration:} The chatbot serves as just one example of an interactive terminal that can feed data into this scalable mathematical backend.
+			\item \textbf{Proving it Works:} System efficiency is validated via retrospective computer simulation using historical hospital data.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 12: Analysis & Expected Results ---
+	\section{Analysis \& Results}
+	\begin{frame}{5. Analysis and Expected Results}
+		\begin{block}{Evaluation Metrics}
+			\begin{itemize}
+				\item \textbf{Sensitivity:} Did the TEWS algorithm catch all truly sick patients?
+				\item \textbf{Specificity:} Did it correctly filter out the healthy ones?
+				\item \textbf{Process Efficiency:} Reduction in total wait times [4].
+			\end{itemize}
+		\end{block}
+		
+		\begin{block}{Expected Outcomes}
+			\begin{itemize}
+				\item A 24/7 ``Digital Architect'' free from computational fatigue.
+				\item Significant reduction in ED congestion via Green Path diversions.
+				\item Systemic safety through mathematically guaranteed routing.
+			\end{itemize}
+		\end{block}
+	\end{frame}
+	
+	% --- SLIDE 13: Conclusion ---
+	\section{Conclusion}
+	\begin{frame}{6. Conclusion \& Recommendations}
+		\textbf{Conclusion}
+		\begin{itemize}
+			\item Transforming triage from a manual task to a mathematically-driven navigation system addresses the root causes of overcrowding.
+			\item Rigid algorithms ensure safety is \textit{systemic}, not accidental.
+			\item The chatbot is the user-friendly frontend to a computational engine that saves lives and optimizes flow.
+		\end{itemize}
+		\vspace{0.3cm}
+		\textbf{Recommendations}
+		\begin{itemize}
+			\item LMIC hospitals should adopt digital tools to \textit{support}, not replace, clinical staff [2].
+			\item Future policy should explicitly integrate ``Blue Pathways'' for structured efficiency.
+		\end{itemize}
+	\end{frame}
+	
+	% --- SLIDE 14: References ---
+	\begin{frame}{References}
+		\small
+		\begin{itemize}
+			\item[{[1]}] Rominski, S., et al. (2014). The implementation of the South African Triage Score (SATS) in an urban teaching hospital, Ghana. \textit{African Journal of Emergency Medicine}.
+			\item[{[2]}] Kamau, S., et al. (2024). Comparison between the Smart Triage model and ETAT guidelines in triaging children in Kenya. \textit{PLOS Digital Health}.
+			\item[{[3]}] Nurchis, M., et al. (2025). Assessing the Impact of Waiting Time on Triage Color Code Assignment and One-Year Mortality. \textit{Health Science Reports}.
+			\item[{[4]}] Mitchell, R., et al. (2023). Systematic review: What is the impact of triage implementation on clinical outcomes in LMIC emergency departments? \textit{Academic Emergency Medicine}.
+		\end{itemize}
+	\end{frame}
+	
+\end{document}

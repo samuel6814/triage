@@ -1,0 +1,191 @@
+\documentclass[12pt, a4paper]{article}
+
+% Required Packages
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{top=1in, bottom=1in, left=1in, right=1in}
+\usepackage{xcolor}
+\usepackage{amssymb} % For square symbols
+\usepackage{enumitem} % For better list formatting
+\usepackage{titlesec} % For customizing section titles
+\usepackage{hyperref} % For clickable links (if any)
+\usepackage{mathptmx} % Times New Roman font (standard for academic papers)
+
+% Define Custom Triage Colors
+\definecolor{triageRed}{RGB}{220, 20, 60}
+\definecolor{triageOrange}{RGB}{255, 140, 0}
+\definecolor{triageYellow}{RGB}{255, 200, 0}
+\definecolor{triageGreen}{RGB}{34, 139, 34}
+\definecolor{triageBlue}{RGB}{0, 0, 139}
+
+% Customize Section Formatting
+\titleformat{\section}{\large\bfseries}{\thesection.}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+% Meta Information
+\title{\textbf{Project Synopsis}\\\Large Design and Simulation of an Integrated Digital Acuity System: Automating Color-Coded Clinical Pathways in Low- and Middle-Income Countries (LMICs)}
+\author{}
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	\vspace{-1.5cm} % Pull the text up slightly after the title
+	
+	% ---------------------------------------------------------
+	\section{Introduction (Background of Study)}
+	% ---------------------------------------------------------
+	\begin{quote}
+		\textit{``Triage is not just about sorting; it is about the right patient getting the right care at the right time.''} \\
+		--- South African Triage Group
+	\end{quote}
+	
+	In high-functioning healthcare systems, \textbf{Triage} (the process of prioritizing patients based on the severity of their condition) is a continuous, dynamic status that dictates a patient's entire journey through the hospital. To achieve this, hospitals use standardized scoring scales, such as the \textbf{South African Triage Scale (SATS)} for adults and \textbf{Emergency Triage Assessment and Treatment (ETAT)} for children. 
+	
+	These scales utilize color codes to classify clinical severity:
+	\begin{itemize}[label={}, leftmargin=1.5em]
+		\item \textcolor{triageRed}{$\blacksquare$} \textbf{Red:} Emergency (Immediate life-saving care needed).
+		\item \textcolor{triageOrange}{$\blacksquare$} \textbf{Orange:} Very Urgent (Potentially life-threatening; care needed within 10 minutes).
+		\item \textcolor{triageYellow}{$\blacksquare$} \textbf{Yellow:} Urgent (Serious but stable; care needed within 60 minutes).
+		\item \textcolor{triageGreen}{$\blacksquare$} \textbf{Green:} Non-Urgent (Minor conditions; can wait safely).
+		\item \textcolor{triageBlue}{$\blacksquare$} \textbf{Blue:} Dead on Arrival (DOA) or unsuccessful resuscitation.
+	\end{itemize}
+	
+	Ideally, these colors are designed to be more than just descriptive labels; they are supposed to trigger specific \textbf{``Clinical Pathways.''} A clinical pathway is a standardized, step-by-step roadmap that defines exactly where a patient goes, what tests they need, and how quickly they must be treated. 
+	
+	However, in many \textbf{Low- and Middle-Income Countries (LMICs)}---nations with developing economies and resource-constrained healthcare systems---the utility of this assigned color often ends at the front desk. Once a patient leaves the triage area, the hospital ecosystem effectively ``forgets'' their acuity (urgency) level. A ``Yellow'' patient transferred to the X-ray department or a general ward often joins a generic, first-come-first-served queue, losing the time-critical protections their color was meant to provide. 
+	
+	This project proposes a hospital-wide digital framework that attaches a specific, automated clinical pathway to every patient. By digitizing the triage logic, the system acts as a \textbf{``Flow Management Engine,''} ensuring that the urgency assigned at the door dictates the allocation of hospital resources (beds, labs, doctors) throughout the patient's entire stay.
+	
+	% ---------------------------------------------------------
+	\section{Problem Statement}
+	% ---------------------------------------------------------
+	Current hospital workflows in resource-constrained settings suffer from systemic bottlenecks at the triage level and a critical failure known as \textbf{``Acuity Discontinuity''}---meaning the patient's urgency level is not continuously tracked. This manifests in four major operational problems:
+	
+	\begin{itemize}
+		\item \textbf{The Pre-Triage Bottleneck (Delayed Assessment):} In overcrowded LMIC hospitals, patients often wait hours just to reach the triage desk. This ``queue to get into the queue'' means that time-critical conditions (like sepsis or internal bleeding) may deteriorate significantly before a healthcare professional even conducts the initial color-coding assessment.
+		
+		\item \textbf{Cognitive Load and Subjectivity:} In manual systems, nurses must quickly memorize and calculate the \textbf{Triage Early Warning Score (TEWS)} under immense pressure. This reliance on human calculation leads to subjectivity and errors, such as \textbf{Under-triage} (sending a critically ill patient to a low-priority queue) or \textbf{Over-triage} (wasting emergency resources on a healthy patient).
+		
+		\item \textbf{Static Triage vs. Dynamic Deterioration:} Manual triage is typically a one-time, static event. If a ``Yellow'' patient sits in the waiting room for three hours, there is no automated system prompting nurses to re-evaluate their vital signs. The patient may covertly transition to an ``Orange'' or ``Red'' state without the staff realizing until it is too late.
+		
+		\item \textbf{The ``Lost'' Urgency (Information Silos):} A patient triaged as ``Orange'' (Very Urgent) in the Emergency Department (ED) often becomes invisible to the system once moved to a diagnostic unit or ward. There is no digital mechanism or timer to track if their strict 10-minute target to see a doctor is actually met, resulting in dangerous delays.
+	\end{itemize}
+	
+	% ---------------------------------------------------------
+	\section{Objectives}
+	% ---------------------------------------------------------
+	\subsection*{General Objective}
+	To design a logic-based digital framework that automates the assignment and management of color-coded clinical pathways to optimize patient flow and safety in LMIC hospitals.
+	
+	\subsection*{Specific Objectives}
+	\begin{enumerate}
+		\item \textbf{To Digitize Triage Logic:} Develop a ``Digital Acuity Engine'' that converts standard SATS/TEWS paper algorithms into computer code, automatically calculating a patient's color based on their inputted vital signs and symptoms to eliminate human math errors.
+		\item \textbf{To Map Hospital-Wide Pathways:} Define strict, step-by-step logistical and clinical rules for each of the color categories that extend beyond the Emergency Room to all departments.
+		\item \textbf{To Design the ``Virtual Interface'':} Create a chatbot-based user interface that acts as a virtual triage assistant, capable of rapidly assessing patients upon arrival, telling staff what to do (e.g., ``Patient is deteriorating, re-assess now''), and telling patients where to go.
+		\item \textbf{To Simulate System Efficiency:} Model the theoretical impact of this automated routing on \textbf{Patient Throughput} (how fast a patient moves from entry to discharge) and \textbf{Resource Utilization} (how efficiently hospital beds are used) compared to traditional manual workflows.
+		
+	\end{enumerate}
+	
+	% ---------------------------------------------------------
+	\section{System Description: The ``Five-Path'' Logic}
+	% ---------------------------------------------------------
+	The core of this research is engineering the ``Rule Book'' that the chatbot will follow. The system will automate the following pathways:
+	
+	\begin{itemize}
+		\item \textcolor{triageRed}{$\blacksquare$} \textbf{Pathway A: The RED Protocol (Immediate Resuscitation)}
+		\begin{itemize}
+			\item \textit{System Action:} Triggers a ``Code Red'' alarm on the devices of senior doctors. The system allows the patient to bypass all registration and payment desks.
+			\item \textit{Destination:} Resuscitation Room.
+		\end{itemize}
+		
+		\item \textcolor{triageOrange}{$\blacksquare$} \textbf{Pathway B: The ORANGE Protocol (High Dependency)}
+		\begin{itemize}
+			\item \textit{System Action:} Allocates a hospital bed immediately and starts a strict 10-minute digital countdown timer. If a doctor does not log into the system to claim the patient within 10 minutes, it escalates an alert to the head nurse.
+		\end{itemize}
+		
+		\item \textcolor{triageYellow}{$\blacksquare$} \textbf{Pathway C: The YELLOW Protocol (Parallel Processing)}
+		\begin{itemize}
+			\item \textit{System Action:} The system introduces ``Standing Orders.'' This means the system automatically orders basic laboratory tests (like a Malaria test) \textit{while} the patient is waiting for the doctor. This reduces the time required to diagnose the patient.
+		\end{itemize}
+		
+		\item \textcolor{triageGreen}{$\blacksquare$} \textbf{Pathway D: The GREEN Protocol (Decongestion)}
+		\begin{itemize}
+			\item \textit{System Action:} The system actively diverts non-urgent patients away from the Emergency Department. It issues a digital ticket directing them to the \textbf{Outpatient Department (OPD)} or Polyclinic, keeping emergency beds free.
+		\end{itemize}
+		
+		\item \textcolor{triageBlue}{$\blacksquare$} \textbf{Pathway E: The BLUE Protocol (Dignity Protocol)}
+		\begin{itemize}
+			\item \textit{System Action:} For deceased patients, the system initiates a silent protocol. It directly notifies mortuary transport services and hospital social workers/chaplains without sounding emergency alarms, keeping clinical bays clear.
+		\end{itemize}
+	\end{itemize}
+	
+	% ---------------------------------------------------------
+	\section{Methodology}
+	% ---------------------------------------------------------
+	The research will follow a \textbf{Design Science Research (DSR)} approach, which focuses on creating an innovative IT artifact (the system) to solve a real-world problem. It is structured in four phases:
+	
+	\begin{itemize}
+		\item \textbf{Phase 1: Knowledge Capture \& Workflow Analysis}
+		\begin{itemize}
+			\item Reviewing Standard Operating Procedures (SOPs) from partner hospitals to map exactly how patients currently move through the building.
+			\item Interviewing triage nurses to identify ``pain points'' where the manual color-coding system breaks down.
+		\end{itemize}
+		
+		\item \textbf{Phase 2: Logic Modeling (The ``Artifact'')}
+		\begin{itemize}
+			\item Constructing the software algorithms (decision trees) that dictate the Five-Path Logic detailed above.
+		\end{itemize}
+		
+		\item \textbf{Phase 3: Prototype Development}
+		\begin{itemize}
+			\item Building a functional prototype of the Chatbot Interface using a conversational AI framework (like Python or Dialogflow). This chatbot will serve as the input/output screen to rapidly triage patients and provide pathway instructions.
+		\end{itemize}
+		
+		\item \textbf{Phase 4: Simulation Testing}
+		\begin{itemize}
+			\item Feeding anonymized, historical patient data into the newly built digital model to verify if the chatbot assigns the correct color and routes the patient correctly compared to what an expert human physician would do.
+		\end{itemize}
+	\end{itemize}
+	
+	% ---------------------------------------------------------
+	\section{Analysis and Expected Results}
+	% ---------------------------------------------------------
+	\subsection*{Analysis Metrics}
+	The system's performance will be statistically evaluated using \textbf{Confusion Matrices} (a table layout that visualizes the performance of an algorithm) to measure:
+	\begin{itemize}
+		\item \textbf{Sensitivity:} The system's ability to successfully identify and catch the truly sick patients.
+		\item \textbf{Specificity:} The system's ability to correctly filter out the healthy, non-urgent patients.
+		\item \textbf{Process Efficiency:} Measured by simulating the reduction in \textbf{``Time to Provider''} (the total minutes a patient waits before being seen by a doctor). 
+	\end{itemize}
+	
+	\subsection*{Expected Results}
+	\begin{itemize}
+		\item A standardized, digital architecture for hospital flow that functions 24/7 without suffering from human fatigue or calculation errors.
+		\item A significant theoretical reduction in Emergency Department overcrowding, achieved by successfully diverting ``Green'' patients to outpatient clinics before they enter the ED.
+		\item Improved patient safety through dynamic tracking, ensuring ``Yellow'' and ``Orange'' patients do not deteriorate unnoticed in the waiting room.
+	\end{itemize}
+	
+	% ---------------------------------------------------------
+	\section{Conclusion and Recommendations}
+	% ---------------------------------------------------------
+	\subsection*{Conclusion}
+	Transforming triage from a manual ``gatekeeping'' task into a digital ``navigation'' system addresses the root causes of ED overcrowding and patient neglect. Digital tools reduce the need for extensive memorization by staff and allow for the rapid, objective identification of critically ill patients. By strictly enforcing color-coded clinical pathways via an AI chatbot interface, hospitals can ensure that patient safety is an automated, systemic guarantee, rather than an accidental outcome dependent on how busy the staff is. 
+	
+	\subsection*{Recommendations}
+	\begin{itemize}
+		\item Hospitals in LMICs should actively adopt digital acuity tools to support---not replace---their overburdened clinical staff.
+		\item Future implementations should focus on integrating these chatbot interfaces into common mobile platforms (like WhatsApp or USSD) to allow patients to begin the pre-triage process before even arriving at the hospital.
+	\end{itemize}
+	
+	% ---------------------------------------------------------
+	\section{References}
+	% ---------------------------------------------------------
+	\begin{enumerate}
+		\item Rominski, S., et al. (2014). The implementation of the South African Triage Score (SATS) in an urban teaching hospital, Ghana. \textit{African Journal of Emergency Medicine}.
+		\item Kamau, S., et al. (2024). Comparison between the Smart Triage model and ETAT guidelines in triaging children in Kenya. \textit{PLOS Digital Health}.
+		\item Nurchis, M., et al. (2025). Assessing the Impact of Waiting Time on Triage Color Code Assignment and One-Year Mortality. \textit{Health Science Reports}.
+		\item Mitchell, R., et al. (2023). Systematic review: What is the impact of triage implementation on clinical outcomes in LMIC emergency departments? \textit{Academic Emergency Medicine}.
+	\end{enumerate}
+	
+\end{document}

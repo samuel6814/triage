@@ -1,0 +1,456 @@
+\documentclass[aspectratio=169]{beamer}
+
+% Theme and Color
+\usetheme{AnnArbor}
+\usecolortheme{spruce} % Spruce provides a professional green color scheme
+\setbeamercolor{title}{bg=green!70!black, fg=white}
+\setbeamercolor{frametitle}{bg=green!70!black, fg=white}
+\setbeamercolor{structure}{fg=green!70!black}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+% Packages
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{caption}
+
+% Define Triage Colors
+\definecolor{triagered}{RGB}{220, 20, 60}
+\definecolor{triageorange}{RGB}{255, 140, 0}
+\definecolor{triageyellow}{RGB}{255, 215, 0}
+\definecolor{triagegreen}{RGB}{34, 139, 34}
+\definecolor{triageblue}{RGB}{30, 144, 255}
+
+\title{Hospital Chatbot for Color-Coded Clinical Pathways}
+\subtitle{Literature Review}
+\author{}
+\date{\today}
+
+\begin{document}
+	
+	% Title Slide
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	% Table of Contents
+	\begin{frame}{Table of Contents}
+		\tableofcontents
+	\end{frame}
+	
+	% ==========================================
+	% SECTION 1: Clinical Pathways & Chatbots
+	% ==========================================
+	\section{Clinical Pathways \& Chatbots}
+	
+	% --- FRAME 1: Defining Clinical Pathways & The Bottleneck ---
+	\begin{frame}{What are Clinical Pathways?}
+		\textbf{Clinical Pathways} are evidence-based, structured multidisciplinary care plans used by health services to detail essential steps in the care of patients with a specific clinical problem \cite{Sundstrom2014}.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{The Core Problem:} Emergency Departments (EDs) globally suffer from severe overcrowding. A major cause is the "Green Tag Burden"—patients with non-urgent, primary-care level symptoms overwhelming the acute care infrastructure \cite{Yilmaz2021}.
+			\item \textbf{The Pathway Solution:} Clinical pathways standardize care and reduce these delays. For example, pathways allow low-risk patients to bypass acute ED beds entirely, gaining direct admission to appropriate medical wards or outpatient clinics, drastically reducing wait times \cite{Sundstrom2014}.
+			\item \textbf{Standardization:} They translate complex medical guidelines into localized, step-by-step algorithms that healthcare workers can easily follow.
+		\end{itemize}
+	\end{frame}
+	
+	% --- FRAME 2: The Role of Color-Coding ---
+	\begin{frame}{Wayfinding and Color-Coded Navigation}
+		Hospitals are highly stressful, complex environments. Research demonstrates that visual communication significantly improves patient compliance and reduces anxiety.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Environmental Graphic Design (EGD):} Applying strict color-coding to hospital layouts, signage, and clinical files helps differentiate areas and intuitively guides patients through a complex facility without requiring high health literacy \cite{Dwiputri2019}.
+			\item \textbf{Improving Patient Compliance:} Color-coding is not just for physical navigation; it is used for clinical management. A study by Benn et al. (2020) proved that sorting patients into color-coded risk files (e.g., \textcolor{triagegreen}{\textbf{Green}} for compliant, \textcolor{triagered}{\textbf{Red}} for non-compliant) directly improved monitoring and reduced patient drop-out rates \cite{Benn2020}.
+			\item \textbf{Cognitive Offloading:} By associating a specific urgency and department with a distinct color, both hospital staff and patients instantly understand the priority level without needing to read complex medical charts.
+		\end{itemize}
+	\end{frame}
+	
+	% --- FRAME 3: Project Application ---
+	\begin{frame}{Project Focus: The Chatbot as a Pathway Director}
+		\textbf{In this project:} We are designing a digital system that bridges physiological triage, color-coded navigation, and artificial intelligence.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{The Digital Front Door:} Before a patient physically enters the ward and contributes to overcrowding, the chatbot calculates their Triage Early Warning Score (TEWS).
+			\item \textbf{Algorithmic Routing:} The chatbot acts as an automated traffic controller. It maps the calculated physiological score directly to a predefined, color-coded hospital pathway.
+			\item \textbf{Practical Examples:} 
+			\begin{itemize}
+				\item A patient with chest pain and tachycardia is mathematically scored and assigned the \textcolor{triageorange}{\textbf{Orange Pathway}}, alerting the cardiac team.
+				\item A patient with a mild rash is assigned the \textcolor{triagegreen}{\textbf{Green Pathway}}, dynamically routing them to an outpatient clinic and keeping an ED bed free.
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Evolution of Healthcare Chatbot Technologies}
+		Modern clinical chatbots have evolved through three distinct technological paradigms:
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Rule-Based (Decision Trees):} The earliest models. They use rigid, hard-coded "if-then" logic to navigate clinical pathways. 
+			\begin{itemize}
+				\item \textit{Pros:} High clinical safety; zero risk of AI "hallucinations."
+				\item \textit{Cons:} Frustrating user experience; cannot handle natural language or complex, overlapping symptoms.
+			\end{itemize}
+			\item \textbf{NLP \& Probabilistic ML:} Uses Natural Language Processing (NLP) to extract medical entities (e.g., mapping "my head is throbbing" to the clinical term "headache"). It employs statistical models, like Bayesian networks, to calculate the probability of urgency.
+			\item \textbf{Generative AI \& LLMs:} Powered by Large Language Models (like Med-PaLM or GPT-4). 
+			\begin{itemize}
+				\item \textit{Advantage:} Highly empathetic, context-aware, and capable of multi-turn conversations.
+				\item \textit{Requirement:} Must be anchored by strict "Clinical Guardrails" to ensure they strictly follow established triage logic (like SATS) rather than inventing medical advice.
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Existing Real-World Triage Chatbots}
+		Several commercial AI chatbots currently perform pre-hospital triage with high clinical validity, paving the way for hospital-specific implementations:
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Ada Health:} A global symptom assessment app. In peer-reviewed benchmarks, Ada correctly recognized medical conditions with 99\% accuracy and provided safe triage advice in 97\% of cases, effectively diverting low-acuity patients away from overcrowded Emergency Rooms.
+			\item \textbf{Infermedica:} An AI triage engine used by health systems. Real-world deployment showed it modified care-seeking behavior in over 80\% of interactions, significantly reducing unnecessary emergency care intent.
+			\item \textbf{Sensely's Virtual Nurse ("Molly"):} Uses an avatar-based conversational interface combined with NLP to monitor chronic conditions, verify medication adherence, and prevent acute emergency readmissions.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{The Future: Agentic AI in Hospital Workflows}
+		The cutting-edge approach for this project is moving from a simple "chatbot" to an \textbf{Agentic AI Workflow}.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{From Assistant to Agent:} Instead of just answering questions, Agentic AI acts autonomously within the hospital's digital infrastructure. It serves as the intelligent "digital front door."
+			\item \textbf{Autonomous Triage Execution in SATS:} 
+			\begin{enumerate}
+				\item \textbf{Data Ingestion:} The agent extracts vital signs ($V_i$) and unstructured symptoms via text or voice.
+				\item \textbf{Calculation:} It mathematically computes the Triage Early Warning Score (TEWS).
+				\item \textbf{Action Engine:} Instead of just displaying the score, the agent automatically routes the patient to the correct color-coded pathway via API, updates the Electronic Health Record (EHR), and instantly alerts the required specialist (e.g., Cardiology for an \textcolor{triageorange}{\textbf{Orange Code}}).
+			\end{enumerate}
+		\end{itemize}
+	\end{frame}
+	% ==========================================
+	% SECTION 2: Triage Systems Overview
+	% ==========================================
+	% ==========================================
+	% SECTION 2: Triage Systems Overview
+	% ==========================================
+	\section{Triage Systems Overview}
+	
+	\begin{frame}{The Core of the System: Medical Triage}
+		\textbf{Triage} (from the French \textit{trier}, "to sort") is the continuous, dynamic prioritization of patient care based on illness severity and resource availability. It acts as the operational bottleneck of any healthcare system.
+		\vspace{0.2cm}
+		\\It is divided into two fundamentally different categories:
+		\begin{enumerate}
+			\item \textbf{Pre-Hospital / Mass Casualty Triage:} Deployed when medical infrastructure is physically overwhelmed (e.g., disasters, multi-vehicle collisions). The ethical framework shifts to utilitarianism: "the greatest good for the greatest number."
+			\item \textbf{Hospital / Emergency Department (ED) Triage:} Deployed for daily operations. The ethical framework focuses on maximizing individual clinical outcomes while managing facility flow and predicting resource consumption.
+		\end{enumerate}
+	\end{frame}
+	
+	\begin{frame}{1. Pre-Hospital \& Mass Casualty Triage}
+		Used in chaotic field environments where resources are outmatched by casualty volume. The priority is rapid physiological assessment, often mandated to take under 60 seconds per patient \cite{Rusiecki2025}.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{START / JumpSTART:} The legacy standard. First responders rapidly sort patients by checking Respiration, Perfusion (pulse/capillary refill), and Mental Status (RPM).
+			\item \textbf{MASS (Move, Assess, Sort, Send):} Uses global verbal commands to immediately identify and filter out ambulatory patients (the "walking wounded") before hands-on assessment begins.
+			\item \textbf{Autonomous Triage (DARPA Triage Challenge):} The cutting-edge standard. Emerging multi-agent systems use UAVs and \textbf{Multimodal Bayesian Networks} to assess casualties without human contact. Fusing computer vision inputs, these networks can detect severe hemorrhage and respiratory distress, recently demonstrating a jump in diagnostic coverage from 31\% to 95\% in field scenarios \cite{Rusiecki2025}.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{2. Hospital / Emergency Department Triage}
+		Used to safely queue patients in standard hospital settings. Several global models exist, but they have distinct operational flaws:
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Emergency Severity Index (ESI):} A 5-level US system. It predicts how many hospital resources (e.g., CT scans, IV fluids) a patient will consume. However, a massive 2023 JAMA cohort study of 5 million ED visits revealed a mistriage rate of 32\%, with a critically low sensitivity (66\%) for identifying high-acuity illness. It is highly subjective and prone to dangerous \textbf{under-triage} \cite{Berkowitz2019}.
+			\item \textbf{Canadian/Australasian Scales (CTAS/ATS):} Enforce strict maximum waiting times before a physician assessment is legally required.
+			\item \textbf{The Green Tag Burden:} A global ED crisis is the influx of Priority 3/Green Tag patients using emergency services for primary care \cite{Yilmaz2021}. A specialized chatbot can actively divert these low-acuity patients to outpatient clinics \cite{Sundstrom2014}.
+		\end{itemize}
+	\end{frame}
+	
+	% --- FRAME: The Australasian Triage Scale (ATS) ---
+	\begin{frame}{The Australasian Triage Scale (ATS)}
+		
+		
+		Developed in the 1990s, the ATS is a five-tier system used across Australia and New Zealand. Its defining characteristic is the strict mathematical enforcement of \textbf{Maximum Waiting Times} and \textbf{Performance Indicator Thresholds (PIT)}.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Category 1 (Immediate):} 0 minutes. PIT: 100\% of patients must be seen within this time.
+			\item \textbf{Category 2 (Emergent):} 10 minutes. PIT: 80\% compliance required by the hospital.
+			\item \textbf{Category 3 (Urgent):} 30 minutes. PIT: 75\% compliance required.
+			\item \textbf{Category 4 (Less Urgent):} 60 minutes. PIT: 70\% compliance required.
+			\item \textbf{Category 5 (Non-Urgent):} 120 minutes. PIT: 70\% compliance required.
+		\end{itemize}
+		\textbf{System Implication:} ATS acts as an operational auditing tool. A digital hospital system must timestamp patient arrival and dynamically alert staff when a patient approaches their KPI threshold.
+	\end{frame}
+	
+	% --- FRAME: The Manchester Triage System (MTS) ---
+	\begin{frame}{The Manchester Triage System (MTS)}
+		
+		
+		Widely used across Europe (UK, Portugal, Germany), the MTS shifts the focus from purely physiological metrics to \textbf{Presenting Complaint Flowcharts}.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Flowchart Methodology:} The system contains 52+ specific algorithmic flowcharts based on the patient's main complaint (e.g., "Abdominal Pain" or "Shortness of Breath").
+			\item \textbf{Discriminators:} The clinician navigates the flowchart by checking for "General Discriminators" (e.g., life threat, hemorrhage, consciousness level) and "Specific Discriminators" (e.g., persistent vomiting).
+			\item \textbf{Chatbot Relevance:} Because MTS relies on navigating a rigid, visual decision-tree, it is highly translatable into a Rule-Based digital chatbot.
+			\item \textbf{Limitations:} Extensive clinical studies show MTS has a strong tendency toward \textbf{over-triage}, particularly in pediatric populations and patients with chronic illnesses.
+		\end{itemize}
+	\end{frame}
+	
+	% --- FRAME: Comparing ED Systems for Digital Implementation ---
+	\begin{frame}{Comparing ED Systems for AI Implementation}
+		When designing a clinical chatbot, the choice of the underlying triage logic dictates your entire software architecture:
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{ESI (US):} Requires the AI to predict \textit{future resource consumption} (labs, X-rays), which is highly subjective and difficult for a pre-hospital chatbot to calculate.
+			\item \textbf{MTS (Europe):} Provides a clean decision-tree for programming, but relies heavily on the user correctly identifying their chief complaint from 50+ broad options.
+			\item \textbf{ATS (Australasia):} Excellent for managing time-based backend queues, but lacks a strict physiological scoring mechanism for an AI to calculate urgency initially.
+			\item \textbf{Conclusion for this Project:} We use \textbf{SATS} because it utilizes an objective, mathematical point-based system (TEWS) derived from hard physiological numbers (vital signs), eliminating subjective guesswork for both the AI and the user in LMICs.
+		\end{itemize}
+	\end{frame}
+	
+	% ==========================================
+	% SECTION 3: The South African Triage Scale (SATS)
+	% ==========================================
+	\section{SATS \& The LMIC Context}
+	
+	\begin{frame}{Why SATS? Context for Ghana (LMICs)}
+		Implementing systems like ESI in Low-to-Middle-Income Countries (LMICs) is practically impossible due to critical shortages of nursing staff and prohibitively expensive diagnostic equipment \cite{Mitchell2023, Mitchell2021}.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Objective Physiology:} Unlike ESI, the South African Triage Scale (SATS) does not rely on subjective nursing intuition. It is mathematically grounded in vital signs (The TEWS Score), creating a standardized baseline \cite{SATS2012}.
+			\item \textbf{Task-Shifting:} Because it is formulaic, SATS safely allows medical trainees, nursing assistants, and digital algorithms to triage accurately—a necessity in resource-constrained environments \cite{Gyedu2016, Conti2022}.
+			\item \textbf{Proven in Ghana (KATH):} Studies at the Komfo Anokye Teaching Hospital (KATH) Accident and Emergency Unit demonstrate that SATS effectively stratifies risk. Even under immense volume, KATH maintains an under-triage rate of just 5.7\% (well within the acceptable bounds of the American College of Surgeons), proving its robustness in our local context \cite{Rominski2014}.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Recognized Color Codes in SATS}
+		SATS utilizes an internationally recognized visual clinical pathway based on strict urgency thresholds. When translating this to a digital chatbot, the mathematical engine targets these specific intervention timelines \cite{SATS2012}:
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textcolor{triagered}{\textbf{RED (Emergency):}} Immediate life threat (e.g., cardiac arrest, uncontrolled hemorrhage). Target time to physician: \textbf{0 minutes} (Immediate Resuscitation).
+			\item \textcolor{triageorange}{\textbf{ORANGE (Very Urgent):}} Serious, potentially life-threatening condition (e.g., shortness of breath, severe pain). Target time to physician: \textbf{$<10$ minutes}.
+			\item \textcolor{triageyellow}{\textbf{YELLOW (Urgent):}} Significant condition, but physiologically stable (e.g., closed fractures, moderate trauma). Target time to physician: \textbf{$<60$ minutes}.
+			\item \textcolor{triagegreen}{\textbf{GREEN (Routine):}} Minor injuries or illnesses (e.g., chronic back pain, minor lacerations). Target time to physician: \textbf{$<240$ minutes}.
+			\item \textcolor{triageblue}{\textbf{BLUE (Dead):}} Dead on arrival.
+		\end{itemize}
+	\end{frame}
+
+% ==========================================
+% SECTION 4: Mathematical Modeling & AI
+% ==========================================
+\section{Mathematical Modeling \& AI}
+
+\begin{frame}{Triage Early Warning Score (TEWS)}
+	SATS uses a mathematical formulation called TEWS to evaluate six parameters \cite{SATS2012}:
+	\vspace{0.2cm}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			1. Mobility\\
+			2. Respiratory Rate (RR)\\
+			3. Heart Rate (HR)
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			4. Temperature ($^\circ$C)\\
+			5. AVPU (Neurological Status)\\
+			6. Trauma Presence
+		\end{column}
+	\end{columns}
+	\vspace{0.3cm}
+	Each physiological range is mapped to a discrete integer score (0 to 3). However, translating this into a digital chatbot requires distinct mathematical paradigms depending on the AI architecture.
+\end{frame}
+
+\begin{frame}{Model 1: The Deterministic Algebraic Model (Rule-Based)}
+	The foundational logic of the chatbot operates on a deterministic weighted summation. This is ideal for structured numerical inputs (vital signs).
+	
+	\begin{block}{General Triage Equation}
+		\begin{equation}
+			T = \sum_{i=1}^{n} w_i \cdot f(V_i)
+		\end{equation}
+	\end{block}
+	
+	\begin{itemize}
+		\item $V_i$: The continuous input of the $i$-th vital sign.
+		\item $f(V_i)$: A piecewise step function mapping the raw vital sign to a discrete sub-score (e.g., HR of 125 maps to 2).
+		\item $w_i$: The assigned weight. In standard SATS, $w_i = 1$.
+		\item \textbf{Limitation:} This model fails if a vital sign is missing (e.g., the user does not have a thermometer at home) or if the patient's text input is vague.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Model 2: The Probabilistic Bayesian Model}
+	To handle uncertainty—such as missing vital signs in pre-hospital chatbot triage—we utilize a Multimodal Bayesian Network \cite{Rusiecki2025}. The chatbot calculates the probability of a specific color code given the observed evidence.
+	
+	\begin{block}{Bayesian Triage Formulation}
+		\begin{equation}
+			P(C_k \mid E) = \frac{P(E \mid C_k) P(C_k)}{\sum_{j} P(E \mid C_j) P(C_j)}
+		\end{equation}
+	\end{block}
+	
+	\begin{itemize}
+		\item $C_k$: The target triage class (e.g., $C_{red}, C_{orange}, C_{yellow}, C_{green}$).
+		\item $E$: The vector of observed evidence (partial vitals or symptoms).
+		\item $P(C_k)$: The prior probability of that acuity level occurring in the hospital.
+		\item \textbf{Advantage:} If temperature ($V_4$) is missing, the AI does not crash. It mathematically infers the most probable acuity based on the remaining evidence (e.g., high HR + Trauma).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Model 3: Deep Attention NLP Model (Processing Text)}
+	Patients rarely speak in physiological numbers; they speak in unstructured text (e.g., "My chest hurts heavily"). The chatbot uses a \textbf{Deep Attention Mechanism} via Recurrent Neural Networks to mathematically weigh the importance of different words in the patient's prompt \cite{Gligorijevic2018}.
+	
+	\begin{block}{Softmax Attention Formulation}
+		\begin{equation}
+			\alpha_j = \frac{\exp(e_j)}{\sum_{k=1}^{m} \exp(e_k)}
+		\end{equation}
+	\end{block}
+	
+	\begin{itemize}
+		\item $e_j$: The raw alignment score of a specific word (how relevant it is to a clinical discriminator).
+		\item $\alpha_j$: The normalized attention weight (between 0 and 1).
+		\item \textbf{Application:} The algorithm suppresses filler words (low $\alpha$) and assigns massive mathematical weight to clinical keywords (e.g., "chest" and "pain"). The text score is then fused with the algebraic score ($T$) to make a final routing decision.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Algorithmic Decision Pathway (Hybrid Execution)}
+	The chatbot acts as an ensemble engine, combining the Deterministic Score ($T$), Probabilistic Inference ($P$), and Textual Discriminators ($D$) extracted by the Attention Model.
+	
+	\begin{block}{Color Classification Logic}
+		Let $C \in \{\text{Green}, \text{Yellow}, \text{Orange}, \text{Red}\}$ \\
+		\vspace{0.2cm}
+		If $D \in \text{Red Discriminators}$ (via NLP Attention), then $C = \text{Red}$ \\
+		Else If $T \geq 7$, then $C = \text{Red}$ \\
+		Else If $T \in [5, 6]$, then $C = \text{Orange}$ \\
+		Else If $T \in [3, 4]$, then $C = \text{Yellow}$ \\
+		Else If Evidence is Incomplete, output $\arg\max_k P(C_k \mid E)$ \\
+		Else $C = \text{Green}$
+	\end{block}
+\end{frame}
+	
+	% --- COMPREHENSIVE EXAMPLE (FRAME 1) ---
+	\begin{frame}{Comprehensive Application: A Real-World Scenario (Part 1)}
+		\textbf{The Scenario:} A 55-year-old patient in Kumasi interacts with the hospital chatbot via SMS. 
+		\vspace{0.2cm}\\
+		\textit{Patient Input:} "I woke up and my chest is crushing me. I feel dizzy. I counted my pulse and it is fast, about 125 beats. I am breathing heavy, 26 times a minute. I don't have a thermometer to check my temperature."
+		\vspace{0.4cm}\\
+		\textbf{Step 1: Deep Attention NLP Execution (Method 2)}
+		\begin{itemize}
+			\item The NLP engine ingests the text. The attention formulation $\alpha_j$ isolates "chest", "crushing", and "dizzy".
+			\item \textbf{Output:} Maps directly to the SATS Clinical Discriminator ($D$) = \textbf{Central Chest Pain}.
+		\end{itemize}
+	\end{frame}
+	
+	% --- COMPREHENSIVE EXAMPLE (FRAME 2) ---
+	\begin{frame}{Comprehensive Application: A Real-World Scenario (Part 2)}
+		\textbf{Step 2: Deterministic Algebraic Execution (Method 1)}
+		\begin{itemize}
+			\item The chatbot extracts the hard numbers to calculate the TEWS ($T$):
+			\item Heart Rate = 125 $\rightarrow f(V_{HR}) = 2$ points.
+			\item Respiratory Rate = 26 $\rightarrow f(V_{RR}) = 2$ points.
+			\item \textbf{Output:} The known algebraic score is $T = 4$. In standard SATS, a score of 4 only triggers a \textcolor{triageyellow}{\textbf{Yellow Pathway}}.
+		\end{itemize}
+		\vspace{0.3cm}
+		\textbf{Step 3: Probabilistic Bayesian Execution (Method 3)}
+		\begin{itemize}
+			\item The algebraic model is missing temperature and blood pressure.
+			\item The Bayesian network takes the evidence ($E$ = Chest Pain + HR 125 + RR 26) and calculates the probability of severe cardiac distress. 
+			\item \textbf{Output:} The Bayesian engine predicts a high probability that the missing blood pressure is dangerously abnormal, updating the risk profile $P(C_{Orange} \mid E) = 0.89$.
+		\end{itemize}
+	\end{frame}
+	
+	% --- COMPREHENSIVE EXAMPLE (FRAME 3) ---
+	\begin{frame}{Comprehensive Application: The Final Hybrid Decision}
+		\textbf{Step 4: The Final Routing Decision}
+		The chatbot processes the outputs from all three mathematical engines through its master logic controller:
+		\vspace{0.2cm}
+		\begin{block}{Execution Logic}
+			1. Base TEWS Algebraic Score ($T$) = 4 (\textcolor{triageyellow}{Yellow}) \\
+			2. Bayesian Adjusted Risk ($P$) = High Cardiac Risk \\
+			3. NLP Extracted Discriminator ($D$) = Central Chest Pain
+		\end{block}
+		\vspace{0.2cm}
+		\textbf{Final Action:} According to SATS, the presence of the "Central Chest Pain" discriminator instantly overrides the lower algebraic score of 4. The chatbot safely upgrades the patient, bypassing the standard queue, and assigns them to the \textcolor{triageorange}{\textbf{Orange Clinical Pathway}}, immediately alerting the hospital's cardiology dashboard.
+	\end{frame}
+	
+	% --- COMPARATIVE ANALYSIS FRAME 1 ---
+	\begin{frame}{Comparative Analysis: Which Method is Superior?}
+		In clinical AI architecture, no single mathematical model is universally "superior" in isolation. Each paradigm possesses specific strengths but carries fatal operational flaws when deployed alone in chaotic emergency settings.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Deterministic Algebraic (TEWS):} Superior for clinical interpretability and regulatory safety (a "white-box" algorithm). \textit{Flaw:} It is completely rigid. It fails or severely under-triages a patient if a single vital sign is missing.
+			\item \textbf{Deep Attention NLP:} Superior for extracting medical meaning from unstructured patient narratives and symptoms. \textit{Flaw:} Highly susceptible to misinterpreting context (like panic or slang) if not bounded by hard clinical rules.
+			\item \textbf{Probabilistic Bayesian:} Superior for handling uncertainty and statistically inferring missing data (e.g., lack of a blood pressure cuff at home). \textit{Flaw:} Relies heavily on generalized population priors, which might overlook acute, unique individual symptoms.
+		\end{itemize}
+	\end{frame}
+	
+	% --- COMPARATIVE ANALYSIS FRAME 2 ---
+	\begin{frame}{The Superiority of the Hybrid Ensemble Architecture}
+		Current state-of-the-art research in medical AI definitively proves that a \textbf{Hybrid Tri-Model System (Ensemble Architecture)} is the superior approach for medical triage.
+		\vspace{0.2cm}
+		\begin{itemize}
+			\item \textbf{Zero Single Point of Failure:} By combining all three methods, the vulnerabilities of one engine are actively compensated for by the strengths of another. 
+			\item \textbf{Multimodal Superiority:} Recent clinical implementations show that integrating structured data (vital signs via Algebra), unstructured data (text via NLP), and probability (Bayesian networks) dramatically outperforms unimodal models in accurately predicting hospital admissions.
+			\item \textbf{Conclusion for the Project:} The Hybrid framework is the most scientifically sound architecture. It provides the conversational flexibility of NLP, the fault-tolerance of Bayesian statistics, and the absolute clinical safety of deterministic SATS mathematics.
+		\end{itemize}
+	\end{frame}
+	
+	
+	% ==========================================
+	% REFERENCES
+	% ==========================================
+	\begin{frame}[allowframebreaks]{References}
+		\tiny
+		\begin{thebibliography}{99}
+			
+			\bibitem{An2025}
+			An, J., et al. (2025). Conversational Agents for Older Adults' Health: A Systematic Literature Review. \textit{arXiv preprint arXiv:2503.23153}.
+			
+			\bibitem{Ahmed}
+			Ahmed, A., et al. An Adaptive Simulated Annealing-Based Machine Learning Approach for Developing an E-Triage Tool. \textit{Unpublished manuscript}.
+			
+			\bibitem{Benn2020}
+			Benn, C.A., et al. (2020). Colour Coding Navigation: "Triage" Techniques to Improve Compliance. \textit{Eur J Breast Health}, 16(4): 262-266.
+			
+			\bibitem{Berkowitz2019}
+			Berkowitz, D., et al. Under-triage: A New Trigger to Drive Quality Improvement in the Emergency Department. 
+			
+			\bibitem{Cheng2025}
+			Cheng, H., et al. (2025). Collaborative Medical Triage under Uncertainty: A Multi-Agent Dynamic Matching Approach. \textit{arXiv preprint arXiv:2507.22504}.
+			
+			\bibitem{Conti2022}
+			Conti, A., et al. (2022). Implementation of SATS in a New Ambulance System in Beira, Mozambique. \textit{Int J Environ Res Public Health}, 19(16).
+			
+			\bibitem{Defilippo2024}
+			Defilippo, A., et al. (2024). Leveraging graph neural networks for supporting Automatic Triage of Patients. \textit{arXiv preprint arXiv:2403.07038}.
+			
+			\bibitem{Dwiputri2019}
+			Dwiputri, A., \& Swasty, W. (2019). Color Coding and Thematic Environmental Graphic Design in Hermina Children's Hospital. \textit{J. Vis. Art \& Des.}, 11(1).
+			
+			\bibitem{Gligorijevic2018}
+			Gligorijevic, D., et al. (2018). Deep Attention Model for Triage of Emergency Department Patients. \textit{arXiv preprint arXiv:1804.03240}.
+			
+			\bibitem{Gyedu2016}
+			Gyedu, A., et al. (2016). Triage capabilities of medical trainees in Ghana using SATS. \textit{PanAfrican Medical Journal}.
+			
+			\bibitem{Jindal2023}
+			Jindal, A., et al. (2023). Usability of an artificially intelligence-powered triage platform for adult ophthalmic emergencies. \textit{Scientific Reports}, 13:22490.
+			
+			\bibitem{Mitchell2021}
+			Mitchell, R., et al. (2021). Validation of the Interagency Integrated Triage Tool in a resource-limited, urban emergency department in Papua New Guinea. \textit{Lancet Reg Health West Pac}, 13.
+			
+			\bibitem{Mitchell2023}
+			Mitchell, R., et al. (2023). Systematic review: What is the impact of triage implementation on clinical outcomes in LMICs? \textit{Academic Emergency Medicine}.
+			
+			\bibitem{Nurchis2025}
+			Nurchis, M.C., et al. (2025). Assessing the Impact of Waiting Time on Triage Color Code Assignment and One-Year Mortality. \textit{Health Science Reports}.
+			
+			\bibitem{Rominski2014}
+			Rominski, S., et al. (2014). The implementation of the South African Triage Score (SATS) in an urban teaching hospital, Ghana. \textit{African Journal of Emergency Medicine}, 4, 71-75.
+			
+			\bibitem{Rusiecki2025}
+			Rusiecki, S., et al. (2025). Multimodal Bayesian Network for Robust Assessment of Casualties in Autonomous Triage. \textit{arXiv preprint arXiv:2512.18908}.
+			
+			\bibitem{SATS2012}
+			South African Triage Group (2012). \textit{The South African Triage Scale (SATS) Training Manual}. Western Cape Government Health.
+			
+			\bibitem{Sundstrom2014}
+			Sundstr\"om, B.W., et al. (2014). A pathway care model allowing low-risk patients to gain direct admission to a hospital medical ward. \textit{Scand J Trauma Resusc Emerg Med}, 22:72.
+			
+			\bibitem{Yilmaz2021}
+			Yilmaz, E. (2021). The Reasons of Apply to the Emergency Department By Priority 3 (Green Tags) Coded Patients. \textit{South Clin Ist Euras}, 32(2).
+			
+		\end{thebibliography}
+	\end{frame}
+	
+\end{document}

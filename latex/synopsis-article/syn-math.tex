@@ -1,0 +1,212 @@
+\documentclass[12pt, a4paper]{article}
+
+% Required Packages
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{top=1in, bottom=1in, left=1in, right=1in}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb} 
+\usepackage{titlesec} 
+\usepackage{mathptmx} 
+
+% Hyperref for Clickable ToC and Citations
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,      % Color of internal links (like ToC)
+	citecolor=blue,      % Color of bibliography citations
+	urlcolor=blue        % Color of external URLs
+}
+
+% Define Custom Triage Colors
+\definecolor{triageRed}{RGB}{220, 20, 60}
+\definecolor{triageOrange}{RGB}{255, 140, 0}
+\definecolor{triageYellow}{RGB}{255, 200, 0}
+\definecolor{triageGreen}{RGB}{34, 139, 34}
+\definecolor{triageBlue}{RGB}{0, 0, 139}
+
+% Customize Section Formatting
+\titleformat{\section}{\large\bfseries}{\thesection.}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+	
+	% ---------------------------------------------------------
+	% TITLE PAGE
+	% ---------------------------------------------------------
+	\begin{titlepage}
+		\centering
+		\vspace*{4cm}
+		
+		{\Huge \textbf{Hopstial Chatbot for Color-Coded Clinical Pathways} \par}
+		\vspace{2cm}
+		
+		{\Large \textbf{} \par}
+		\vspace{0.5cm}
+		{\Large Automating Color-Coded Clinical Pathways in Low- and Middle-Income Countries (LMICs) \par}
+		
+		\vspace{4cm}
+		
+		% You can add your name, supervisor name, or institution here later
+		{\large \today \par}
+		
+		\vfill
+	\end{titlepage}
+	
+	% ---------------------------------------------------------
+	% TABLE OF CONTENTS
+	% ---------------------------------------------------------
+	\tableofcontents
+	\newpage
+	
+	% ---------------------------------------------------------
+	\section{Introduction (Background of Study)}
+	% ---------------------------------------------------------
+	\begin{quote}
+		\textit{``Triage is not just about sorting; it is about the right patient getting the right care at the right time.''} \\
+		--- South African Triage Group
+	\end{quote}
+	
+	In high-functioning healthcare systems, triage is a continuous, dynamic status that dictates a patient's entire journey through the hospital. Standardized scales, such as the South African Triage Scale (SATS) \cite{rominski2014} and ETAT \cite{kamau2024}, utilize discrete color codes to classify clinical severity:
+	\begin{itemize}
+		\item \textcolor{triageRed}{$\blacksquare$} \textbf{Red:} Emergency (Immediate life-saving care needed)
+		\item \textcolor{triageOrange}{$\blacksquare$} \textbf{Orange:} Very Urgent (Care needed within 10 minutes)
+		\item \textcolor{triageYellow}{$\blacksquare$} \textbf{Yellow:} Urgent (Care needed within 60 minutes)
+		\item \textcolor{triageGreen}{$\blacksquare$} \textbf{Green:} Non-Urgent (Can wait safely or be redirected)
+		\item \textcolor{triageBlue}{$\blacksquare$} \textbf{Blue:} Dead (Deceased on arrival)
+	\end{itemize}
+	
+	Mathematically, these colors are designed to be more than just labels; they act as triggers for specific ``Clinical Pathways'' that define exactly where a patient goes and the strict time constraints under which they must be treated. 
+	
+	However, in many Low- and Middle-Income Countries (LMICs), the utility of this color often ends at the front desk. Once a patient leaves the triage area, the hospital ecosystem effectively ``forgets'' their acuity level. A ``Yellow'' patient transferred to a diagnostic unit often joins a generic queue, losing their time-critical priority \cite{mitchell2023}. This project proposes a hospital-wide digital framework that digitizes this triage logic, acting as a ``Flow Management Engine'' that algorithmically dictates the allocation of resources throughout the patient's entire stay.
+	
+	% ---------------------------------------------------------
+	\section{Problem Statement}
+	% ---------------------------------------------------------
+	Current hospital workflows in resource-constrained settings suffer from systemic bottlenecks at the triage level and a critical failure known as \textbf{``Acuity Discontinuity''}. This breakdown in the processing of patient flow manifests in four major operational problems:
+	
+	\begin{itemize}
+		\item \textbf{The Pre-Triage Queue Bottleneck:} In overcrowded LMIC hospitals, patients experience massive delays just to reach the physical triage desk. Time-critical conditions deteriorate significantly before the initial assessment can even take place \cite{mitchell2023}.
+		
+		\item \textbf{Cognitive Load and Computational Error:} In manual systems, nurses must rapidly calculate the Triage Early Warning Score (TEWS) mentally. This reliance on human computation leads to subjective mathematical errors, resulting in \textbf{Under-triage} (allocating a critically ill patient to a low-priority state) or \textbf{Over-triage} (wasting acute resources on a healthy patient).
+		
+		\item \textbf{Static Triage vs. Dynamic Deterioration:} Manual triage functions as a one-time event. If a ``Yellow'' patient waits for three hours, there is no system prompting nurses to re-evaluate their vital signs. The patient may covertly transition to a dangerous ``Orange'' state without the hospital recognizing the change \cite{nurchis2025}.
+		
+		\item \textbf{Information Silos and Lost Urgency:} A patient triaged as ``Orange'' (Very Urgent) in the Emergency Department (ED) becomes invisible to the overall system once moved. There is no digital mechanism to track if their strict 10-minute review target is actually met. Furthermore, ``Green'' (Non-urgent) patients frequently congest acute care zones, causing dangerous delays for truly critical ``Red'' patients due to bed blockages \cite{nurchis2025}.
+	\end{itemize}
+	
+	% ---------------------------------------------------------
+	\section{Objectives}
+	% ---------------------------------------------------------
+	\subsection*{General Objective}
+	To design a logic-based digital framework and chatbot interface that automates the assignment and continuous management of color-coded clinical pathways to optimize patient flow and safety in LMIC hospitals.
+	
+	\subsection*{Specific Objectives}
+	The specific objectives are engineered to directly resolve the operational bottlenecks identified above:
+	\begin{enumerate}
+		\item \textbf{To Eliminate the Pre-Triage Bottleneck:} Design an asynchronous chatbot interface that allows for the rapid, automated collection of patient symptoms immediately upon arrival.
+		\item \textbf{To Automate Acuity Computation:} Develop a ``Digital Acuity Engine'' that converts standard paper triage algorithms into strict computer code, objectively calculating patient color based on physiological inputs to eliminate human mathematical errors.
+		\item \textbf{To Implement Dynamic State Tracking:} Engineer automated countdown timers within the system that actively track elapsed wait times, prompting staff to input new vital signs to dynamically recalculate priority if a patient waits too long.
+		\item \textbf{To Break Down Information Silos:} Define strict logistical rules for the five color categories beyond the ER, ensuring priority states travel as digital tags across all hospital departments.
+		\item \textbf{To Simulate System Efficiency:} Model the theoretical impact of this automated routing on overall Patient Throughput and Resource Utilization compared to traditional manual workflows.
+	\end{enumerate}
+	
+	% ---------------------------------------------------------
+	\section{Methodology \& System Architecture (The Mathematical Core)}
+	% ---------------------------------------------------------
+	The research adopts a \textbf{Design Science Research (DSR)} methodology. Before any software (like a chatbot) is built, the triage process is formally modeled as a mathematical system. The chatbot simply serves as the user-friendly interface to compute this underlying math.
+	
+	\subsection*{Phase 1: The Acuity Engine (Calculating the Danger Level)}
+	Triage is fundamentally a problem of turning physical symptoms into a quantifiable number. Let a patient ($P_i$) present with a set of clinical vital signs represented by an input vector $V_i = [\text{HR}, \text{RR}, \text{SBP}, \text{T}, \text{AVPU}]$, representing Heart Rate, Respiratory Rate, Systolic Blood Pressure, Temperature, and Neurological Status.
+	
+	The \textbf{Digital Acuity Engine} computes a continuous Triage Early Warning Score ($\text{TEWS}$) using a weighted summation function:
+	\begin{equation}
+		\text{TEWS}(P_i) = \sum_{k=1}^{n} w_k \cdot f_k(v_k)
+	\end{equation}
+	
+	Operationally, this means that instead of relying on subjective human estimation, the engine employs a strict computational approach. For every vital sign inputted, the system calculates its deviation from a normal, healthy baseline (represented by $f_k$) and multiplies it by the clinical importance of that specific sign (the weight, $w_k$). These individual scores are aggregated to generate one objective physiological danger score. 
+	
+	Next, the system applies a classification function to map this numeric score into a discrete clinical color:
+	\begin{equation}
+		C(\text{TEWS}) = 
+		\begin{cases} 
+			\text{Red} & \text{if } \text{TEWS} \geq 7 \\
+			\text{Orange} & \text{if } 5 \leq \text{TEWS} \leq 6 \\
+			\text{Yellow} & \text{if } 3 \leq \text{TEWS} \leq 4 \\
+			\text{Green} & \text{if } \text{TEWS} \leq 2 
+		\end{cases}
+	\end{equation}
+	
+	This piecewise function acts as an automated digital sorting filter \cite{rominski2014}. If the total physiological danger score is 7 or higher, the system instantly flags the patient as ``Red''. Conversely, a score of 2 or below flags them as ``Green''. This translation of continuous variables into discrete categories entirely removes human subjectivity from the triage sorting process.
+	
+	\subsection*{Phase 2: Graph-Theoretic Routing (Directing Hospital Traffic)}
+	Once the color is established, the patient's movement through the hospital is modeled as a directed graph $G = (N, E)$. The nodes ($N$) represent physical hospital departments (like the ER, Lab, or Pharmacy), and the edges ($E$) represent the permitted physical paths the patient can take.
+	
+	The system acts as a digital GPS, utilizing a routing function $R$ to dictate where the patient is allowed to go based on their color:
+	\begin{itemize}
+		\item \textbf{Red Path ($R_{Red}$):} Forces an immediate path straight to the Resuscitation Room, mathematically bypassing all registration and payment desks.
+		\item \textbf{Yellow Path ($R_{Yellow}$):} Establishes parallel processing. It routes the patient to the waiting room while simultaneously sending an automated digital request to the Lab for blood tests, drastically saving diagnostic time.
+		\item \textbf{Green Path ($R_{Green}$):} Actively severs the path to the Emergency Room. The system redirects the patient to the Outpatient Polyclinic, ensuring non-urgent cases do not consume emergency resources.
+	\end{itemize}
+	
+	\subsection*{Phase 3: Priority Queuing (The Digital Stopwatch)}
+	Emergency Departments operate as multi-class priority queues. Each color state dictates a maximum allowable wait time constraint, $T_{max}$ (e.g., Orange = 10 minutes, Yellow = 60 minutes). The system constantly monitors the elapsed waiting time: $\Delta t = t_{current} - t_0$. 
+	
+	Practically, this functions as a digital stopwatch attached to every patient the moment they are triaged. If a ``Yellow'' patient's wait time approaches their 60-minute limit ($\Delta t \to T_{max}$), the system triggers an automated alarm on the clinical dashboard. Because a patient's health can rapidly deteriorate while waiting \cite{nurchis2025}, this system-generated interrupt forces the nursing staff to collect new vital signs. The mathematical engine then recalculates the TEWS, allowing for an instant, dynamic upgrade to ``Orange'' or ``Red'' if deterioration is detected.
+	
+	\subsection*{Phase 4: Computational Implementation and Validation}
+	Only after this mathematical logic is mapped out is the software built. The chatbot (developed using frameworks like Dialogflow or Python) acts as the interactive terminal that asks the patient questions and feeds their answers into the mathematical engine. 
+	
+	To validate the architecture, the project conducts \textbf{Retrospective Simulation Testing}. We will feed anonymized, historical hospital data into our mathematical model to prove that our digital engine routes patients faster and more accurately than the manual system.
+	
+	% ---------------------------------------------------------
+	\section{Analysis and Expected Results}
+	% ---------------------------------------------------------
+	\subsection*{Analysis Metrics}
+	The system's performance will be statistically evaluated using Confusion Matrices to measure:
+	\begin{itemize}
+		\item \textbf{Sensitivity:} Did the mathematical algorithm successfully catch all the truly sick patients?
+		\item \textbf{Specificity:} Did the algorithm correctly filter out the healthy, non-urgent ones?
+		\item \textbf{Process Efficiency:} Evaluated by simulating the reduction in the total time a patient spends waiting to see a doctor \cite{mitchell2023}.
+	\end{itemize}
+	
+	\subsection*{Expected Results}
+	\begin{itemize}
+		\item A standardized ``Digital Architect'' for hospital flow that functions 24/7 without computational fatigue or human bias.
+		\item A significant theoretical reduction in ED congestion by successfully executing the Green Path diversion.
+		\item Improved safety and systemic integrity through mathematically guaranteed routing of time-critical pathways.
+	\end{itemize}
+	
+	% ---------------------------------------------------------
+	\section{Conclusion and Recommendations}
+	% ---------------------------------------------------------
+	\subsection*{Conclusion}
+	Transforming triage from a manual gatekeeping task into a digital, mathematically-driven navigation system addresses the root causes of ED overcrowding. By enforcing color-coded pathways through rigid algorithms, hospitals can ensure that safety is systemic, not accidental. The chatbot interface merely provides the accessible, user-friendly frontend for a highly structured computational engine capable of saving lives and optimizing hospital flow.
+	
+	\subsection*{Recommendations}
+	\begin{itemize}
+		\item Hospitals in LMICs should adopt these digital acuity tools to support, rather than replace, their overburdened clinical staff \cite{kamau2024}.
+		\item Future policy should integrate ``Blue Pathways'' explicitly into emergency frameworks to handle mortality with structured efficiency.
+	\end{itemize}
+	
+	% ---------------------------------------------------------
+	% REFERENCES (Converted to a proper LaTeX Bibliography)
+	% ---------------------------------------------------------
+	\begin{thebibliography}{9}
+		
+		\bibitem{rominski2014} 
+		Rominski, S., et al. (2014). The implementation of the South African Triage Score (SATS) in an urban teaching hospital, Ghana. \textit{African Journal of Emergency Medicine}.
+		
+		\bibitem{kamau2024} 
+		Kamau, S., et al. (2024). Comparison between the Smart Triage model and ETAT guidelines in triaging children in Kenya. \textit{PLOS Digital Health}.
+		
+		\bibitem{nurchis2025} 
+		Nurchis, M., et al. (2025). Assessing the Impact of Waiting Time on Triage Color Code Assignment and One-Year Mortality. \textit{Health Science Reports}.
+		
+		\bibitem{mitchell2023} 
+		Mitchell, R., et al. (2023). Systematic review: What is the impact of triage implementation on clinical outcomes in LMIC emergency departments? \textit{Academic Emergency Medicine}.
+		
+	\end{thebibliography}
+	
+\end{document}

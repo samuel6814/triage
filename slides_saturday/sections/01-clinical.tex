@@ -1,0 +1,62 @@
+% =============================================================================
+\section{Clinical Foundations}
+% =============================================================================
+
+\begin{frame}{What is triage?}
+  \textbf{Triage} sorts patients by clinical urgency so the sickest are seen first.
+
+  \vspace{0.3em}
+  Curatio uses the \textbf{South African Triage Scale (SATS)}, validated at
+  \textbf{Komfo Anokye Teaching Hospital (KATH)}, Kumasi, Ghana.
+
+  \vspace{0.4em}
+  \begin{center}
+    \begin{tikzpicture}[x=1.35cm]
+      \foreach \x/\col/\lab in {0/triageRed/Red, 1/triageOrange/Orange, 2/triageYellow/Yellow, 3/triageGreen/Green, 4/triageBlue/Blue} {
+        \fill[\col!80] (\x,0) rectangle ++(0.9,0.35);
+        \node[font=\tiny, white] at (\x+0.45,0.175) {\lab};
+      }
+      \draw[->] (-0.2,0.175) -- (5.2,0.175);
+      \node[font=\scriptsize] at (2.5,-0.35) {Most urgent \hfill Least urgent};
+    \end{tikzpicture}
+  \end{center}
+
+  \plain{Think of triage as a traffic light for the ED: each colour tells staff how quickly a patient must be seen. The system \textbf{supports} clinical staff --- it does not replace their judgment.}
+\end{frame}
+
+\begin{frame}{SATS colour codes}
+  \footnotesize
+  \begin{tabular}{@{}llp{5.8cm}@{}}
+    \toprule
+    \textbf{Colour} & \textbf{Target time} & \textbf{Clinical meaning} \\
+    \midrule
+    \sats{triageRed}{Red} & 0 min & Immediate resuscitation --- life-threatening \\
+    \sats{triageOrange}{Orange} & $< 10$ min & Very urgent --- high dependency \\
+    \sats{triageYellow}{Yellow} & $< 60$ min & Urgent --- needs physician review \\
+    \sats{triageGreen}{Green} & $< 4$ hours & Non-urgent --- routine care \\
+    \sats{triageBlue}{Blue} & $< 2$ hours & Deceased on arrival --- dignity protocol \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.5em}
+  \normalsize
+  Each colour triggers a \textbf{clinical pathway} with strict time limits and department routing.
+\end{frame}
+
+\begin{frame}{Colour $\to$ pathways $\to$ departments (Ghana)}
+  \footnotesize
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    \textbf{Colour} & \textbf{Protocol} & \textbf{Destination} & \textbf{System action} \\
+    \midrule
+    \sats{triageRed}{Red} & RED & Resuscitation Room & Code Red; bypass registration/payment \\
+    \sats{triageOrange}{Orange} & ORANGE & Majors (ED) & 10-min countdown; cardiology alert \\
+    \sats{triageYellow}{Yellow} & YELLOW & Majors (ED) & Standing orders (e.g.\ malaria test) \\
+    \sats{triageGreen}{Green} & GREEN & Minors / OPD / Polyclinic & Divert non-urgent from ER \\
+    \sats{triageBlue}{Blue} & Mortuary & --- & Silent dignity protocol; notify social workers \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.5em}
+  \plain{Curatio routes patients automatically by assigned colour --- maintaining \textbf{acuity continuity} across departments (the hospital does not ``forget'' how sick someone is).}
+\end{frame}

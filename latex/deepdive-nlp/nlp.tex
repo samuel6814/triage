@@ -1,0 +1,419 @@
+\documentclass[aspectratio=169]{beamer}
+
+% Theme selection
+\usetheme{AnnArbor}
+\usecolortheme{wolverine}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{multicol} % <-- Add this line
+
+% Title Page Information
+\title[Clinical NLP \& BioBERT]{Hospital Chatbot for Color-Coded Clinical Pathways}
+\subtitle{A Deep Dive into NLP, Transformers, and Multi-Layer Triage}
+\author{Undergraduate Research Presentation}
+\date{\today}
+
+\begin{document}
+	
+	% --- Slide 1: Title Page ---
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	% --- Slide 2: Table of Contents ---
+% --- Slide 2: Table of Contents ---
+\begin{frame}{Presentation Outline}
+	\begin{multicols}{2}
+		\tableofcontents[hideallsubsections]
+	\end{multicols}
+\end{frame}
+	
+	% ==========================================
+	\section{1. Introduction \& Key NLP Definitions}
+	% ==========================================
+	
+	% --- Slide 3 ---
+	\begin{frame}{Introduction to Clinical NLP}
+		\begin{itemize}
+			\item \textbf{Definition:} Natural Language Processing (NLP) bridges computer science and linguistics. In healthcare, it transforms highly subjective, unstructured medical text (triage notes) into structured, predictive data.
+			\item \textbf{The Core Challenge:} Emergency Department (ED) notes lack strict sequence order. Nurses write rapidly, producing high variance, typos, and abbreviations.
+			\item \textbf{Historical Evolution:}
+			\begin{itemize}
+				\item \textit{Rule-Based (1950s-80s):} Handcrafted syntax rules. Failed due to linguistic ambiguity.
+				\item \textit{Statistical (1990s-00s):} Relied on word frequencies (TF-IDF). Ignored context.
+				\item \textit{Deep Learning (2010s):} RNNs/CNNs learned features automatically.
+				\item \textit{Transformers (2017-Present) (Vaswani et al., 2017):} Attention-only architecture enabling massive parallelization and contextual understanding.
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 4 ---
+	\begin{frame}{Key NLP Definitions}
+		To understand the math, we must define the core units of NLP:
+		\begin{itemize}
+			\item \textbf{Tokenization:} The process of breaking raw text into fundamental units (words, sub-words, or characters).
+			\item \textbf{Embeddings:} Dense, low-dimensional mathematical vectors (arrays of numbers) representing the semantic meaning of a token.
+			\item \textbf{Static vs. Contextual Embeddings:} Older models (Word2Vec) (Mikolov et al., 2013) gave the word "bank" one static vector. Modern models (BERT) (Devlin et al., 2018) generate \textit{contextual} embeddings, where the vector changes dynamically depending on the surrounding sentence.
+		\end{itemize}
+	\end{frame}
+	
+	% ==========================================
+	\section{2. NLP Pipelines}
+	% ==========================================
+	
+	% --- Slide 5 ---
+	\begin{frame}{Traditional vs. Deep Learning Pipelines}
+		\begin{columns}
+			\column{0.5\textwidth}
+			\textbf{Traditional NLP Pipeline}
+			\begin{itemize}
+				\item \textit{Flow:} Tokenization $\rightarrow$ Part-of-Speech Tagging $\rightarrow$ Dependency Parsing $\rightarrow$ Entity Extraction.
+				\item \textit{Limitation:} Highly modular. Errors compound at each sequential stage. Requires manual feature engineering.
+			\end{itemize}
+			
+			\column{0.5\textwidth}
+			\textbf{Modern Deep Learning Pipeline}
+			\begin{itemize}
+				\item \textit{Flow:} Raw Text $\rightarrow$ Sub-word Tokenization $\rightarrow$ Contextual Embedding Layer $\rightarrow$ Deep Neural Network $\rightarrow$ Output Probabilities.
+				\item \textit{Advantage:} End-to-end processing. The model learns optimal representations automatically.
+			\end{itemize}
+		\end{columns}
+	\end{frame}
+	
+	% ==========================================
+	\section{3. The Mathematics of Attention}
+	% ==========================================
+	
+	% --- Slide 6 ---
+	\begin{frame}{Why Attention? (The Clinical Need)}
+		\begin{block}{The Problem with Standard Pooling}
+			Traditional neural networks take the mathematical average of all words in a document. This is dangerous in medicine: averaging treats the word "patient" with the same mathematical weight as "gunshot" or "cardiac arrest".
+		\end{block}
+		\vspace{0.3cm}
+		\textbf{The Solution:} Attention models build a dynamic neural layer to mathematically evaluate and score the "importance" of every single word based on its surrounding context.
+	\end{frame}
+	
+	% --- Slide 7 ---
+	\begin{frame}{Additive Attention Formula (Variable Breakdown)}
+		In models like the Deep Attention Model (DAM), attention is calculated via:
+		$$a(i)=\frac{exp(s(h_{n}^{(i)};\theta))}{\sum_{i=1}^{l_{n}}exp(s(h_{n}^{(i)};\theta))}$$ 
+		
+		\textbf{Defining the Parameters:}
+		\begin{itemize}
+			\item $a(i)$: The final normalized \textbf{Attention Score} (weight) for the $i$-th word.
+			\item $h_{n}^{(i)}$: The \textbf{Hidden State} (vector representation) of the $i$-th word.
+			\item $\theta$: The \textbf{Trainable Weights} of the neural network learning the attention.
+			\item $s(...)$: The \textbf{Scoring Function} (a dense neural layer) evaluating the word's importance.
+			\item $l_n$: The total \textbf{Length of the Document} (number of words).
+			\item $exp(...)$: The exponential function, used here within a \textbf{Softmax} operation to ensure all word attention scores sum up to exactly 1.0.
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 8 ---
+	\begin{frame}{Scaled Dot-Product Attention (Transformers)}
+		Transformers upgraded this to "Self-Attention", evaluating how words relate to each other:
+		$$Attention(Q, K, V) = softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+		
+		\textbf{Defining the Parameters:}
+		\begin{itemize}
+			\item $Q$ \textbf{(Query matrix):} Represents "What is this token looking for?"
+			\item $K$ \textbf{(Key matrix):} Represents "What information does this token contain?"
+			\item $V$ \textbf{(Value matrix):} The actual semantic content of the token.
+			\item $QK^T$: The \textbf{Dot Product}. This multiplies Queries and Keys to calculate mathematical similarity (alignment) between every pair of words.
+			\item $\sqrt{d_k}$: \textbf{Scaling Factor}. $d_k$ is the dimension of the Key vectors. Dividing by its square root prevents the dot products from growing too large and pushing the softmax function into regions with near-zero gradients.
+		\end{itemize}
+	\end{frame}
+	
+	% ==========================================
+	\section{4. Transformers: Architecture In-Depth}
+	% ==========================================
+	
+	% --- Slide 9 ---
+	\begin{frame}{What is a Transformer?}
+		\begin{itemize}
+			\item \textbf{Definition:} A deep learning architecture introduced by Google in 2017 ("Attention is All You Need") (Vaswani et al., 2017) that relies \textit{entirely} on self-attention mechanisms, dispensing with recurrent networks (RNNs/LSTMs) completely.
+			\item \textbf{The Core Innovation:} Because they do not process text sequentially (left-to-right), Transformers look at an entire sequence simultaneously. 
+			\item \textbf{The Benefit:} Resolves the vanishing gradient problem for long documents and allows for massive parallel computation on GPUs, leading to models with billions of parameters.
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 10 ---
+	\begin{frame}{Transformer Architecture Breakdown}
+		A standard Transformer consists of two main blocks:
+		\begin{itemize}
+			\item \textbf{Encoder:} Reads the input text and maps it into a continuous, deeply contextualized mathematical representation.
+			\item \textbf{Decoder:} Takes the Encoder's representation and generates an output sequence one token at a time (auto-regressive).
+		\end{itemize}
+		\vspace{0.2cm}
+		\textbf{Crucial Sub-components:}
+		\begin{itemize}
+			\item \textit{Positional Encoding:} Because Transformers process everything at once, they have no concept of word order. We mathematically inject sine/cosine waves into the input embeddings to track positions.
+			\item \textit{Multi-Head Attention:} Computes the $Attention(Q,K,V)$ formula multiple times in parallel, allowing the model to simultaneously focus on different relationships (e.g., one head tracks grammar, another tracks clinical symptoms).
+		\end{itemize}
+	\end{frame}
+	
+	% ==========================================
+	\section{5. Intro to BERT}
+	% ==========================================
+	
+	% --- Slide 11 ---
+	\begin{frame}{Defining BERT}
+		\textbf{B}idirectional \textbf{E}ncoder \textbf{R}epresentations from \textbf{T}ransformers (Devlin et al., 2018).
+		
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item \textbf{Architecture:} BERT is an \textbf{Encoder-Only} Transformer. It drops the Decoder because its goal is to understand text deeply, not to generate new paragraphs.
+			\item \textbf{Bidirectional Context:} Unlike previous models that looked left-to-right, BERT's self-attention looks at the entire sentence in both directions simultaneously across all its layers.
+			\item \textbf{Transfer Learning Paradigm:} BERT is "pre-trained" on massive general data (Wikipedia), learning the rules of language. We then "fine-tune" it on smaller, specific datasets (like our hospital triage data).
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 12 ---
+	\begin{frame}{How BERT Learns (Training Objectives)}
+		How do you teach a machine the English language without labeled data?
+		\vspace{0.3cm}
+		
+		\begin{enumerate}
+			\item \textbf{Masked Language Modeling (MLM):} 
+			\begin{itemize}
+				\item The model randomly hides 15\% of the words in a sentence.
+				\item BERT must use the surrounding context to predict the masked word. (e.g., "The patient presented with a severe \_\_\_\_\_ pain.")
+				\item Forces deep bidirectional semantic understanding.
+			\end{itemize}
+			\item \textbf{Next Sentence Prediction (NSP):}
+			\begin{itemize}
+				\item BERT is fed two sentences (A and B). It must predict if B logically follows A.
+				\item Teaches the model relationships spanning across entire documents.
+			\end{itemize}
+		\end{enumerate}
+	\end{frame}
+	
+	% ==========================================
+	\section{6. BioBERT \& Datasets}
+	% ==========================================
+	
+	% --- Slide 13 ---
+	\begin{frame}{The BioBERT Variant}
+		\begin{itemize}
+			\item \textbf{The Motivation:} Standard BERT fails in healthcare because medical literature contains highly specific jargon, chemical compounds, and abbreviations not found in standard English corpora.
+			\item \textbf{The Solution (BioBERT):} Researchers took the pre-trained standard BERT and continually pre-trained it for 23 extra days on massive biomedical corpora (Lee et al., 2020).
+			\item \textbf{The Datasets:}
+			\begin{itemize}
+				\item \textit{PubMed Abstracts:} Over 4.5 billion words of biomedical scientific abstracts.
+				\item \textit{PubMed Central (PMC):} Over 13.5 billion words from full-text biomedical research articles.
+			\end{itemize}
+			\item \textbf{Result:} A model that inherently understands the complex semantic relationships between diseases, drugs, and symptoms.
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 23 ---
+	\begin{frame}{Math of BERT: The Layer Computation}
+		Inside the Transformer, the data passes through $L$ identical layers. For each layer $l$:
+		
+		\textbf{Step 1: Self-Attention \& Normalization}
+		$$Z^l = LayerNorm(H^{l-1} + MultiHead(H^{l-1}, H^{l-1}, H^{l-1}))$$
+		\begin{itemize}
+			\item $H^{l-1}$: The \textbf{Input State} from the previous layer.
+			\item $MultiHead(...)$: The attention operation passing $H^{l-1}$ as Query, Key, and Value.
+			\item $LayerNorm(...)$: \textbf{Layer Normalization} standardizes the variance of the vectors to stabilize deep network training. Note the residual connection (adding $H^{l-1}$ back in).
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 24 ---
+	\begin{frame}{Math of BERT: Feed-Forward \& Output}
+		\textbf{Step 2: Non-Linearity}
+		$$H^l = LayerNorm(Z^l + FFN(Z^l))$$
+		\begin{itemize}
+			\item $Z^l$: The \textbf{Intermediate State} outputted by the attention mechanism.
+			\item $FFN(...)$: A two-layer \textbf{Feed-Forward Network} with a ReLU or GELU activation function. This applies non-linear transformations to each position identically and independently.
+			\item $H^l$: The final \textbf{Hidden State output} of layer $l$, passed to the next layer.
+		\end{itemize}
+	\end{frame}
+	
+	% ==========================================
+	\section{11. Mathematical Foundations of BERT}
+	% ==========================================
+	
+	% --- Slide 22 ---
+	\begin{frame}{Math of BERT: Input Representations}
+		Returning to the core NLP engine, before text enters the Attention layers, it is converted into a base matrix $E(token)$ via element-wise addition:
+		$$E(token) = E_{word} + E_{position} + E_{segment}$$
+		
+		\textbf{Defining the Parameters:}
+		\begin{itemize}
+			\item $E_{word}$: The base dictionary \textbf{Token Embedding} (e.g., the vector for "fever").
+			\item $E_{position}$: The \textbf{Positional Embedding}. A learned vector indicating whether the word is 1st, 5th, or 20th in the sentence.
+			\item $E_{segment}$: The \textbf{Segment Embedding}. Used during Next Sentence Prediction to tell the model if a word belongs to Sentence A or Sentence B.
+		\end{itemize}
+	\end{frame}
+	
+	
+	
+	
+	% ==========================================
+	\section{7. Layer 1: The NLP Pipeline}
+	% ==========================================
+	
+	% --- Slide 14 ---
+	\begin{frame}{Integrating BioBERT into the Hospital Chatbot}
+		\begin{block}{Layer 1: The NLP Extraction Process}
+			\begin{enumerate}
+				\item \textbf{Input:} Patient inputs raw symptoms into the chatbot interface.
+				\item \textbf{Tokenization:} The system uses WordPiece to break down complex medical terms into recognized sub-words.
+				\item \textbf{Feature Extraction:} BioBERT processes the sequence, using Multi-Head Attention to generate high-dimensional contextual embeddings.
+				\item \textbf{Dimensionality Reduction:} Optionally use Principal Component Analysis (PCA) to compress the massive feature space.
+				\item \textbf{Classification Output:} A final neural classification layer maps the embeddings to predict the initial patient disposition.
+			\end{enumerate}
+		\end{block}
+	\end{frame}
+	
+	% ==========================================
+	\section{8. Layer 2: The Deterministic Model}
+	% ==========================================
+	
+	% --- Slide 15 ---
+	\begin{frame}{Layer 2: The Deterministic Algebraic Layer (TEWS)}
+		After the NLP layer extracts subjective symptoms, we validate the patient's status using objective vital signs inputted by a provider.
+		
+		\begin{block}{The Triage Early Warning Score (TEWS) Equation}
+			$$TEWS=\sum_{k=1}^{n}w_{k}\cdot f_{k}(v_{k})$$
+		\end{block}
+		
+		\textbf{Defining the Parameters:}
+		\begin{itemize}
+			\item $v_k$: The objective \textbf{Vital Sign} (e.g., heart rate, temperature).
+			\item $f_k(...)$: A strict \textbf{Piecewise Function} that evaluates the vital sign against clinical thresholds to output a specific sub-score.
+			\item $w_k$: A \textbf{Weighting Factor} adjusting the clinical importance of the specific vital sign.
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 16 ---
+	\begin{frame}{Algorithmic Color Mapping}
+		The deterministic equation entirely removes human calculation error. The final TEWS score strictly dictates the \textbf{Color-Coded Pathway}:
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item \textbf{TEWS 7+ $\rightarrow$ Red} (Immediate Resuscitation Required)
+			\item \textbf{TEWS 5-6 $\rightarrow$ Orange} (Urgent: $<$ 10 minutes)
+			\item \textbf{TEWS 3-4 $\rightarrow$ Yellow} (Semi-Urgent: $<$ 60 minutes)
+			\item \textbf{TEWS 0-2 $\rightarrow$ Green} (Divert to Polyclinic / Non-Urgent)
+		\end{itemize}
+	\end{frame}
+	
+	% ==========================================
+	\section{9. Layer 3: The Bayesian Probabilistic Model}
+	% ==========================================
+	
+	% --- Slide 17 ---
+	\begin{frame}{Layer 3: The Bayesian Override}
+		\textbf{The Clinical Flaw:} If an active heart attack patient has temporarily normal resting vitals, the deterministic math scores them as Green (0). What if vitals are missing or misleading?
+		
+		\begin{block}{Bayes' Theorem for Medical Probability}
+			$$P(D|S)=\frac{P(S|D)\cdot P(D)}{P(S)}$$
+		\end{block}
+		
+		\textbf{Defining the Parameters:}
+		\begin{itemize}
+			\item $P(D|S)$ \textbf{(Posterior):} The final probability the patient has the severe Disease given the NLP-extracted Symptoms.
+			\item $P(S|D)$ \textbf{(Likelihood):} The probability these exact symptoms occur in patients who actually have the disease.
+			\item $P(D)$ \textbf{(Prior):} The baseline historical prevalence of the disease.
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 18 ---
+	\begin{frame}{Executing the Clinical Override}
+		\begin{itemize}
+			\item \textbf{The Calculation:} The system evaluates the NLP tokens (e.g., $S =$ Confusion, Anuria, Cold) against historical databases.
+			\item \textbf{The Result:} If the Bayesian calculation evaluates to an exceptionally high Posterior Probability (e.g., $P(SepticShock|S) = 0.92$).
+			\item \textbf{The Override:} The system triggers a \textbf{Clinical Override}, bypassing the low TEWS score and instantly upgrading the patient from the Green pathway to the Red pathway to prevent under-triage fatalities.
+		\end{itemize}
+	\end{frame}
+	
+	% ==========================================
+	\section{10. Color-Coded Clinical Pathways \& Streaming}
+	% ==========================================
+	
+	% --- Slide 19 ---
+	\begin{frame}{The Concept of Patient Streaming, (SATS Manual, 2012)}
+		Once the final triage color is determined by the 3-Layer architecture, the system enforces strict \textbf{Patient Streaming}.
+		
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item \textbf{Why Stream?} Without streaming, non-urgent (Green) patients are constantly pushed to the back of the queue by incoming emergencies, causing massive delays.
+			\item \textbf{Resource Allocation:} Streaming ensures that a patient's physical location matches the resources they require (e.g., separating a patient who needs a chair from a patient who needs a ventilator).
+			\item \textbf{The Goal:} High-acuity patients are saved immediately, while low-acuity patients are seen efficiently in an alternative area.
+		\end{itemize}
+	\end{frame}
+	
+	% --- Slide 20 ---
+	\begin{frame}{High Acuity Pathways: RED \& ORANGE}
+		\begin{block}{\textbf{RED Pathway (Emergency)}}
+			\begin{itemize}
+				\item \textbf{Target Time:} IMMEDIATE.
+				\item \textbf{Management:} Bypasses all queues. Taken directly to the \textbf{Resuscitation Room}.
+				\item \textbf{Resources:} Requires full physiological monitoring, high-powered interventions, and a full medical team response.
+			\end{itemize}
+		\end{block}
+		
+		\begin{block}{\textbf{ORANGE Pathway (Very Urgent)}}
+			\begin{itemize}
+				\item \textbf{Target Time:} $<$ 10 minutes.
+				\item \textbf{Management:} Referred to the \textbf{Majors} area of the Emergency Department.
+				\item \textbf{Resources:} Requires advanced equipment and highly trained personnel to manage imminent life threats.
+			\end{itemize}
+		\end{block}
+	\end{frame}
+	
+	% --- Slide 21 ---
+	\begin{frame}{Lower Acuity \& Special Pathways}
+		\begin{itemize}
+			\item \textbf{YELLOW Pathway (Urgent):} 
+			\begin{itemize}
+				\item \textbf{Target Time:} $<$ 1 hour.
+				\item \textbf{Management:} Referred to the \textbf{Majors} area.
+			\end{itemize}
+			\item \textbf{GREEN Pathway (Routine/Non-Urgent):} 
+			\begin{itemize}
+				\item \textbf{Target Time:} $<$ 4 hours.
+				\item \textbf{Management:} Streamed to the \textbf{Minors} area or a primary care clinic. Requires minimal resources (e.g., a single practitioner and a consultation room).
+			\end{itemize}
+			\item \textbf{BLUE Pathway (Deceased):} 
+			\begin{itemize}
+				\item \textbf{Target Time:} $<$ 2 hours.
+				\item \textbf{Management:} Dead on arrival. Referred directly to a doctor for legal certification.
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	
+	
+	% ==========================================
+	\section{12. Conclusion}
+	% ==========================================
+	
+	% --- Slide 25 ---
+	\begin{frame}{Summary: The Three-Layered Architecture}
+		By integrating these three computational models, we transform triage from a bottleneck into a high-speed, mathematically guaranteed safety net:
+		\begin{itemize}
+			\item \textbf{Layer 1 (BioBERT NLP):} Deep contextual understanding of subjective patient narratives.
+			\item \textbf{Layer 2 (Deterministic TEWS):} Mathematical security utilizing objective baseline vitals.
+			\item \textbf{Layer 3 (Bayesian Override):} Probabilistic hyper-vigilance predicting covert clinical deterioration.
+		\end{itemize}
+	\end{frame}
+	
+
+	
+	% --- Slide 27: References ---
+	\begin{frame}{References}
+		\begin{itemize}
+			\item Devlin, J., Chang, M. W., Lee, K., \& Toutanova, K. (2018). BERT: Pre-training of deep bidirectional transformers for language understanding. \textit{arXiv preprint arXiv:1810.04805}.
+			\item Lee, J., Yoon, W., Kim, S., Kim, D., Kim, S., So, C. H., \& Kang, J. (2020). BioBERT: a pre-trained biomedical language representation model for biomedical text mining. \textit{Bioinformatics}, 36(4), 1234-1240.
+			\item Mikolov, T., Chen, K., Corrado, G., \& Dean, J. (2013). Efficient estimation of word representations in vector space. \textit{arXiv preprint arXiv:1301.3781}.
+			\item Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., ... \& Polosukhin, I. (2017). Attention is all you need. \textit{Advances in neural information processing systems}, 30.
+		\end{itemize}
+	\end{frame}
+	
+\end{document}

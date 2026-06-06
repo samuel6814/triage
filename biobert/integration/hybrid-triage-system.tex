@@ -1,0 +1,551 @@
+% Hybrid triage system — full integration deck (voice, NLP, TEWS, Bayesian)
+% Compile: pdflatex hybrid-triage-system.tex (twice)
+
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{multicol}
+\usetheme{AnnArbor}
+\usecolortheme{wolverine}
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{triageRed}{RGB}{220, 20, 60}
+\definecolor{triageOrange}{RGB}{255, 140, 0}
+\definecolor{triageYellow}{RGB}{255, 200, 0}
+\definecolor{triageGreen}{RGB}{34, 139, 34}
+
+\newcommand{\bcol}[2][blue!70!black]{\textcolor{#1}{#2}}
+
+\title[Hybrid Triage System]{Hybrid Triage System Architecture}
+\subtitle{How BioBERT NLP, Deterministic TEWS, and Bayesian Models\\Work Together --- Including Voice and Twi Input}
+\author{Quaigraine Samuel}
+\institute{Department of Mathematics\\Kwame Nkrumah University of Science and Technology}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+	\tableofcontents[hideallsubsections]
+\end{frame}
+
+% ==================================================================
+\section{Introduction}
+% ==================================================================
+
+\begin{frame}{The clinical problem}
+	\textbf{Hospital Chatbot for Patient Color-Coded Clinical Pathways}
+
+	\vspace{0.3em}
+	\begin{itemize}
+		\item Emergency departments in LMICs face \textbf{overcrowding} and the \textbf{Green Tag Burden} (non-urgent patients occupying acute resources).
+		\item At KATH (Kumasi), mixed acuity and \textbf{under-triage} remain patient-safety risks.
+		\item Many patients cannot self-report reliable vitals at home; they \textit{can} describe symptoms in speech or SMS.
+	\end{itemize}
+
+	\vspace{0.3em}
+	\textbf{Solution:} A \textbf{hybrid digital triage engine} that fuses language understanding with SATS mathematics \textit{before} the patient reaches the ward.
+\end{frame}
+
+\begin{frame}{Why a hybrid system?}
+	No single model is safe alone:
+
+	\begin{center}
+		\small
+		\begin{tabular}{@{}lll@{}}
+			\toprule
+			\textbf{Model} & \textbf{Strength} & \textbf{Fatal flaw if used alone} \\
+			\midrule
+			NLP (BioBERT) & Reads free text & Cannot verify vitals; slang risk \\
+			Deterministic (TEWS) & Objective, auditable & Fails when vitals missing \\
+			Bayesian & Handles uncertainty & Population priors may mislead \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+
+	\vspace{0.4em}
+	\textbf{Design goal:} Complementary layers with a \textbf{master controller} that prioritises patient safety (minimise under-triage).
+
+	\vspace{0.2em}
+	\footnotesize Full equations, data contracts, and fusion spec: \texttt{biobert/mathematics/biobert-mathematics.pdf}.
+\end{frame}
+
+% ==================================================================
+\section{Input channels}
+% ==================================================================
+
+\begin{frame}{How patients reach the system}
+	\begin{columns}[T]
+		\column{0.48\textwidth}
+		\textbf{Channel A: Text}
+		\begin{itemize}
+			\item SMS, WhatsApp, web chat
+			\item English or Twi (typed)
+		\end{itemize}
+
+		\column{0.48\textwidth}
+		\textbf{Channel B: Voice}
+		\begin{itemize}
+			\item Microphone in app / USSD voice
+			\item Twi or English spoken
+			\item Speech $\rightarrow$ text $\rightarrow$ (translate) $\rightarrow$ NLP
+		\end{itemize}
+	\end{columns}
+
+	\vspace{0.5em}
+	\textbf{Equity:} Voice + local language support reduces literacy barriers; translation normalises input before BioBERT (trained primarily on English biomedical text).
+\end{frame}
+
+\begin{frame}{End-to-end pipeline (conceptual)}
+	\small
+	\begin{enumerate}
+		\item \textbf{Capture} --- patient speaks or types symptoms (and partial vitals if known).
+		\item \textbf{Pre-process} --- ASR (voice), Twi$\rightarrow$English translation, text cleanup.
+		\item \textbf{Layer 1 (NLP)} --- BioBERT $\rightarrow$ entities + SATS discriminators $\mathbf{D}$.
+		\item \textbf{Layer 2 (Deterministic)} --- nurse/patient vitals $\rightarrow$ TEWS score $T$ $\rightarrow$ base colour.
+		\item \textbf{Layer 3 (Bayesian)} --- evidence $E$ $\rightarrow$ $P(C_k \mid E)$, infer missing risk.
+		\item \textbf{Fusion} --- master rules $\rightarrow$ final pathway $C$ (Red/Orange/Yellow/Green/Blue).
+		\item \textbf{Output} --- colour code, queue instructions, alert to triage desk.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Data flow diagram}
+	\begin{center}
+		\footnotesize
+		\textbf{SMS/Chat} $\rightarrow$ normalise $\rightarrow$ \textbf{BioBERT} $\rightarrow$ $\mathbf{D}$ \\
+		$\downarrow$ \hspace{2em} $\swarrow$ \hspace{2em} $\searrow$ \\
+		\textbf{Voice} $\rightarrow$ ASR $\rightarrow$ Translate(tw$\rightarrow$en) $\rightarrow$ BioBERT \\
+		\vspace{0.3em}
+		\textbf{Vitals} $\rightarrow$ TEWS ($T$) \hspace{1em} \textbf{Bayesian} ($P$) \\
+		\vspace{0.3em}
+		$\downarrow$ \hspace{4em} $\downarrow$ \\
+		\hspace{2em} \textbf{Master controller} $\rightarrow$ \bcol[triageOrange]{Final colour $C$}
+	\end{center}
+
+	\vspace{0.3em}
+	All layers run in parallel where possible; fusion waits for available evidence (text always; vitals may arrive at nurse desk).
+\end{frame}
+
+% ==================================================================
+\section{Voice and translation}
+% ==================================================================
+
+\begin{frame}{Voice pipeline overview}
+	\textbf{Step 1 --- Automatic Speech Recognition (ASR):}
+	\begin{itemize}
+		\item Convert audio waveform to transcript (Twi or English).
+		\item Candidate service: \textbf{Google Cloud Speech-to-Text}.
+	\end{itemize}
+
+	\textbf{Step 2 --- Machine translation (if needed):}
+	\begin{itemize}
+		\item If transcript language $\neq$ English, translate to English.
+		\item Candidate service: \textbf{Google Cloud Translation API}.
+		\item BioBERT NER/discriminators run on \textbf{English-normalised} text.
+	\end{itemize}
+
+	\textbf{Step 3 --- NLP triage:} English text enters Layer 1 (BioBERT).
+\end{frame}
+
+\begin{frame}{Google Cloud APIs: cost and access}
+	\small
+	\begin{tabular}{@{}p{0.28\textwidth}p{0.36\textwidth}p{0.30\textwidth}@{}}
+		\toprule
+		\textbf{Service} & \textbf{Role} & \textbf{Cost / access} \\
+		\midrule
+		Speech-to-Text & Audio $\rightarrow$ text & GCP account; free tier \textbf{limited} (not unlimited) \\
+		Translation API & tw $\rightarrow$ en & $\sim$\textbf{500k characters/month} free (NMT), then paid \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.4em}
+	\begin{alertblock}{Important}
+		\begin{itemize}
+			\item APIs require a \textbf{Google Cloud project} with billing enabled (free tier still needs an account).
+			\item Translation is \textbf{not permanently free} beyond the monthly character allowance.
+		\end{itemize}
+	\end{alertblock}
+\end{frame}
+
+\begin{frame}{Twi language: support caveat}
+	\begin{alertblock}{Verify before deployment}
+		Google's published Translation language list does \textbf{not clearly include Twi} (ISO~639-1: \texttt{tw}). Do \textit{not} assume Twi$\rightarrow$English works until tested on the live API.
+	\end{alertblock}
+
+	\textbf{Fallback strategies (FYP / pilot):}
+	\begin{enumerate}
+		\item Bilingual UI: patient chooses \textbf{English} for full BioBERT path.
+		\item Twi ASR + \textbf{local glossary} (common symptom phrases $\rightarrow$ English).
+		\item Evaluate \textbf{alternate APIs} (e.g.\ Microsoft Translator language list for Akan/Twi).
+		\item SMS in Twi with human triage backup for unsupported paths.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Conceptual API sequence (implementation)}
+	\footnotesize
+	\begin{verbatim}
+POST /speech/recognize  -> transcript, language_code
+POST /translate         -> english_text (if not English)
+POST /nlp/analyze       -> entities, discriminators D
+POST /triage/compute    -> TEWS T, bayesian P, final_color C
+	\end{verbatim}
+
+	\vspace{0.3em}
+	\textbf{Audit log:} Store original Twi transcript + English translation + model outputs for clinical governance review.
+\end{frame}
+
+% ==================================================================
+\section{Layer 1: NLP and BioBERT}
+% ==================================================================
+
+\begin{frame}{Role of Layer 1 in the hybrid stack}
+	\textbf{Input:} Normalised English symptom narrative (from SMS or voice pipeline).
+
+	\textbf{Output:} Structured clinical signal $\mathbf{D}$:
+	\begin{itemize}
+		\item Named entities (symptoms, anatomy, severity)
+		\item SATS \textbf{clinical discriminators} with confidence scores
+		\item Optional: extracted numeric vitals mentioned in text (``pulse 125'')
+	\end{itemize}
+
+	\textbf{Does not:} Replace TEWS arithmetic or issue a final diagnosis.
+\end{frame}
+
+\begin{frame}{BioBERT pipeline (five steps)}
+	\begin{enumerate}
+		\item \textbf{Tokenisation} (WordPiece) --- sub-word units for rare medical terms.
+		\item \textbf{Embedding} --- $E = E_{\text{word}} + E_{\text{position}} + E_{\text{segment}}$.
+		\item \textbf{Encoder} --- $L$ Transformer layers; contextual vectors per token.
+		\item \textbf{Attention} --- high weight on clinically salient tokens (e.g.\ \textit{crushing}, \textit{chest}).
+		\item \textbf{Classification head} --- map to SATS discriminator taxonomy.
+	\end{enumerate}
+
+	\vspace{0.3em}
+	BioBERT = BERT architecture + weights continually pre-trained on PubMed/PMC (Lee et al., 2020).
+\end{frame}
+
+\begin{frame}{What BioBERT produces for fusion}
+	Define discriminator vector:
+	\[
+	\mathbf{D} = \{ d_1, d_2, \ldots, d_m \}, \quad d_j \in [0,1]
+	\]
+	each $d_j$ = confidence that discriminator $j$ is present (e.g.\ central chest pain, altered consciousness).
+
+	\vspace{0.3em}
+	\textbf{Hard safety rule (feeds master controller):}
+	\[
+	\text{if } \max_{j \in \text{Red/Orange}} d_j > \tau \Rightarrow \text{override low TEWS}
+	\]
+	Threshold $\tau$ set by clinical governance (e.g.\ 0.85).
+\end{frame}
+
+\begin{frame}{NLP when vitals are missing}
+	\textbf{Pre-hospital reality:} Patients rarely own BP cuffs or pulse oximeters.
+
+	\vspace{0.3em}
+	\begin{itemize}
+		\item Deterministic TEWS may be \textbf{incomplete} or zero.
+		\item NLP still extracts urgency from language: \textit{``chest is crushing, dizzy, cannot breathe''}.
+		\item Bayesian layer uses NLP entities as evidence $S$ for $P(D \mid S)$.
+	\end{itemize}
+
+	\vspace{0.3em}
+	\textbf{Complementarity:} NLP active when algebra is blind; algebra anchors NLP when vitals exist.
+\end{frame}
+
+\begin{frame}{Layer 1 failure modes (bounded by other layers)}
+	\begin{itemize}
+		\item Colloquial Twi idiom mistranslated $\rightarrow$ mitigated by translation QA + glossary.
+		\item Low-confidence NLP $\rightarrow$ Bayesian uses priors; nurse collects vitals.
+		\item Hallucination risk $\rightarrow$ \textbf{fixed discriminator labels only} (no generative diagnosis text).
+	\end{itemize}
+\end{frame}
+
+% ==================================================================
+\section{Layer 2: Deterministic TEWS}
+% ==================================================================
+
+\begin{frame}{Role of Layer 2}
+	\textbf{Input:} Objective vital signs $v_k$ (mobility, RR, HR, temperature, AVPU, trauma).
+
+	\textbf{Source:}
+	\begin{itemize}
+		\item Patient-reported numbers in chat (if reliable), \textit{or}
+		\item \textbf{Triage nurse} measurement on arrival (primary clinical workflow).
+	\end{itemize}
+
+	\textbf{Output:} TEWS score $T$ and base colour $C_{\text{TEWS}}$.
+\end{frame}
+
+\begin{frame}{TEWS equation}
+	\begin{block}{Triage Early Warning Score (SATS)}
+		\[
+		T = \mathrm{TEWS} = \sum_{k=1}^{n} w_k \cdot f_k(v_k)
+		\]
+	\end{block}
+	\begin{itemize}
+		\item $f_k$: piecewise scoring function per vital (0--3 points)
+		\item $w_k$: protocol weights
+		\item Fully \textbf{deterministic}: same inputs $\Rightarrow$ same $T$ (auditable, no randomness)
+	\end{itemize}
+
+	\vspace{0.2em}
+	\textbf{Example} (heart rate): $f_1(v_1)=3$ if $v_1 \geq 130$; $0$ if $51 \leq v_1 \leq 100$.
+\end{frame}
+
+\begin{frame}{Colour mapping from TEWS}
+	\[
+	C_{\text{TEWS}}(T) = \begin{cases}
+		\bcol[triageRed]{\text{Red}} & T > 7 \\
+		\bcol[triageOrange]{\text{Orange}} & 5 \leq T \leq 6 \\
+		\bcol[triageYellow]{\text{Yellow}} & 3 \leq T \leq 4 \\
+		\bcol[triageGreen]{\text{Green}} & T \leq 2
+	\end{cases}
+	\]
+
+	\vspace{0.3em}
+	\textbf{Limitation:} If any required $v_k$ is missing, $T$ may be undefined or under-estimated $\rightarrow$ Layer 3 + NLP overrides required.
+\end{frame}
+
+\begin{frame}{Dynamic re-calculation}
+	\begin{itemize}
+		\item Initial chatbot session may be \textbf{text-only} ($T$ unknown).
+		\item Nurse enters vitals at desk $\rightarrow$ system \textbf{recalculates} $T$ instantly.
+		\item Colour can \textbf{upgrade} (e.g.\ Green $\rightarrow$ Orange) if vitals worsen.
+	\end{itemize}
+
+	\vspace{0.3em}
+	\textbf{Integration point:} Layer 2 receives structured vitals from the same patient record ID as Layer 1 text session.
+\end{frame}
+
+% ==================================================================
+\section{Layer 3: Bayesian model}
+% ==================================================================
+
+\begin{frame}{Role of Layer 3}
+	\textbf{Input:} Evidence $E$ = NLP entities $\cup$ partial vitals $\cup$ demographics.
+
+	\textbf{Output:}
+	\begin{itemize}
+		\item Posterior $P(D \mid S)$ for latent severity / disease $D$
+		\item $P(C_k \mid E)$ over colour classes when evidence incomplete
+		\item \textbf{Clinical override} signal to master controller
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Bayes' theorem in triage}
+	\begin{equation*}
+		P(D \mid S) = \frac{P(S \mid D)\, P(D)}{P(S)}
+	\end{equation*}
+	\begin{itemize}
+		\item $P(D)$: \textbf{prior} (disease prevalence at hospital)
+		\item $P(S \mid D)$: \textbf{likelihood} (symptoms given disease)
+		\item $P(D \mid S)$: \textbf{posterior} --- updated urgency belief
+	\end{itemize}
+
+	\vspace{0.3em}
+	\textbf{Use case:} Normal vitals but text suggests sepsis/MI $\rightarrow$ high posterior $\Rightarrow$ upgrade pathway.
+\end{frame}
+
+\begin{frame}{Missing vitals and incomplete evidence}
+	When temperature or BP is unknown:
+	\begin{itemize}
+		\item Deterministic layer cannot complete $T$.
+		\item Bayesian network \textbf{infers} probable acuity from remaining $E$.
+		\item Master rule: if evidence incomplete,
+		\[
+		C = \arg\max_k P(C_k \mid E)
+		\]
+	\end{itemize}
+
+	\vspace{0.3em}
+	\textbf{Safety bias:} Priors and discriminators tuned to prefer \textbf{over-triage} over under-triage where ambiguous.
+\end{frame}
+
+\begin{frame}{Scenario: septic shock override}
+	\textbf{Patient text:} \textit{``I am confused, freezing cold, have not urinated today.''}
+
+	\vspace{0.2em}
+	\begin{itemize}
+		\item TEWS from sparse vitals: \bcol[triageGreen]{Green}
+		\item $P(\text{Septic shock} \mid S) \approx 0.92$
+		\item \textbf{Action:} Bayesian + discriminator rules $\Rightarrow$ \bcol[triageRed]{Red} override
+	\end{itemize}
+
+	\vspace{0.3em}
+	Under-triage requires \textbf{both} deterministic and probabilistic layers to fail; NLP discriminators add a third safety net.
+\end{frame}
+
+% ==================================================================
+\section{Master fusion}
+% ==================================================================
+
+\begin{frame}{Master controller: priority rules}
+	Let $C \in \{\text{Red}, \text{Orange}, \text{Yellow}, \text{Green}, \text{Blue}\}$.
+
+	\vspace{0.2em}
+	\small
+	\begin{enumerate}
+		\item If $\mathbf{D}$ contains Red/Orange discriminator with confidence $> \tau$ $\Rightarrow$ $C =$ Red or Orange.
+		\item Else if $T \geq 7$ $\Rightarrow$ $C =$ Red.
+		\item Else if $T \in [5,6]$ $\Rightarrow$ $C =$ Orange.
+		\item Else if $T \in [3,4]$ $\Rightarrow$ $C =$ Yellow.
+		\item Else if evidence incomplete $\Rightarrow$ $C = \arg\max_k P(C_k \mid E)$.
+		\item Else $C =$ Green.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Conflict resolution}
+	\begin{center}
+		\begin{tabular}{@{}ccc@{}}
+			\toprule
+			NLP $\mathbf{D}$ & TEWS $T$ & \textbf{Winner} \\
+			\midrule
+			High (chest pain) & Low ($T=4$) & \bcol[triageOrange]{NLP discriminator} \\
+			Low & High ($T \geq 7$) & \bcol[triageRed]{TEWS} \\
+			Ambiguous & Incomplete & \bcol[triageRed]{Bayesian} \\
+			Low & Low & Green (with disclaimer) \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+
+	\vspace{0.4em}
+	\textbf{Principle:} When in doubt, route to the \textbf{more urgent} colour (SATS philosophy).
+\end{frame}
+
+\begin{frame}{Why the ensemble is safer}
+	\begin{itemize}
+		\item \textbf{NLP} catches language-only emergencies (MI, stroke phrases).
+		\item \textbf{TEWS} anchors decisions to physiology when data exist.
+		\item \textbf{Bayesian} fills gaps when data are partial.
+		\item \textbf{Voice + translate} extends access without bypassing the same three layers.
+	\end{itemize}
+
+	\vspace{0.3em}
+	Research: multimodal triage (text + vitals + probability) outperforms unimodal models in admission prediction and resource forecasting (Gligorijevi\'c et al., 2018; Stewart et al., 2023).
+\end{frame}
+
+\begin{frame}{Outputs to the patient and hospital}
+	\begin{itemize}
+		\item \textbf{Patient:} colour explanation, expected wait guidance, when to seek immediate help.
+		\item \textbf{Triage desk:} $C$, $T$, top discriminators, transcript (Twi + English), confidence scores.
+		\item \textbf{Specialist alert:} Orange/Red cardiac or trauma flags to dashboard.
+	\end{itemize}
+
+	\vspace{0.3em}
+	\textbf{Disclaimer:} Decision support only --- final triage by qualified staff.
+\end{frame}
+
+% ==================================================================
+\section{End-to-end scenarios}
+% ==================================================================
+
+\begin{frame}{Scenario A: English SMS (chest pain) --- Part 1}
+	\textbf{Input:} \textit{``Chest is crushing. Dizzy. Pulse fast, about 125. Breathing heavy, 26 per minute. No thermometer.''}
+
+	\vspace{0.3em}
+	\textbf{Layer 1 (BioBERT):}
+	\begin{itemize}
+		\item Entities: chest pain, dizziness, tachycardia, tachypnoea
+		\item $\mathbf{D}$: Central chest pain (high confidence)
+	\end{itemize}
+
+	\textbf{Layer 2 (TEWS):} HR=125 $\to$ 2 pts; RR=26 $\to$ 2 pts; $\Rightarrow$ $T=4$ (Yellow alone).
+\end{frame}
+
+\begin{frame}{Scenario A: English SMS --- Part 2 (fusion)}
+	\textbf{Layer 3 (Bayesian):} Missing BP/temperature $\Rightarrow$ high $P(\text{cardiac event} \mid E)$.
+
+	\vspace{0.3em}
+	\begin{block}{Master decision}
+		Discriminator \textit{central chest pain} overrides $T=4$.\\
+		\textbf{Final:} \bcol[triageOrange]{Orange pathway} + cardiology alert.
+	\end{block}
+
+	\vspace{0.2em}
+	\small Same logic as comprehensive example in literature-review slides (Kumasi SMS case).
+\end{frame}
+
+\begin{frame}{Scenario B: Twi voice input}
+	\textbf{1. Voice (Twi):} Patient speaks symptom phrase.
+
+	\textbf{2. ASR:} Twi transcript (e.g.\ fever, chest pain, breathlessness colloquialism).
+
+	\textbf{3. Translate:} English: \textit{``I have fever, my chest hurts, I am short of breath.''}
+
+	\textbf{4. BioBERT:} Flags fever, chest pain, respiratory distress; high attention on \textit{chest}, \textit{breath}.
+
+	\textbf{5. Fusion:} If discriminators for cardio-respiratory distress $\Rightarrow$ urgent colour even before nurse vitals.
+
+	\vspace{0.2em}
+	\footnotesize Original Twi example from project nlp-short deck; translation step made explicit here.
+\end{frame}
+
+\begin{frame}{Scenario C: TEWS Green but NLP urgent}
+	\begin{itemize}
+		\item Nurse measures vitals: all normal $\Rightarrow$ $T=0$, $C_{\text{TEWS}}=$ Green.
+		\item Patient chat: \textit{``Worst headache of my life, stiff neck, vomiting.''}
+		\item BioBERT: possible CNS red-flag discriminator.
+		\item Bayesian: high $P(\text{meningitis/SAH} \mid S)$.
+	\end{itemize}
+
+	\vspace{0.3em}
+	\textbf{Final:} Override Green $\Rightarrow$ \bcol[triageRed]{Red/Orange}.\\
+	Demonstrates why TEWS alone is insufficient in pre-hospital chatbot use.
+\end{frame}
+
+% ==================================================================
+\section{Implementation outlook}
+% ==================================================================
+
+\begin{frame}{Modular backend architecture}
+	\begin{itemize}
+		\item \textbf{Ingestion service:} SMS, web, voice endpoints
+		\item \textbf{Language service:} ASR + translation adapters (swappable if Twi unsupported)
+		\item \textbf{NLP service:} BioBERT inference (GPU optional for prototype)
+		\item \textbf{Triage engine:} TEWS calculator + Bayesian network + fusion rules
+		\item \textbf{Persistence:} session store, audit logs, pathway definitions (SATS tables)
+	\end{itemize}
+
+	\vspace{0.3em}
+	Each module exposes JSON; fusion is a single deterministic function of module outputs.
+\end{frame}
+
+\begin{frame}{Ethics, limitations, and next steps}
+	\textbf{Limitations:}
+	\begin{itemize}
+		\item Translation errors for Twi; domain shift vs.\ PubMed training
+		\item Self-reported symptoms; no physical examination
+		\item Google API cost and language support must be validated in pilot
+	\end{itemize}
+
+	\textbf{Next steps:}
+	\begin{itemize}
+		\item Pilot at KATH with nurse-in-the-loop validation
+		\item Fine-tune BioBERT on local de-identified chat logs
+		\item Evaluate Twi fallbacks; add Ga, Hausa per main-presentation roadmap
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{References}
+	\footnotesize
+	\begin{itemize}
+		\item Lee, J., et al.\ (2020). BioBERT. \textit{Bioinformatics}, 36(4), 1234--1240.
+		\item Devlin, J., et al.\ (2018). BERT. arXiv:1810.04805.
+		\item Gligorijevi\'c, D., et al.\ (2018). Deep attention model for ED triage. arXiv:1804.03240.
+		\item Stewart, J., et al.\ (2023). NLP at ED triage: narrative review. \textit{PLoS ONE}, 18(12):e0279953.
+		\item Google Cloud. Speech-to-Text \& Translation API documentation (pricing, language support).
+		\item SATS manual; Rominski et al.\ KATH validation (project papers).
+		\item Project decks: \texttt{biobert/mathematics/}, \texttt{latex/nlp-short/}, \texttt{latex/literature-review/}.
+	\end{itemize}
+\end{frame}
+
+\end{document}
