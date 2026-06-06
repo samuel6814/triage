@@ -4,6 +4,7 @@ import MathBlock from './MathBlock';
 import PlainEnglish from './PlainEnglish';
 import FlipMathCard from './FlipMathCard';
 import ExamplePanel from './ExamplePanel';
+import InfoTooltip from './InfoTooltip';
 
 const Section = styled.div`
   display: flex;
@@ -16,6 +17,18 @@ const Title = styled.h4`
   font-size: 0.95rem;
   font-weight: 700;
   color: #166534;
+  display: flex;
+  align-items: center;
+`;
+
+const EqLabelRow = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #166534;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 `;
 
 const VariableGrid = styled.dl`
@@ -45,6 +58,7 @@ const VariableGrid = styled.dl`
 
 const MathSection = ({
   title,
+  info,
   equations = [],
   variables = [],
   compact = false,
@@ -53,16 +67,27 @@ const MathSection = ({
   example,
   flipMinHeight,
 }) => {
-  const renderFront = (eq) => (
+  const resolveEqInfo = (eq) => eq.info || (equations.length === 1 ? info : undefined);
+
+  const renderFront = (eq) => {
+    const eqInfo = resolveEqInfo(eq);
+    return (
     <>
-      <MathBlock equation={eq.latex} label={eq.label} compact={compact} />
+      {eqInfo && (
+        <EqLabelRow>
+          {eq.label}
+          <InfoTooltip topic={eqInfo} />
+        </EqLabelRow>
+      )}
+      <MathBlock equation={eq.latex} label={eqInfo ? undefined : eq.label} compact={compact} />
       {eq.explanation && (
         <PlainEnglish title={eq.explanationTitle || explanationTitle}>
           {eq.explanation}
         </PlainEnglish>
       )}
     </>
-  );
+    );
+  };
 
   const renderExample = (ex) => (
     <ExamplePanel title={ex.title}>
@@ -72,7 +97,12 @@ const MathSection = ({
 
   return (
     <Section>
-      {title && <Title>{title}</Title>}
+      {title && (
+        <Title>
+          {title}
+          {info && <InfoTooltip topic={info} />}
+        </Title>
+      )}
 
       {equations.map((eq, i) => {
         const ex = eq.example || (equations.length === 1 && i === 0 ? example : null);

@@ -26,29 +26,33 @@ const BayesianDeepDiveSlide = () => (
 
     <MathSection
       title="Bayes' rule"
-      equations={[{ latex: BAYES_POSTERIOR, example: bayesPosteriorExample }]}
+      info="bayesPosterior"
+      equations={[{ latex: BAYES_POSTERIOR, label: "Bayes' rule", info: 'bayesPosterior', example: bayesPosteriorExample }]}
       flipMinHeight={320}
     />
 
     <MathSection
       title="Evidence vector E"
-      equations={[{ latex: BAYES_EVIDENCE, example: bayesEvidenceExample }]}
+      info="bayesEvidence"
+      equations={[{ latex: BAYES_EVIDENCE, label: 'Evidence vector', info: 'bayesEvidence', example: bayesEvidenceExample }]}
       compact
       flipMinHeight={200}
     />
 
     <MathSection
       title="Pick the winner"
-      equations={[{ latex: BAYES_ARGMAX, example: bayesArgmaxExample }]}
+      info="bayesArgmax"
+      equations={[{ latex: BAYES_ARGMAX, label: 'argmax', info: 'bayesArgmax', example: bayesArgmaxExample }]}
       compact
       flipMinHeight={180}
     />
 
     <MathSection
       title="Serious disease override"
+      info="bayesDisease"
       equations={[
-        { latex: BAYES_DISEASE, example: bayesDiseaseExample },
-        { latex: BAYES_OVERRIDE, label: 'Override rule', example: bayesOverrideExample },
+        { latex: BAYES_DISEASE, label: 'P(D | S)', info: 'bayesDisease', example: bayesDiseaseExample },
+        { latex: BAYES_OVERRIDE, label: 'Override rule', info: 'bayesOverride', example: bayesOverrideExample },
       ]}
       compact
       flipMinHeight={200}

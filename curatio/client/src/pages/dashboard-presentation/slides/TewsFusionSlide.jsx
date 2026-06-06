@@ -4,6 +4,7 @@ import MathSection from '../../../components/presentation/MathSection';
 import PlainEnglish from '../../../components/presentation/PlainEnglish';
 import DataTable from '../../../components/presentation/DataTable';
 import ColourBadge from '../../../components/presentation/ColourBadge';
+import InfoTooltip from '../../../components/presentation/InfoTooltip';
 import {
   TEWS_SUM,
   TEWS_COLOUR_MAP,
@@ -32,8 +33,11 @@ const TewsFusionSlide = () => {
 
       <MathSection
         title="TEWS summation"
+        info="tewsSum"
         equations={[{
           latex: TEWS_SUM,
+          label: 'TEWS summation',
+          info: 'tewsSum',
           explanation: <p>Add points from six vitals — deterministic, no AI.</p>,
           example: tewsSumExample,
         }]}
@@ -42,8 +46,11 @@ const TewsFusionSlide = () => {
 
       <MathSection
         title="Colour from vitals alone"
+        info="tewsColourMap"
         equations={[{
           latex: TEWS_COLOUR_MAP,
+          label: 'Colour lookup',
+          info: 'tewsColourMap',
           explanation: <p>Lookup T in the table to get C_TEWS before fusion.</p>,
           example: tewsColourExample,
         }]}
@@ -53,8 +60,11 @@ const TewsFusionSlide = () => {
 
       <MathSection
         title="Numeric example"
+        info="tewsExample"
         equations={[{
           latex: TEWS_EXAMPLE,
+          label: 'Worked example',
+          info: 'tewsExample',
           explanation: <p>HR 125 + RR 26 → T = 4 → Yellow band.</p>,
           example: tewsWorkedExample,
         }]}
@@ -71,7 +81,10 @@ const TewsFusionSlide = () => {
       />
 
       <PlainEnglish>
-        <p>TEWS meets BioBERT at fusion (Step 5). Fusion picks the safer colour when they disagree.</p>
+        <p>
+          TEWS meets BioBERT at fusion (Step 5) <InfoTooltip topic="confidenceGate" />. Fusion picks
+          the safer colour when they disagree.
+        </p>
       </PlainEnglish>
     </SlideContainer>
   );

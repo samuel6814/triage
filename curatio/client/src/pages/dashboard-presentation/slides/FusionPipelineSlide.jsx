@@ -3,6 +3,7 @@ import { SlideContainer, LeadText } from '../../../components/presentation/Slide
 import MathSection from '../../../components/presentation/MathSection';
 import PlainEnglish from '../../../components/presentation/PlainEnglish';
 import ColourBadge from '../../../components/presentation/ColourBadge';
+import InfoTooltip from '../../../components/presentation/InfoTooltip';
 import { PipelineStepper, StepBadge } from '../../../components/presentation/PipelineStepper';
 import { FusionPipelineDiagram } from '../../../components/presentation/FlowDiagram';
 import { FUSION_FUNCTION } from '../../../components/presentation/equations';
@@ -22,21 +23,25 @@ const FusionPipelineSlide = () => (
 
     <MathSection
       title="Fusion master controller"
+      info="fusionController"
       equations={[{
         latex: FUSION_FUNCTION,
+        label: 'Fusion function',
+        info: 'fusionController',
         explanation: (
           <p>
-            f_fusion is a safety checklist — not an average. It always picks the more urgent signal
-            when layers disagree.
+            f_fusion is a safety checklist <InfoTooltip topic="safetyRule" /> — not an average. It
+            always picks the more urgent signal <InfoTooltip topic="urgencyOrder" /> when layers
+            disagree.
           </p>
         ),
         example: fusionFunctionExample,
       }]}
       variables={[
-        { symbol: 'ŷ / D', meaning: 'BioBERT from Step 4' },
-        { symbol: 'T', meaning: 'TEWS from vitals (parallel branch)' },
-        { symbol: 'P', meaning: 'Bayesian when data is incomplete' },
-        { symbol: 'C', meaning: 'Final colour → Ghana pathway' },
+        { symbol: 'ŷ / D', meaning: <>BioBERT from Step 4 <InfoTooltip topic="nlpChain" /></> },
+        { symbol: 'T', meaning: <>TEWS from vitals (parallel branch) <InfoTooltip topic="tewsSum" /></> },
+        { symbol: 'P', meaning: <>Bayesian when data is incomplete <InfoTooltip topic="bayesPosterior" /></> },
+        { symbol: 'C', meaning: <>Final colour → Ghana pathway <InfoTooltip topic="acuityToSats" /></> },
       ]}
       flipMinHeight={280}
     />

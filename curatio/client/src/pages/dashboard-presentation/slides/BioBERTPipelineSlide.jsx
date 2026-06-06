@@ -3,6 +3,7 @@ import { SlideContainer, LeadText } from '../../../components/presentation/Slide
 import MathSection from '../../../components/presentation/MathSection';
 import PlainEnglish from '../../../components/presentation/PlainEnglish';
 import DataTable from '../../../components/presentation/DataTable';
+import InfoTooltip from '../../../components/presentation/InfoTooltip';
 import { PipelineStepper, StepBadge } from '../../../components/presentation/PipelineStepper';
 import { BioBERTFlowDiagram } from '../../../components/presentation/FlowDiagram';
 import {
@@ -29,9 +30,9 @@ const BioBERTPipelineSlide = () => {
       <PipelineStepper currentStep={4} />
 
       <LeadText>
-        English text <strong>X</strong> passes through our fine-tuned BioBERT model. Each formula
-        below has a <strong>flip button</strong> — click it to see how real patient data flows through
-        the equation.
+        English text <strong>X</strong> <InfoTooltip topic="tokens128" /> passes through our
+        fine-tuned BioBERT model. Each formula below has a <strong>flip button</strong> — click it
+        to see how real patient data flows through the equation.
       </LeadText>
 
       <BioBERTFlowDiagram />
@@ -42,6 +43,7 @@ const BioBERTPipelineSlide = () => {
           {
             latex: NLP_CHAIN,
             label: 'The journey of text X',
+            info: 'nlpChain',
             explanation: (
               <p>X is tokenised, encoded through 12 layers, then classified into an acuity level ŷ.</p>
             ),
@@ -50,6 +52,7 @@ const BioBERTPipelineSlide = () => {
           {
             latex: ACUITY_SOFTMAX,
             label: 'Softmax picks the level',
+            info: 'softmaxHead',
             explanation: (
               <p>Converts raw scores into percentages over 5 acuity levels — highest wins.</p>
             ),
@@ -58,6 +61,7 @@ const BioBERTPipelineSlide = () => {
           {
             latex: CONFIDENCE,
             label: 'Confidence gate',
+            info: 'confidenceGate',
             explanation: (
               <p>If max(ŷ) &lt; τ ≈ 0.85, flag for Bayesian fallback at fusion.</p>
             ),
@@ -65,8 +69,8 @@ const BioBERTPipelineSlide = () => {
           },
         ]}
         variables={[
-          { symbol: 'X', meaning: 'Chief complaint from chat or Step 3 (ASR + translate)' },
-          { symbol: 'ŷ', meaning: 'Five probabilities — one per acuity level' },
+          { symbol: 'X', meaning: <>Chief complaint from chat or Step 3 (ASR + translate) <InfoTooltip topic="chiefComplaint" /></> },
+          { symbol: 'ŷ', meaning: <>Five probabilities — one per acuity level <InfoTooltip topic="acuityFiveLevels" /></> },
         ]}
         compact
         flipMinHeight={260}
@@ -75,7 +79,7 @@ const BioBERTPipelineSlide = () => {
       <DataTable
         columns={[
           { key: 'acuity', label: 'Predicted acuity' },
-          { key: 'sats', label: 'Maps to SATS colour' },
+          { key: 'sats', label: <>Maps to SATS colour <InfoTooltip topic="acuityToSats" /></> },
           { key: 'meaning', label: 'Clinical meaning' },
         ]}
         rows={mappingRows}

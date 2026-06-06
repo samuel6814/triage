@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { SlideContainer, LeadText } from '../../../components/presentation/SlideLayout';
 import MathSection from '../../../components/presentation/MathSection';
 import PlainEnglish from '../../../components/presentation/PlainEnglish';
+import InfoTooltip from '../../../components/presentation/InfoTooltip';
 import { PipelineStepper, StepBadge } from '../../../components/presentation/PipelineStepper';
 import { AudioTranslateDiagram } from '../../../components/presentation/FlowDiagram';
 import { VOICE_PIPELINE } from '../../../components/presentation/equations';
@@ -41,8 +42,11 @@ const VoicePipelineSlide = () => (
 
     <MathSection
       title="Audio → English text pipeline"
+      info="voicePipeline"
       equations={[{
         latex: VOICE_PIPELINE,
+        label: 'Voice pipeline',
+        info: 'voicePipeline',
         explanationTitle: 'Read inside → outside',
         explanation: (
           <p>
@@ -53,9 +57,9 @@ const VoicePipelineSlide = () => (
         example: voicePipelineExample,
       }]}
       variables={[
-        { symbol: 'g_ASR', meaning: 'Speech-to-text — sound → written words' },
-        { symbol: 'g_trans', meaning: 'Twi / local language → medical English' },
-        { symbol: 'X', meaning: 'English text for BioBERT (Step 4)' },
+        { symbol: 'g_ASR', meaning: <>Speech-to-text — sound → written words <InfoTooltip topic="gAsr" /></> },
+        { symbol: 'g_trans', meaning: <>Twi / local language → medical English <InfoTooltip topic="gTrans" /></> },
+        { symbol: 'X', meaning: <>English text for BioBERT (Step 4) <InfoTooltip topic="tokens128" /></> },
       ]}
       flipMinHeight={240}
     />

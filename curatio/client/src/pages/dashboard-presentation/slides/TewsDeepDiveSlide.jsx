@@ -4,6 +4,7 @@ import MathSection from '../../../components/presentation/MathSection';
 import PlainEnglish from '../../../components/presentation/PlainEnglish';
 import DataTable from '../../../components/presentation/DataTable';
 import ColourBadge from '../../../components/presentation/ColourBadge';
+import InfoTooltip from '../../../components/presentation/InfoTooltip';
 import {
   TEWS_SUM,
   TEWS_HR,
@@ -38,41 +39,47 @@ const TewsDeepDiveSlide = () => {
 
       <MathSection
         title="Total score"
-        equations={[{ latex: TEWS_SUM, example: tewsSumExample }]}
+        info="tewsSum"
+        equations={[{ latex: TEWS_SUM, label: 'TEWS sum', info: 'tewsSum', example: tewsSumExample }]}
         flipMinHeight={300}
       />
 
       <MathSection
         title="Heart rate f₁(HR)"
-        equations={[{ latex: TEWS_HR, example: tewsHrExample }]}
+        info="tewsHr"
+        equations={[{ latex: TEWS_HR, label: 'Heart rate', info: 'tewsHr', example: tewsHrExample }]}
         compact
         flipMinHeight={200}
       />
 
       <MathSection
         title="Respiratory rate f₂(RR)"
-        equations={[{ latex: TEWS_RR, example: tewsRrExample }]}
+        info="tewsRr"
+        equations={[{ latex: TEWS_RR, label: 'Respiratory rate', info: 'tewsRr', example: tewsRrExample }]}
         compact
         flipMinHeight={180}
       />
 
       <MathSection
         title="Score → colour"
-        equations={[{ latex: TEWS_COLOUR_MAP, example: tewsColourExample }]}
+        info="tewsColourMap"
+        equations={[{ latex: TEWS_COLOUR_MAP, label: 'Colour map', info: 'tewsColourMap', example: tewsColourExample }]}
         compact
         flipMinHeight={200}
       />
 
       <MathSection
         title="Worked example"
-        equations={[{ latex: TEWS_EXAMPLE, example: tewsWorkedExample }]}
+        info="tewsExample"
+        equations={[{ latex: TEWS_EXAMPLE, label: 'Numeric example', info: 'tewsExample', example: tewsWorkedExample }]}
         compact
         flipMinHeight={220}
       />
 
       <MathSection
         title="Missing vitals"
-        equations={[{ latex: TEWS_PARTIAL, example: tewsPartialExample }]}
+        info="tewsPartial"
+        equations={[{ latex: TEWS_PARTIAL, label: 'Partial TEWS', info: 'tewsPartial', example: tewsPartialExample }]}
         compact
         flipMinHeight={220}
       />
