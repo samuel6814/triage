@@ -1,0 +1,17 @@
+Image attributions for nlp_patient_to_acuity.tex
+==========================================
+
+1. bert_encoder.pdf
+   Source: BERT encoder-only attention.svg (Wikimedia Commons)
+   Author: Zhang, Aston; Lipton, Zachary C.; Li, Mu; Smola, Alexander J.
+   Source URL: https://github.com/d2l-ai/d2l-en
+   License: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+   https://creativecommons.org/licenses/by-sa/4.0/
+
+2. word_embedding.pdf
+   Source: Word embedding illustration.svg (Wikimedia Commons)
+   Author: Fschwarzentruber
+   License: See file page on Wikimedia Commons
+
+3. convo.jpg
+   Project asset (slides_new/convo.jpg)
