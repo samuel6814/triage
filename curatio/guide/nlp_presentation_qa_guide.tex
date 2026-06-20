@@ -1,0 +1,456 @@
+% ============================================================================
+%  NLP Patient-to-Acuity — Presentation Q&A Guide
+%  Compile: pdflatex nlp_presentation_qa_guide.tex (run twice for TOC)
+% ============================================================================
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{forest}{HTML}{166534}
+\definecolor{vibrant}{HTML}{22C55E}
+\definecolor{deepforest}{HTML}{064E3B}
+\definecolor{slate}{HTML}{1E293B}
+
+\hypersetup{linkcolor=forest, urlcolor=forest}
+
+\titleformat{\section}{\Large\bfseries\color{forest}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{deepforest}}{\thesubsection}{0.6em}{}
+\setlist{nosep, leftmargin=1.4em, topsep=2pt}
+
+\newtcolorbox{questionbox}{
+  enhanced, breakable, colback=forest!6, colframe=forest,
+  boxrule=0.8pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\color{white}, coltitle=white,
+  title={QUESTION}, attach title to upper={\par\medskip}}
+
+\newtcolorbox{answerbox}{
+  enhanced, breakable, colback=vibrant!7, colframe=vibrant!70!black,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=forest,
+  title={ANSWER}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{saybox}{
+  enhanced, breakable, colback=slate!4, colframe=slate!55,
+  boxrule=0.6pt, arc=3pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=slate,
+  title={HOW TO SAY IT LIVE}, attach title to upper={\par\smallskip}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{forest}{NLP to Acuity Q\&A Guide}}
+\fancyhead[R]{\small\textcolor{forest}{\thepage}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\title{\textbf{NLP Patient Description to Acuity}\\[0.4em]
+\large Presentation Q\&A Guide --- Detailed Answers}
+\author{Quaigraine Samuel \and Twum Samuel\\Department of Mathematics, KNUST}
+\date{June 2026}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+This guide contains detailed answers to every question asked during preparation for the \textbf{NLP Patient-to-Acuity} presentation (\texttt{slides\_new/nlp\_patient\_to\_acuity.pdf}, 28 slides, 16:9 Beamer).
+
+\textbf{Running example throughout:}
+\begin{quote}
+\textit{``I have a headache and feel feverish. My body aches and I feel weak.''}
+\end{quote}
+
+% =============================================================================
+\section{Clinical Context (Pages 3--5)}
+
+\subsection{Page 4 --- Fusion safety rule}
+
+\begin{questionbox}
+What does it mean that fusion assigns a less urgent colour than a strong signal requires?
+\end{questionbox}
+
+\begin{answerbox}
+Curatio uses \textbf{two parallel pathways}: TEWS (vitals) and NLP (patient words). Fusion combines them into a final SATS colour.
+
+The safety rule means: if BioBERT assigns a \textbf{strong, confident} urgency signal from language (e.g.\ crushing chest pain, severe distress), fusion must \textbf{not downgrade} to a less urgent colour (e.g.\ Green) simply because vitals look normal.
+
+Fusion is a \textbf{priority checklist}, not an average of scores. Strong language can pull the final colour \textit{upward}; weak vitals alone cannot pull a strong language signal below the safety floor. This prevents \textbf{under-triage} --- the most dangerous error in emergency care.
+\end{answerbox}
+
+\begin{saybox}
+``We never under-triage when the words scream emergency. Vitals supplement the text --- they don't override a strong language signal.''
+\end{saybox}
+
+\subsection{Page 5 --- Bag of words and supervised learning}
+
+\begin{questionbox}
+What does bag-of-words mean? How should I explain page 5 during my presentation?
+\end{questionbox}
+
+\begin{answerbox}
+\textbf{Bag-of-words (BOW):} Throw all words into a bag, count frequencies, feed counts to a classifier. Word order and negation are lost. ``Not feverish, no headache'' and ``headache and feverish'' can look similar because they share vocabulary.
+
+\textbf{Supervised deep learning (our approach):}
+\[
+X \xrightarrow{\tau} \text{tokens} \xrightarrow{E} \text{embeddings} \xrightarrow{12\,\text{layers}} h_{[\mathrm{CLS}]} \xrightarrow{\mathrm{softmax}} \text{acuity}
+\]
+Labels come from nurses (Triagegeist, $\sim$80{,}000 chief complaints). The model learns context bidirectionally --- ``feverish'' modifies ``headache'' through self-attention.
+\end{answerbox}
+
+\begin{saybox}
+``Old NLP counted words in a bag and lost order. Our BioBERT reads the full sentence, learns from 80{,}000 nurse-labeled complaints, and predicts acuity with context.''
+\end{saybox}
+
+% =============================================================================
+\section{NLP Pipeline (Pages 6--19)}
+
+\subsection{Page 6 --- Tokenization}
+
+\begin{questionbox}
+What does $\tau$ mean? What is $t$ representing? Why is $M \leq 128$? Why $\sim$30{,}000 vocabulary? Why row index? How is the ID assigned? What is embedding?
+\end{questionbox}
+
+\begin{answerbox}
+\begin{itemize}
+  \item $\boldsymbol{\tau}$ --- the \textbf{tokenizer} function: splits raw text $X$ into sub-word tokens $(t_1, t_2, \ldots)$.
+  \item $t_i$ --- the $i$-th token (word-piece) after tokenisation.
+  \item $M \leq 128$ --- hard cap on sequence length; longer complaints are truncated. Keeps inference fast (attention cost grows with length$^2$).
+  \item $\sim$30{,}000 vocab (28{,}996 for BioBERT) --- fixed dictionary from pre-training.
+  \item \textbf{Row index} --- each token ID is the row number in the embedding table $E$: ID 1045 $\Rightarrow$ row 1045 $\Rightarrow$ 768-d vector.
+  \item \textbf{ID assignment} --- tokenizer matches text to vocabulary; known words get fixed IDs; rare words split into sub-pieces (e.g.\ ``\#\#ish'').
+  \item \textbf{Embedding} --- lookup table $E$: integer ID $\to$ 768-number vector (page 9).
+\end{itemize}
+\end{answerbox}
+
+\subsection{Pages 7--8 --- UNK, brackets, [CLS], $h_{[\mathrm{CLS}]}$}
+
+\begin{questionbox}
+What do the square brackets in [CLS] mean? What happens when UNK is assigned? Why is [CLS] = 101? What does the $h$ in $h_{[\mathrm{CLS}]}$ mean?
+\end{questionbox}
+
+\begin{answerbox}
+\begin{itemize}
+  \item \textbf{Square brackets $[\,]$} --- mark \textbf{special tokens}, not ordinary words. \texttt{[CLS]}, \texttt{[SEP]}, \texttt{[MASK]} are control tokens.
+  \item \textbf{\texttt{<redacted\_UNK>}} (ID 100) --- assigned when the tokenizer cannot match a piece. The model still runs but may lose fine detail for that word.
+  \item \textbf{Why [CLS] = 101} --- fixed ID from BERT's original vocabulary design; arbitrary but consistent across all inputs.
+  \item \textbf{$h$ in $h_{[\mathrm{CLS}]}$} --- $h$ = \textbf{hidden state}: the 768-d vector for the \texttt{[CLS]} token after all 12 layers. Row 0 of $H^{(12)}$.
+\end{itemize}
+\texttt{[CLS]} is prepended to every sentence; its final state is the complaint summary used for classification.
+\end{answerbox}
+
+\subsection{Page 9 --- Embedding lookup}
+
+\begin{questionbox}
+Explain slide 9. When I pick ``headache'', it has 768 numbers --- where are they coming from?
+\end{questionbox}
+
+\begin{answerbox}
+Slide 9 shows \textbf{embedding lookup}: token ID $\xrightarrow{E}$ 768-dimensional vector.
+
+The 768 numbers are \textbf{learned weights}, not extracted from PubMed text. Each vocabulary row holds 768 floats updated during:
+\begin{enumerate}
+  \item MLM pre-training on PubMed/PMC ($\sim$18B words)
+  \item Fine-tuning on Triagegeist ($\sim$80k labeled complaints)
+\end{enumerate}
+
+\textbf{D1, D2, \ldots, D768} are dimension labels --- not named clinical features. The model discovers which combinations encode medical meaning.
+\end{answerbox}
+
+\subsection{Cross-cutting --- PubMed and BioBERT paper}
+
+\begin{questionbox}
+Where is the PubMed training data? How do the 768 features look in the data? What do D1, D2 numbers mean?
+\end{questionbox}
+
+\begin{answerbox}
+\textbf{PubMed} is not one downloadable table --- it is millions of biomedical abstracts at \url{https://pubmed.ncbi.nlm.nih.gov/}. Full-text articles: \url{https://www.ncbi.nlm.nih.gov/pmc/}.
+
+\textbf{BioBERT paper:} \url{https://academic.oup.com/bioinformatics/article/36/4/1234/5566506}
+
+The 768 features do \textbf{not appear as columns in PubMed text}. They are \textbf{internal weight matrix rows} learned by gradient descent. You cannot open a CSV and see D1--D768 for ``headache'' --- they exist only in the model checkpoint (\texttt{model.safetensors}).
+
+Each $D_j$ is one coordinate in learned semantic space. After training, similar clinical terms cluster near each other.
+\end{answerbox}
+
+\subsection{Page 11 --- Contextual mapping}
+
+\begin{questionbox}
+Explain page 11.
+\end{questionbox}
+
+\begin{answerbox}
+Before entering the transformer, each token vector is the \textbf{sum of three embeddings}:
+\[
+H^{(0)}[i] = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(i)
+\]
+\begin{itemize}
+  \item \textbf{Token embedding} --- what word it is (``headache'').
+  \item \textbf{Position embedding} --- where it sits (1st, 2nd, \ldots).
+  \item \textbf{Segment embedding} --- which sentence segment (usually 0 for one complaint).
+\end{itemize}
+The diagram shows three vectors adding point-wise. Same word at different positions gets different input vectors.
+\end{answerbox}
+
+\subsection{Page 13 --- Input matrix and why 768}
+
+\begin{questionbox}
+Explain page 13. What is 768 and why that number?
+\end{questionbox}
+
+\begin{answerbox}
+$H^{(0)}$ is a matrix: \textbf{one row per token, 768 columns}. Shape $[\text{seq\_len} \times 768]$. This is the input to encoder layer 1.
+
+\textbf{Why 768?} BERT-Base architecture standard:
+\begin{itemize}
+  \item \texttt{hidden\_size} = 768
+  \item 12 layers, 12 attention heads
+  \item 64 dims per head $\times$ 12 heads = 768
+\end{itemize}
+BioBERT inherits this from BERT --- not tuned specifically for triage. It balances capacity vs.\ speed.
+\end{answerbox}
+
+\subsection{Page 15 --- Encoder diagram, arrows, FFN}
+
+\begin{questionbox}
+Explain page 15. Why do arrows point upward? What is a feed-forward network?
+\end{questionbox}
+
+\begin{answerbox}
+\textbf{Upward arrows:} standard diagram convention --- input tokens at the \textbf{bottom}, output after 12 layers at the \textbf{top}. Data flows upward through the stack.
+
+\textbf{Feed-Forward Network (FFN):} Two linear layers with ReLU:
+\[
+\mathrm{FFN}(x) = W_2\,\mathrm{ReLU}(W_1 x + b_1) + b_2
+\]
+Expands 768 $\to$ 3072 $\to$ 768. Adds non-linear processing \textit{per token} after attention mixes context. Like two $y = Wx + b$ lines with a ReLU bend between them.
+\end{answerbox}
+
+\subsection{Page 16 --- $Z^\ell$ and $H^\ell$}
+
+\begin{questionbox}
+Explain slide 16. Explain the FFN formula using the equation of a line. Use simple mathematics for $Z^\ell$ and $H^\ell$.
+\end{questionbox}
+
+\begin{answerbox}
+Inside each encoder layer $\ell$:
+\begin{align*}
+Z^{(\ell)} &= \mathrm{LayerNorm}\!\left(H^{(\ell-1)} + \mathrm{MultiHeadAttention}(H^{(\ell-1)})\right) \\
+H^{(\ell)} &= \mathrm{LayerNorm}\!\left(Z^{(\ell)} + \mathrm{FFN}(Z^{(\ell)})\right)
+\end{align*}
+
+\textbf{FFN as equation of a line:} First line $y_1 = W_1 x + b_1$, ReLU gate (zero out negatives), second line $y_2 = W_2 y_1 + b_2$.
+
+\textbf{Simple numeric walkthrough:} Suppose $H^{(\ell-1)}[\text{headache}] = 2.0$ and attention adds 0.5 from ``feverish'':
+\begin{itemize}
+  \item Pre-norm sum: $2.0 + 0.5 = 2.5$
+  \item LayerNorm scales to e.g.\ 2.3 $\Rightarrow$ part of $Z^{(\ell)}$
+  \item FFN transforms 2.3 $\to$ 2.8; residual: $2.3 + 2.8 = 5.1$; LayerNorm $\Rightarrow$ $H^{(\ell)}[\text{headache}]$
+\end{itemize}
+Residual connections keep gradients stable during training.
+\end{answerbox}
+
+\subsection{Pages 18--19 --- Self-attention and $W$ matrices}
+
+\begin{questionbox}
+Explain slides 18 and 19. What does the $W$ there mean?
+\end{questionbox}
+
+\begin{answerbox}
+\textbf{Slide 18 (diagram):} Four steps --- (1) split embeddings into Q, K, V; (2) score with $QK^\top$; (3) softmax to probabilities; (4) blend Value vectors. For ``headache'': feverish 0.41, headache 0.32, weak 0.18, filler $\approx$ 0.02.
+
+\textbf{Slide 19 (formula):}
+\[
+\mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+\]
+
+\textbf{$W_Q$, $W_K$, $W_V$:} Learned weight matrices (like $y = Wx + b$). Same token matrix $H$ multiplied by three different $W$ gives three roles:
+\begin{itemize}
+  \item $W_Q$ --- ``what is this token looking for?''
+  \item $W_K$ --- ``what does each token advertise?''
+  \item $W_V$ --- ``what content to pass forward?''
+\end{itemize}
+Each is $\sim$768 $\times$ 64 per head; 12 heads in parallel. Updated via backpropagation during training.
+\end{answerbox}
+
+% =============================================================================
+\section{BERT Pre-Training (Pages 20--22)}
+
+\subsection{Page 20 --- Masked Language Modeling}
+
+\begin{questionbox}
+Explain slide 20.
+\end{questionbox}
+
+\begin{answerbox}
+Before triage fine-tuning, BioBERT learns medical English via \textbf{Masked Language Modeling (MLM)} on PubMed/PMC:
+\begin{itemize}
+  \item 15\% of tokens randomly masked with \texttt{[MASK]}
+  \item Model predicts missing words from \textbf{bidirectional} context
+  \item Teaches vocabulary (``feverish'', ``tachycardia'') \textbf{without} acuity labels
+\end{itemize}
+BioBERT = BERT architecture + biomedical pre-training ($\sim$18B words). Fine-tuning on Triagegeist comes later.
+\end{answerbox}
+
+\subsection{Page 21 --- MLM loss}
+
+\begin{questionbox}
+Explain slide 21.
+\end{questionbox}
+
+\begin{answerbox}
+\[
+\mathcal{L}_{\mathrm{LM}} = -\sum_{i \in \mathcal{M}} \log P(t_i \mid H^{(L)};\, \theta)
+\]
+\begin{itemize}
+  \item $\mathcal{M}$ --- masked positions; $t_i$ --- true word; $H^{(L)}$ --- context from 12 layers; $\theta$ --- all weights.
+  \item $P = 0.92 \Rightarrow -\log(0.92) \approx 0.08$ (small penalty)
+  \item $P = 0.01 \Rightarrow -\log(0.01) \approx 4.6$ (large penalty)
+\end{itemize}
+Same $-\log P$ pattern as triage cross-entropy --- only the label changes.
+\end{answerbox}
+
+% =============================================================================
+\section{Learning Math (Pages 23--27)}
+
+\subsection{Page 23 --- Attention softmax}
+
+\begin{questionbox}
+Explain page 23.
+\end{questionbox}
+
+\begin{answerbox}
+\[
+\alpha_j = \frac{\exp(e_j)}{\sum_{k=1}^{m}\exp(e_k)}
+\]
+Converts raw attention scores $e_j$ into probabilities $\alpha_j$ summing to 1. Used \textbf{inside} self-attention (over tokens), not for classification.
+
+\textbf{exp} forces positive values and amplifies large scores. ``I'', ``a'' $\to \alpha \approx 0.01$; ``headache'', ``feverish'' $\to \alpha \approx 0.35+$.
+\end{answerbox}
+
+\subsection{Page 24 --- Classification softmax}
+
+\begin{questionbox}
+Explain page 24.
+\end{questionbox}
+
+\begin{answerbox}
+\[
+\hat{\mathbf{y}} = \mathrm{softmax}(W h_{[\mathrm{CLS}]} + \mathbf{b}), \quad \hat{y}_c = P(\text{acuity} = c \mid X)
+\]
+\begin{itemize}
+  \item $h_{[\mathrm{CLS}]}$ --- 768-d summary from layer 12
+  \item $W \in \mathbb{R}^{5 \times 768}$ --- learned classification weights
+  \item $\hat{y}_c$ --- probability of acuity level $c$; $\sum_c \hat{y}_c = 1$
+\end{itemize}
+\textbf{Running example:} Level 3 (Moderate) = 72\% $\Rightarrow$ Yellow on SATS. Class indices 0--4 map to acuity levels 1--5 in the deployed Curatio model.
+\end{answerbox}
+
+\subsection{Page 25 --- Forward pass and cross-entropy}
+
+\begin{questionbox}
+Explain page 25.
+\end{questionbox}
+
+\begin{answerbox}
+\textbf{1. Forward pass:} $z = Wx + b$ where $x = h_{[\mathrm{CLS]}}$, then $\hat{y} = \mathrm{softmax}(z)$.
+
+\textbf{2. Cross-entropy loss:}
+\[
+\mathcal{L} = -\sum_{i=1}^{C} y_i \log(\hat{y}_i), \quad C = 5
+\]
+With one-hot nurse label, collapses to $-\log(\hat{y}_{\text{correct}})$.
+
+\textbf{Example:} true = Yellow, model predicts Green at 90\% (Yellow only 5\%) $\Rightarrow \mathcal{L} = -\log(0.05) \approx 3.0$.
+\end{answerbox}
+
+\subsection{Page 26 --- Backpropagation}
+
+\begin{questionbox}
+Explain page 26.
+\end{questionbox}
+
+\begin{answerbox}
+\[
+\frac{\partial \mathcal{L}}{\partial W} = \frac{\partial \mathcal{L}}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial z} \cdot \frac{\partial z}{\partial W}
+\]
+Chain rule traces error backward: loss $\to$ softmax $\to$ logits $z = Wh + b$ $\to$ all 12 layers $\to$ embeddings.
+
+Each $\partial \mathcal{L}/\partial W$ pinpoints how much weight $W$ contributed to the mistake. Example: model says Green 90\% when nurse labeled Yellow --- backprop finds weights in layers 8--12 that over-weighted non-urgent patterns.
+\end{answerbox}
+
+\subsection{Page 27 --- Gradient descent}
+
+\begin{questionbox}
+Explain page 27.
+\end{questionbox}
+
+\begin{answerbox}
+\[
+W_{\mathrm{new}} = W_{\mathrm{old}} - \alpha \frac{\partial \mathcal{L}}{\partial W}
+\]
+\begin{itemize}
+  \item $\alpha = 2 \times 10^{-5}$ --- learning rate (\texttt{triage\_new.ipynb})
+  \item Minus sign --- move \textit{opposite} to gradient (downhill on loss)
+  \item $\mathcal{L}_{\mathrm{triage}} = -\sum_{i=1}^{N} \log P(y_i \mid X_i;\, \theta)$, $N \approx 80{,}000$
+  \item Best \texttt{eval\_loss} = 0.001812 after 3 epochs, 13{,}500 steps
+\end{itemize}
+\end{answerbox}
+
+% =============================================================================
+\section{Appendix}
+
+\subsection{Data and model references}
+
+\begin{itemize}
+  \item \textbf{Triagegeist (fine-tuning):} \url{https://www.kaggle.com/competitions/triagegeist/data}
+  \item \textbf{PubMed abstracts:} \url{https://pubmed.ncbi.nlm.nih.gov/}
+  \item \textbf{PMC full text:} \url{https://www.ncbi.nlm.nih.gov/pmc/}
+  \item \textbf{BioBERT paper:} \url{https://academic.oup.com/bioinformatics/article/36/4/1234/5566506}
+\end{itemize}
+
+\subsection{BioBERT-Base configuration}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+hidden\_size & 768 \\
+num\_hidden\_layers & 12 \\
+num\_attention\_heads & 12 \\
+vocab\_size & 28{,}996 \\
+max\_length & 128 \\
+num\_labels (fine-tuned) & 5 \\
+learning\_rate & $2 \times 10^{-5}$ \\
+training epochs & 3 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Acuity to SATS mapping (Curatio)}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Class index} & \textbf{Acuity level} & \textbf{SATS colour} \\
+\midrule
+0 & 1 & Red \\
+1 & 2 & Orange \\
+2 & 3 & Yellow \\
+3 & 4 & Green \\
+4 & 5 & Green \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}

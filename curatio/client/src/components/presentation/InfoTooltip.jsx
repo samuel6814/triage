@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { HelpCircle, X } from 'lucide-react';
 
 import { INFO } from './infoContent';
+import { SLIDE_GUIDE } from './slideGuideContent';
 
 const Trigger = styled.button`
   display: inline-flex;
@@ -206,7 +207,7 @@ const InfoTooltip = ({ topic, title, children, label }) => {
   const [open, setOpen] = useState(false);
   const panelRef = useRef(null);
 
-  const entry = topic ? INFO[topic] : null;
+  const entry = topic ? (SLIDE_GUIDE[topic] || INFO[topic]) : null;
   const resolvedTitle = title || entry?.title || 'More info';
   const resolvedBody = children || entry?.body || null;
   const accessibleLabel = label || `Explain: ${resolvedTitle}`;

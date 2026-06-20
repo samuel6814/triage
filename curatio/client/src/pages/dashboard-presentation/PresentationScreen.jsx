@@ -3,16 +3,16 @@ import styled from 'styled-components';
 import { gsap } from 'gsap';
 import { Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useSidebar } from '../../context/SidebarContext';
+import InfoTooltip from '../../components/presentation/InfoTooltip';
 
 const SIDEBAR_WIDTH = 280;
-const SCROLL_STEP = 100;
 
 const ScreenWrapper = styled.div`
   flex: 1;
   height: 100vh;
   background-color: #f4f7f5;
-  margin-left: ${props => (props.$sidebarOpen ? `${SIDEBAR_WIDTH}px` : '0')};
-  padding: 2rem 3rem;
+  margin-left: ${(props) => (props.$sidebarOpen ? `${SIDEBAR_WIDTH}px` : '0')};
+  padding: ${(props) => (props.$pdfMode ? '1rem 1.5rem' : '2rem 3rem')};
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s ease;
@@ -21,11 +21,11 @@ const ScreenWrapper = styled.div`
 
   @media (max-width: 1024px) {
     margin-left: 0;
-    padding: 5rem 2rem 2rem;
+    padding: ${(props) => (props.$pdfMode ? '4.5rem 0.75rem 0.75rem' : '5rem 2rem 2rem')};
   }
 
   @media (max-width: 768px) {
-    padding: 4.5rem 1rem 1rem;
+    padding: ${(props) => (props.$pdfMode ? '4rem 0.5rem 0.5rem' : '4.5rem 1rem 1rem')};
   }
 
   &:fullscreen {
@@ -33,20 +33,17 @@ const ScreenWrapper = styled.div`
     width: 100vw;
     height: 100vh;
     max-height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 2.5rem 4rem;
+    overflow: hidden;
+    padding: ${(props) => (props.$pdfMode ? '0.75rem 1.25rem' : '2.5rem 4rem')};
     background: #f4f7f5;
-    --presentation-zoom: 1.18;
   }
 
   &:-webkit-full-screen {
     margin-left: 0;
     width: 100vw;
     height: 100vh;
-    overflow-y: auto;
-    padding: 2.5rem 4rem;
-    --presentation-zoom: 1.18;
+    overflow: hidden;
+    padding: ${(props) => (props.$pdfMode ? '0.75rem 1.25rem' : '2.5rem 4rem')};
   }
 `;
 
@@ -54,13 +51,12 @@ const PresentationHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: ${(props) => (props.$pdfMode ? '0.6rem' : '1.5rem')};
   gap: 1rem;
   flex-shrink: 0;
 
   ${ScreenWrapper}:fullscreen & {
-    margin-bottom: 2rem;
-
+    margin-bottom: ${(props) => (props.$pdfMode ? '0.5rem' : '2rem')};
     h2 { font-size: calc(1.75rem * var(--presentation-zoom, 1)); }
     p { font-size: calc(0.95rem * var(--presentation-zoom, 1)); }
   }
@@ -69,37 +65,50 @@ const PresentationHeader = styled.div`
 const SlideInfo = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
 `;
 
 const SlideTitle = styled.h2`
-  font-size: 1.75rem;
+  font-size: ${(props) => (props.$pdfMode ? '1.25rem' : '1.75rem')};
   font-weight: 800;
   color: #166534;
   margin: 0;
   letter-spacing: -0.5px;
 
   @media (max-width: 768px) {
-    font-size: 1.4rem;
+    font-size: ${(props) => (props.$pdfMode ? '1.05rem' : '1.4rem')};
   }
 `;
 
 const SlideSubtitle = styled.p`
-  font-size: 0.95rem;
+  font-size: ${(props) => (props.$pdfMode ? '0.82rem' : '0.95rem')};
   color: #64748b;
   margin: 0;
   font-weight: 500;
 
   @media (max-width: 768px) {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
   }
+`;
+
+const PageBadge = styled.span`
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: middle;
 `;
 
 const ControlsGroup = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
+  align-items: center;
 `;
 
 const IconButton = styled.button`
@@ -126,7 +135,7 @@ const SlideCanvas = styled.div`
   flex: 1;
   min-height: 0;
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: ${(props) => (props.$pdfMode ? '16px' : '24px')};
   border: 1px solid rgba(22, 101, 52, 0.08);
   box-shadow: 0 10px 40px rgba(22, 101, 52, 0.04);
   display: flex;
@@ -135,14 +144,14 @@ const SlideCanvas = styled.div`
   overflow: hidden;
 
   ${ScreenWrapper}:fullscreen & {
-    min-height: auto;
-    flex: none;
-    border-radius: 28px;
+    min-height: 0;
+    flex: 1;
+    border-radius: 20px;
     box-shadow: 0 16px 48px rgba(22, 101, 52, 0.08);
   }
 
   @media (max-width: 768px) {
-    border-radius: 20px;
+    border-radius: 12px;
   }
 `;
 
@@ -162,13 +171,6 @@ const SlideScrollArea = styled.div`
     border-radius: 6px;
   }
 
-  ${ScreenWrapper}:fullscreen & {
-    overflow: visible;
-    flex: none;
-    padding: 3.5rem 4rem;
-    font-size: calc(1rem * var(--presentation-zoom, 1));
-  }
-
   @media (max-width: 1024px) {
     padding: 2rem;
   }
@@ -176,6 +178,14 @@ const SlideScrollArea = styled.div`
   @media (max-width: 768px) {
     padding: 1.5rem;
   }
+`;
+
+const PdfContentArea = styled.div`
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 `;
 
 const KeyboardHint = styled.span`
@@ -190,7 +200,7 @@ const KeyboardHint = styled.span`
 `;
 
 const SidebarReopenTab = styled.button`
-  display: ${props => (props.$visible ? 'flex' : 'none')};
+  display: ${(props) => (props.$visible ? 'flex' : 'none')};
   position: fixed;
   left: 0;
   top: 50%;
@@ -228,13 +238,20 @@ const PresentationScreen = ({
   onNext,
   hasPrev,
   hasNext,
+  mode = 'default',
+  pageNumber,
+  totalPages,
+  guideTopic,
+  footer,
 }) => {
+  const pdfMode = mode === 'pdf';
   const wrapperRef = useRef(null);
   const scrollRef = useRef(null);
   const { isOpen: sidebarOpen, toggle: toggleSidebar, open: openSidebar } = useSidebar();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useLayoutEffect(() => {
+    if (pdfMode) return undefined;
     const ctx = gsap.context(() => {
       if (scrollRef.current) {
         gsap.from(scrollRef.current, {
@@ -246,14 +263,13 @@ const PresentationScreen = ({
       }
     });
     return () => ctx.revert();
-  }, [slideKey]);
+  }, [slideKey, pdfMode]);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
-    if (isFullscreen) {
-      wrapperRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    if (!pdfMode) {
+      scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
     }
-  }, [slideKey, isFullscreen]);
+  }, [slideKey, pdfMode]);
 
   useEffect(() => {
     const onFullscreenChange = () => {
@@ -262,22 +278,6 @@ const PresentationScreen = ({
     document.addEventListener('fullscreenchange', onFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
   }, []);
-
-  const getScrollElement = useCallback(() => {
-    if (isFullscreen && wrapperRef.current) return wrapperRef.current;
-    return scrollRef.current;
-  }, [isFullscreen]);
-
-  const canScrollUp = useCallback(() => {
-    const el = getScrollElement();
-    return el ? el.scrollTop > 2 : false;
-  }, [getScrollElement]);
-
-  const canScrollDown = useCallback(() => {
-    const el = getScrollElement();
-    if (!el) return false;
-    return el.scrollTop + el.clientHeight < el.scrollHeight - 2;
-  }, [getScrollElement]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -296,18 +296,6 @@ const PresentationScreen = ({
             onNext?.();
           }
           break;
-        case 'ArrowUp':
-          if (canScrollUp()) {
-            e.preventDefault();
-            getScrollElement()?.scrollBy({ top: -SCROLL_STEP, behavior: 'smooth' });
-          }
-          break;
-        case 'ArrowDown':
-          if (canScrollDown()) {
-            e.preventDefault();
-            getScrollElement()?.scrollBy({ top: SCROLL_STEP, behavior: 'smooth' });
-          }
-          break;
         default:
           break;
       }
@@ -315,7 +303,7 @@ const PresentationScreen = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [hasPrev, hasNext, onPrev, onNext, canScrollUp, canScrollDown, getScrollElement]);
+  }, [hasPrev, hasNext, onPrev, onNext]);
 
   const handleFullscreen = async () => {
     const el = wrapperRef.current;
@@ -344,15 +332,27 @@ const PresentationScreen = ({
         <PanelLeftOpen size={18} />
       </SidebarReopenTab>
 
-      <ScreenWrapper ref={wrapperRef} $sidebarOpen={sidebarOpen}>
-        <PresentationHeader>
+      <ScreenWrapper ref={wrapperRef} $sidebarOpen={sidebarOpen} $pdfMode={pdfMode}>
+        <PresentationHeader $pdfMode={pdfMode}>
           <SlideInfo>
-            <SlideTitle>{title || 'Curatio Presentation'}</SlideTitle>
-            <SlideSubtitle>{subtitle || 'View and interact with clinical data'}</SlideSubtitle>
+            <SlideTitle $pdfMode={pdfMode}>
+              {title || 'Curatio Presentation'}
+              {pdfMode && pageNumber && totalPages && (
+                <PageBadge>
+                  {pageNumber} / {totalPages}
+                </PageBadge>
+              )}
+            </SlideTitle>
+            <SlideSubtitle $pdfMode={pdfMode}>
+              {subtitle || 'View and interact with clinical data'}
+            </SlideSubtitle>
           </SlideInfo>
 
           <ControlsGroup>
-            <KeyboardHint>← → slides · ↑ ↓ scroll</KeyboardHint>
+            <KeyboardHint>{pdfMode ? '← → pages' : '← → slides'}</KeyboardHint>
+            {pdfMode && guideTopic && (
+              <InfoTooltip topic={guideTopic} label="Explain this slide" />
+            )}
             <IconButton
               type="button"
               title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
@@ -372,11 +372,15 @@ const PresentationScreen = ({
           </ControlsGroup>
         </PresentationHeader>
 
-        <SlideCanvas>
-          <SlideScrollArea ref={scrollRef}>
-            {children}
-          </SlideScrollArea>
+        <SlideCanvas $pdfMode={pdfMode}>
+          {pdfMode ? (
+            <PdfContentArea>{children}</PdfContentArea>
+          ) : (
+            <SlideScrollArea ref={scrollRef}>{children}</SlideScrollArea>
+          )}
         </SlideCanvas>
+
+        {footer}
       </ScreenWrapper>
     </>
   );

@@ -3,9 +3,35 @@ import styled from 'styled-components';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Menu, ChevronDown, ChevronRight, PanelLeftClose,
-  Activity, HeartPulse, GitBranch, Stethoscope,
+  BookOpen, Brain, FlaskConical, Layers, Stethoscope,
 } from 'lucide-react';
 import { useSidebar } from '../context/SidebarContext';
+import { nlpPresentationSections } from '../pages/dashboard-presentation/nlpPresentationSlides';
+
+const sectionIcons = {
+  intro: BookOpen,
+  clinical: Stethoscope,
+  pipeline: Layers,
+  pretraining: FlaskConical,
+  learning: Brain,
+  summary: BookOpen,
+};
+
+const presentationData = nlpPresentationSections.map((section) => ({
+  section: section.title,
+  items: [
+    {
+      id: section.id,
+      title: section.title,
+      icon: sectionIcons[section.id] || BookOpen,
+      subPages: section.pages.map((p) => ({
+        id: `page-${p.page}`,
+        title: `${p.page}. ${p.title}`,
+        path: `/dashboard/nlp/${p.page}`,
+      })),
+    },
+  ],
+}));
 
 const MobileToggleBtn = styled.button`
   display: none;
@@ -180,58 +206,16 @@ const SubPageItem = styled(Link)`
   }
 `;
 
-const presentationData = [
-  {
-    section: 'Clinical Foundations',
-    items: [
-      { id: 'triage', title: 'What is Triage?', icon: Stethoscope, path: '/dashboard' },
-      { id: 'pathways', title: 'Colour → Departments', icon: Activity, path: '/dashboard/pathways' },
-    ],
-  },
-  {
-    section: 'The Pipeline',
-    items: [
-      {
-        id: 'pipeline',
-        title: 'Input Pipeline',
-        icon: GitBranch,
-        subPages: [
-          { id: 'input', title: '1. Patient Input', path: '/dashboard/pipeline/input' },
-          { id: 'text', title: '2. Text Example', path: '/dashboard/pipeline/text-example' },
-          { id: 'voice', title: '3. Speech & Translate', path: '/dashboard/pipeline/voice' },
-          { id: 'biobert', title: '4. Fine-Tuned BioBERT', path: '/dashboard/pipeline/biobert' },
-          { id: 'bb-infer', title: '↳ BioBERT Internals', path: '/dashboard/math/biobert-inference' },
-          { id: 'bb-train', title: '↳ BioBERT Training', path: '/dashboard/math/biobert-training' },
-          { id: 'data', title: '↳ Data & Findings', path: '/dashboard/math/data-exploration' },
-          { id: 'fusion-p', title: '5. Fusion → Colour', path: '/dashboard/pipeline/fusion' },
-          { id: 'tews', title: '↳ TEWS (vitals)', path: '/dashboard/pipeline/tews' },
-          { id: 'tews-math', title: '↳ TEWS Mathematics', path: '/dashboard/math/tews' },
-          { id: 'bayes-fb', title: '↳ Bayesian Fallback', path: '/dashboard/pipeline/bayesian-fallback' },
-          { id: 'bayes', title: '↳ Bayesian Mathematics', path: '/dashboard/math/bayesian' },
-          { id: 'fusion-m', title: '↳ Fusion Mathematics', path: '/dashboard/math/fusion' },
-          { id: 'worked', title: '↳ Worked Example', path: '/dashboard/math/worked-example' },
-        ],
-      },
-    ],
-  },
-  {
-    section: 'Clinical Pathways',
-    items: [
-      {
-        id: 'protocols',
-        title: 'Color Protocols',
-        icon: HeartPulse,
-        subPages: [
-          { id: 'resus', title: 'Resuscitation (Red)', path: '/dashboard/pathways/resus' },
-        ],
-      },
-    ],
-  },
-];
-
 const Sidebar = () => {
   const { isOpen, open, close, toggle } = useSidebar();
-  const [openAccordions, setOpenAccordions] = useState({ pipeline: true, math: true, protocols: true });
+  const [openAccordions, setOpenAccordions] = useState({
+    intro: true,
+    clinical: true,
+    pipeline: true,
+    pretraining: false,
+    learning: false,
+    summary: true,
+  });
   const location = useLocation();
 
   const toggleAccordion = (id) => {
