@@ -1,0 +1,12 @@
+transformers>=4.36
+datasets
+accelerate
+torch
+pandas
+scikit-learn
+imbalanced-learn
+nlpaug
+matplotlib
+seaborn
+evaluate
+huggingface_hub
