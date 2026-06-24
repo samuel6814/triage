@@ -64,8 +64,8 @@ const Overlay = styled.div`
   background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(4px);
   z-index: 1000;
-  opacity: ${props => (props.isOpen ? 1 : 0)};
-  pointer-events: ${props => (props.isOpen ? 'auto' : 'none')};
+  opacity: ${props => (props.$isOpen ? 1 : 0)};
+  pointer-events: ${props => (props.$isOpen ? 'auto' : 'none')};
   transition: opacity 0.3s ease;
 
   @media (max-width: 1024px) {
@@ -159,13 +159,13 @@ const NavItem = styled.div`
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s ease;
-  background: ${props => (props.isActive ? '#dcfce7' : 'transparent')};
-  color: ${props => (props.isActive ? '#166534' : '#475569')};
-  font-weight: ${props => (props.isActive ? '700' : '500')};
+  background: ${props => (props.$isActive ? '#dcfce7' : 'transparent')};
+  color: ${props => (props.$isActive ? '#166534' : '#475569')};
+  font-weight: ${props => (props.$isActive ? '700' : '500')};
 
   &:hover {
-    background: ${props => (props.isActive ? '#dcfce7' : '#f8fafc')};
-    color: ${props => (props.isActive ? '#166534' : '#0f172a')};
+    background: ${props => (props.$isActive ? '#dcfce7' : '#f8fafc')};
+    color: ${props => (props.$isActive ? '#166534' : '#0f172a')};
   }
 `;
 
@@ -184,8 +184,8 @@ const SubPageList = styled.div`
   padding-left: 16px;
   border-left: 1px solid #e2e8f0;
   overflow: hidden;
-  max-height: ${props => (props.isOpen ? '800px' : '0')};
-  opacity: ${props => (props.isOpen ? '1' : '0')};
+  max-height: ${props => (props.$isOpen ? '800px' : '0')};
+  opacity: ${props => (props.$isOpen ? '1' : '0')};
   transition: max-height 0.3s ease, opacity 0.3s ease;
 `;
 
@@ -195,13 +195,13 @@ const SubPageItem = styled(Link)`
   text-decoration: none;
   font-size: 0.9rem;
   transition: all 0.2s ease;
-  background: ${props => (props.isActive ? '#f0fdf4' : 'transparent')};
-  color: ${props => (props.isActive ? '#22c55e' : '#64748b')};
-  font-weight: ${props => (props.isActive ? '600' : '500')};
-  border-left: 3px solid ${props => (props.isActive ? '#22c55e' : 'transparent')};
+  background: ${props => (props.$isActive ? '#f0fdf4' : 'transparent')};
+  color: ${props => (props.$isActive ? '#22c55e' : '#64748b')};
+  font-weight: ${props => (props.$isActive ? '600' : '500')};
+  border-left: 3px solid ${props => (props.$isActive ? '#22c55e' : 'transparent')};
 
   &:hover {
-    color: ${props => (props.isActive ? '#22c55e' : '#1e293b')};
+    color: ${props => (props.$isActive ? '#22c55e' : '#1e293b')};
     background: #f8fafc;
   }
 `;
@@ -242,7 +242,7 @@ const Sidebar = () => {
         <Menu size={24} />
       </MobileToggleBtn>
 
-      <Overlay isOpen={isOpen} onClick={handleNavClick} />
+      <Overlay $isOpen={isOpen} onClick={handleNavClick} />
 
       <SidebarWrapper $isOpen={isOpen}>
         <SidebarHeader>
@@ -271,7 +271,7 @@ const Sidebar = () => {
                 return (
                   <NavItemWrapper key={item.id}>
                     {hasSubPages ? (
-                      <NavItem as="div" isActive={active} onClick={() => toggleAccordion(item.id)}>
+                      <NavItem as="div" $isActive={active} onClick={() => toggleAccordion(item.id)}>
                         <NavItemLeft>
                           <Icon size={18} strokeWidth={active ? 2.5 : 2} />
                           {item.title}
@@ -282,7 +282,7 @@ const Sidebar = () => {
                       <NavItem
                         as={Link}
                         to={item.path}
-                        isActive={active}
+                        $isActive={active}
                         onClick={handleNavClick}
                       >
                         <NavItemLeft>
@@ -293,12 +293,12 @@ const Sidebar = () => {
                     )}
 
                     {hasSubPages && (
-                      <SubPageList isOpen={isAccordionOpen}>
+                      <SubPageList $isOpen={isAccordionOpen}>
                         {item.subPages.map((sub) => (
                           <SubPageItem
                             key={sub.id}
                             to={sub.path}
-                            isActive={location.pathname === sub.path}
+                            $isActive={location.pathname === sub.path}
                             onClick={handleNavClick}
                           >
                             {sub.title}

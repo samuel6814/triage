@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { gsap } from 'gsap';
 import { Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useSidebar } from '../../context/SidebarContext';
-import InfoTooltip from '../../components/presentation/InfoTooltip';
+import QaTooltip from '../../components/presentation/QaTooltip';
 
 const SIDEBAR_WIDTH = 280;
 
@@ -12,7 +12,7 @@ const ScreenWrapper = styled.div`
   height: 100vh;
   background-color: #f4f7f5;
   margin-left: ${(props) => (props.$sidebarOpen ? `${SIDEBAR_WIDTH}px` : '0')};
-  padding: ${(props) => (props.$pdfMode ? '1rem 1.5rem' : '2rem 3rem')};
+  padding: ${(props) => (props.$fixedAspect ? '1rem 1.5rem' : '2rem 3rem')};
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s ease;
@@ -21,11 +21,11 @@ const ScreenWrapper = styled.div`
 
   @media (max-width: 1024px) {
     margin-left: 0;
-    padding: ${(props) => (props.$pdfMode ? '4.5rem 0.75rem 0.75rem' : '5rem 2rem 2rem')};
+    padding: ${(props) => (props.$fixedAspect ? '4.5rem 0.75rem 0.75rem' : '5rem 2rem 2rem')};
   }
 
   @media (max-width: 768px) {
-    padding: ${(props) => (props.$pdfMode ? '4rem 0.5rem 0.5rem' : '4.5rem 1rem 1rem')};
+    padding: ${(props) => (props.$fixedAspect ? '4rem 0.5rem 0.5rem' : '4.5rem 1rem 1rem')};
   }
 
   &:fullscreen {
@@ -34,7 +34,7 @@ const ScreenWrapper = styled.div`
     height: 100vh;
     max-height: 100vh;
     overflow: hidden;
-    padding: ${(props) => (props.$pdfMode ? '0.75rem 1.25rem' : '2.5rem 4rem')};
+    padding: ${(props) => (props.$fixedAspect ? '0.75rem 1.25rem' : '2.5rem 4rem')};
     background: #f4f7f5;
   }
 
@@ -43,7 +43,7 @@ const ScreenWrapper = styled.div`
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    padding: ${(props) => (props.$pdfMode ? '0.75rem 1.25rem' : '2.5rem 4rem')};
+    padding: ${(props) => (props.$fixedAspect ? '0.75rem 1.25rem' : '2.5rem 4rem')};
   }
 `;
 
@@ -51,12 +51,12 @@ const PresentationHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${(props) => (props.$pdfMode ? '0.6rem' : '1.5rem')};
+  margin-bottom: ${(props) => (props.$fixedAspect ? '0.6rem' : '1.5rem')};
   gap: 1rem;
   flex-shrink: 0;
 
   ${ScreenWrapper}:fullscreen & {
-    margin-bottom: ${(props) => (props.$pdfMode ? '0.5rem' : '2rem')};
+    margin-bottom: ${(props) => (props.$fixedAspect ? '0.5rem' : '2rem')};
     h2 { font-size: calc(1.75rem * var(--presentation-zoom, 1)); }
     p { font-size: calc(0.95rem * var(--presentation-zoom, 1)); }
   }
@@ -70,19 +70,19 @@ const SlideInfo = styled.div`
 `;
 
 const SlideTitle = styled.h2`
-  font-size: ${(props) => (props.$pdfMode ? '1.25rem' : '1.75rem')};
+  font-size: ${(props) => (props.$fixedAspect ? '1.25rem' : '1.75rem')};
   font-weight: 800;
   color: #166534;
   margin: 0;
   letter-spacing: -0.5px;
 
   @media (max-width: 768px) {
-    font-size: ${(props) => (props.$pdfMode ? '1.05rem' : '1.4rem')};
+    font-size: ${(props) => (props.$fixedAspect ? '1.05rem' : '1.4rem')};
   }
 `;
 
 const SlideSubtitle = styled.p`
-  font-size: ${(props) => (props.$pdfMode ? '0.82rem' : '0.95rem')};
+  font-size: ${(props) => (props.$fixedAspect ? '0.82rem' : '0.95rem')};
   color: #64748b;
   margin: 0;
   font-weight: 500;
@@ -135,7 +135,7 @@ const SlideCanvas = styled.div`
   flex: 1;
   min-height: 0;
   background: #ffffff;
-  border-radius: ${(props) => (props.$pdfMode ? '16px' : '24px')};
+  border-radius: ${(props) => (props.$fixedAspect ? '16px' : '24px')};
   border: 1px solid rgba(22, 101, 52, 0.08);
   box-shadow: 0 10px 40px rgba(22, 101, 52, 0.04);
   display: flex;
@@ -180,12 +180,25 @@ const SlideScrollArea = styled.div`
   }
 `;
 
-const PdfContentArea = styled.div`
+const AspectViewport = styled.div`
   flex: 1;
   min-height: 0;
+  width: 100%;
+  max-height: 100%;
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   overflow: hidden;
+  --slide-font-scale: 0.92;
+`;
+
+const SlideScaleWrapper = styled.div`
+  width: 100%;
+  max-width: 100%;
+  transform-origin: top center;
+  overflow: hidden;
+  padding: 1.25rem 1.75rem;
+  box-sizing: border-box;
 `;
 
 const KeyboardHint = styled.span`
@@ -229,6 +242,44 @@ const SidebarReopenTab = styled.button`
   }
 `;
 
+const useSlideAutoScale = (slideKey, enabled) => {
+  const viewportRef = useRef(null);
+  const contentRef = useRef(null);
+  const [scale, setScale] = useState(1);
+
+  const measure = useCallback(() => {
+    const viewport = viewportRef.current;
+    const content = contentRef.current;
+    if (!viewport || !content) return;
+
+    const vh = viewport.clientHeight;
+    const ch = content.scrollHeight;
+    const vw = viewport.clientWidth;
+    const cw = content.scrollWidth;
+    if (vh === 0 || vw === 0) return;
+
+    const scaleY = ch > vh ? vh / ch : 1;
+    const scaleX = cw > vw ? vw / cw : 1;
+    setScale(Math.min(1, scaleY, scaleX));
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!enabled) return undefined;
+
+    measure();
+    const viewport = viewportRef.current;
+    const content = contentRef.current;
+    if (!viewport || !content) return undefined;
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(viewport);
+    ro.observe(content);
+    return () => ro.disconnect();
+  }, [slideKey, enabled, measure]);
+
+  return { viewportRef, contentRef, scale };
+};
+
 const PresentationScreen = ({
   title,
   subtitle,
@@ -244,14 +295,15 @@ const PresentationScreen = ({
   guideTopic,
   footer,
 }) => {
-  const pdfMode = mode === 'pdf';
+  const fixedAspect = mode === 'fixedAspect';
   const wrapperRef = useRef(null);
   const scrollRef = useRef(null);
   const { isOpen: sidebarOpen, toggle: toggleSidebar, open: openSidebar } = useSidebar();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const { viewportRef, contentRef, scale } = useSlideAutoScale(slideKey, fixedAspect);
 
   useLayoutEffect(() => {
-    if (pdfMode) return undefined;
+    if (fixedAspect) return undefined;
     const ctx = gsap.context(() => {
       if (scrollRef.current) {
         gsap.from(scrollRef.current, {
@@ -263,13 +315,13 @@ const PresentationScreen = ({
       }
     });
     return () => ctx.revert();
-  }, [slideKey, pdfMode]);
+  }, [slideKey, fixedAspect]);
 
   useEffect(() => {
-    if (!pdfMode) {
+    if (!fixedAspect) {
       scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
     }
-  }, [slideKey, pdfMode]);
+  }, [slideKey, fixedAspect]);
 
   useEffect(() => {
     const onFullscreenChange = () => {
@@ -332,26 +384,26 @@ const PresentationScreen = ({
         <PanelLeftOpen size={18} />
       </SidebarReopenTab>
 
-      <ScreenWrapper ref={wrapperRef} $sidebarOpen={sidebarOpen} $pdfMode={pdfMode}>
-        <PresentationHeader $pdfMode={pdfMode}>
+      <ScreenWrapper ref={wrapperRef} $sidebarOpen={sidebarOpen} $fixedAspect={fixedAspect}>
+        <PresentationHeader $fixedAspect={fixedAspect}>
           <SlideInfo>
-            <SlideTitle $pdfMode={pdfMode}>
+            <SlideTitle $fixedAspect={fixedAspect}>
               {title || 'Curatio Presentation'}
-              {pdfMode && pageNumber && totalPages && (
+              {fixedAspect && pageNumber && totalPages && (
                 <PageBadge>
                   {pageNumber} / {totalPages}
                 </PageBadge>
               )}
             </SlideTitle>
-            <SlideSubtitle $pdfMode={pdfMode}>
+            <SlideSubtitle $fixedAspect={fixedAspect}>
               {subtitle || 'View and interact with clinical data'}
             </SlideSubtitle>
           </SlideInfo>
 
           <ControlsGroup>
-            <KeyboardHint>{pdfMode ? '← → pages' : '← → slides'}</KeyboardHint>
-            {pdfMode && guideTopic && (
-              <InfoTooltip topic={guideTopic} label="Explain this slide" />
+            <KeyboardHint>{fixedAspect ? '← → pages' : '← → slides'}</KeyboardHint>
+            {fixedAspect && guideTopic && (
+              <QaTooltip topic={guideTopic} label="Q&A" />
             )}
             <IconButton
               type="button"
@@ -372,9 +424,16 @@ const PresentationScreen = ({
           </ControlsGroup>
         </PresentationHeader>
 
-        <SlideCanvas $pdfMode={pdfMode}>
-          {pdfMode ? (
-            <PdfContentArea>{children}</PdfContentArea>
+        <SlideCanvas $fixedAspect={fixedAspect}>
+          {fixedAspect ? (
+            <AspectViewport ref={viewportRef}>
+              <SlideScaleWrapper
+                ref={contentRef}
+                style={{ transform: scale < 1 ? `scale(${scale})` : undefined }}
+              >
+                {children}
+              </SlideScaleWrapper>
+            </AspectViewport>
           ) : (
             <SlideScrollArea ref={scrollRef}>{children}</SlideScrollArea>
           )}

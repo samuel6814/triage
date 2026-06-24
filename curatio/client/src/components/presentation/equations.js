@@ -71,3 +71,31 @@ export const TRAINING_LOSS = String.raw`\mathcal{L} = -\sum_{i=1}^{N} \log P(y_i
 export const MLM_LOSS = String.raw`\mathcal{L}_{\mathrm{MLM}} = -\sum_{i \in \mathcal{M}} \log P(t_i \mid H^{(L)}; \theta)`;
 
 export const WORKED_CHEST = String.raw`\underbrace{d_{\mathrm{chest}} > \tau}_{\text{language}} + \underbrace{T = 4}_{\text{TEWS alone = Yellow}} + \underbrace{P(\mathrm{Orange} \mid E) \approx 0.89}_{\text{Bayesian}} \;\Rightarrow\; C = \text{Orange}`;
+
+export const TOKENIZATION_TAU = String.raw`X \xrightarrow{\tau} (t_1, \ldots, t_M), \quad M \leq 128`;
+
+export const EMBEDDING_LOOKUP = String.raw`\mathbf{e}_i = E_{\mathrm{word}}[\mathrm{id}(t_i)] \in \mathbb{R}^{768}`;
+
+export const CONTEXTUAL_SUM = String.raw`H^{(0)}[i] = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(t_i)`;
+
+export const INPUT_MATRIX = String.raw`H^{(0)} \in \mathbb{R}^{M \times 768}`;
+
+export const ENCODER_Z = String.raw`Z^{(\ell)} = \mathrm{LayerNorm}\!\bigl(H^{(\ell-1)} + \mathrm{MultiHeadAttention}(H^{(\ell-1)})\bigr)`;
+
+export const ENCODER_H = String.raw`H^{(\ell)} = \mathrm{LayerNorm}\!\bigl(Z^{(\ell)} + \mathrm{FFN}(Z^{(\ell)})\bigr)`;
+
+export const FFN = String.raw`\mathrm{FFN}(x) = W_2\,\mathrm{ReLU}(W_1 x + b_1) + b_2`;
+
+export const ATTENTION_QKV = String.raw`Q = H W_Q,\quad K = H W_K,\quad V = H W_V`;
+
+export const ATTENTION_SOFTMAX = String.raw`\alpha_j = \frac{\exp(e_j)}{\sum_k \exp(e_k)}, \quad e_j = \frac{Q_i \cdot K_j}{\sqrt{d_k}}`;
+
+export const STACK_LAYERS = String.raw`H^{(0)} \xrightarrow{\text{Layer 1}} H^{(1)} \xrightarrow{\text{Layer 2}} \cdots \xrightarrow{\text{Layer 12}} H^{(L)}`;
+
+export const CROSS_ENTROPY = String.raw`\mathcal{L} = -\sum_{i=1}^{N} y_i \log \hat{y}_i`;
+
+export const GRADIENT_DESCENT = String.raw`W_{\mathrm{new}} = W_{\mathrm{old}} - \alpha \frac{\partial \mathcal{L}}{\partial W}`;
+
+export const CHAIN_RULE = String.raw`\frac{\partial \mathcal{L}}{\partial W} = \frac{\partial \mathcal{L}}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial h_{\mathrm{[CLS]}}} \cdot \frac{\partial h_{\mathrm{[CLS]}}}{\partial W}`;
+
+export const BAG_OF_WORDS_FAIL = String.raw`\text{BoW: ``not fever''} \approx \text{``do fever''} \;\Rightarrow\; \text{same word counts}`;

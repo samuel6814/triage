@@ -828,6 +828,183 @@ export const INFO = {
       </>
     ),
   },
+
+  tokenizationTau: {
+    title: 'Tokenization — X → τ → (t_i)',
+    body: (
+      <>
+        <Formula><code>X → τ → (t₁, …, t_M), M ≤ 128</code></Formula>
+        <Symbols>
+          <Sym code="X">Raw chief-complaint text string.</Sym>
+          <Sym code="τ">WordPiece tokeniser — splits text into sub-word pieces.</Sym>
+          <Sym code="t_i">i-th token after splitting (e.g. head, ##ache).</Sym>
+          <Sym code="M">Sequence length after tokenisation (capped at 128).</Sym>
+          <Sym code="𝒱">Vocabulary (~30k entries) — each ID is a row in the embedding table.</Sym>
+        </Symbols>
+        <Why>Computers only process numbers; tokenisation is the first step from English to IDs.</Why>
+      </>
+    ),
+  },
+  clsToken: {
+    title: '[CLS] classification token',
+    body: (
+      <>
+        <Formula><code>h_[CLS] = H^(L) row 0 ∈ ℝ^768</code></Formula>
+        <Symbols>
+          <Sym code="[CLS]">Artificial token (ID 101) — not from patient words; always at position 0.</Sym>
+          <Sym code="h_[CLS]">768-dim summary vector after 12 layers — fed to the acuity head.</Sym>
+          <Sym code="[SEP]">Sentence-end marker (ID 102).</Sym>
+        </Symbols>
+        <Why>The model compresses the whole complaint into one vector for triage classification.</Why>
+      </>
+    ),
+  },
+  embeddingLookup: {
+    title: 'Embedding lookup — ID to vector',
+    body: (
+      <>
+        <Formula><code>e_i = E_word[id(t_i)] ∈ ℝ^768</code></Formula>
+        <Symbols>
+          <Sym code="E_word">Learned lookup table — ~30k rows × 768 columns.</Sym>
+          <Sym code="id(t_i)">Integer token ID from the tokeniser.</Sym>
+          <Sym code="e_i">Dense vector for token i — carries learned meaning.</Sym>
+          <Sym code="768">Embedding dimension D — BERT-base standard.</Sym>
+        </Symbols>
+        <Why>An ID alone has no meaning until mapped to a learned vector in ℝ^768.</Why>
+      </>
+    ),
+  },
+  contextualSum: {
+    title: 'Contextual input — three embeddings summed',
+    body: (
+      <>
+        <Formula><code>H^(0)[i] = E_word + E_pos + E_seg</code></Formula>
+        <Symbols>
+          <Sym code="H^(0)[i]">Initial hidden vector for token i before layer 1.</Sym>
+          <Sym code="E_word">What the word means (e.g. headache ≈ symptom).</Sym>
+          <Sym code="E_pos">Where the word sits in the sentence (order).</Sym>
+          <Sym code="E_seg">Which sentence segment (usually 0 for single complaints).</Sym>
+        </Symbols>
+        <Why>BERT needs meaning, position, and segment before self-attention runs.</Why>
+      </>
+    ),
+  },
+  inputMatrix: {
+    title: 'Input matrix H^(0)',
+    body: (
+      <>
+        <Formula><code>H^(0) ∈ ℝ^(M×768)</code></Formula>
+        <Symbols>
+          <Sym code="M">Number of tokens (rows) — one per token including [CLS].</Sym>
+          <Sym code="768">Feature dimensions (columns) per token.</Sym>
+          <Sym code="Row 0">[CLS] row — becomes the triage summary after 12 layers.</Sym>
+        </Symbols>
+        <Why>Matrix shape stays M×768 through all layers; only the values inside change.</Why>
+      </>
+    ),
+  },
+  encoderStack: {
+    title: '12-layer encoder stack',
+    body: (
+      <>
+        <Formula><code>Z^(ℓ) = LN(H^(ℓ-1) + MHA); H^(ℓ) = LN(Z^(ℓ) + FFN)</code></Formula>
+        <Symbols>
+          <Sym code="ℓ">Layer index 1…12.</Sym>
+          <Sym code="Z^(ℓ)">Post-attention sub-layer output.</Sym>
+          <Sym code="H^(ℓ)">Full layer output — input to next layer.</Sym>
+          <Sym code="MHA">Multi-head self-attention — 12 parallel heads.</Sym>
+          <Sym code="FFN">Feed-forward network — two linear layers with ReLU.</Sym>
+          <Sym code="LN">Layer normalisation — stabilises deep training.</Sym>
+        </Symbols>
+        <Why>Stacking layers builds from words → phrases → clinical urgency patterns.</Why>
+      </>
+    ),
+  },
+  attentionQKV: {
+    title: 'Query, Key, Value projections',
+    body: (
+      <>
+        <Formula><code>Q = H W_Q, K = H W_K, V = H W_V</code></Formula>
+        <Symbols>
+          <Sym code="Q">Query — what is this token looking for?</Sym>
+          <Sym code="K">Key — what does each token offer?</Sym>
+          <Sym code="V">Value — content to mix after weights are computed.</Sym>
+          <Sym code="W_Q, W_K, W_V">Learned weight matrices projecting hidden states.</Sym>
+          <Sym code="d_k">Key dimension — √d_k scales dot products in attention.</Sym>
+        </Symbols>
+        <Why>Attention lets feverish attend to headache and weak — clinical context, not bag-of-words.</Why>
+      </>
+    ),
+  },
+  attentionSoftmax: {
+    title: 'Attention softmax weights',
+    body: (
+      <>
+        <Formula><code>α_j = exp(e_j) / Σ exp(e_k), e_j = Q·K_j / √d_k</code></Formula>
+        <Symbols>
+          <Sym code="α_j">Attention weight on token j — sums to 1 across tokens.</Sym>
+          <Sym code="e_j">Raw compatibility score before softmax.</Sym>
+          <Sym code="softmax">Turns scores into a probability distribution over tokens.</Sym>
+        </Symbols>
+        <Why>High α on symptom tokens drives the [CLS] summary toward urgency-relevant context.</Why>
+      </>
+    ),
+  },
+  crossEntropy: {
+    title: 'Cross-entropy loss',
+    body: (
+      <>
+        <Formula><code>ℒ = −Σ y_i log ŷ_i</code></Formula>
+        <Symbols>
+          <Sym code="y_i">One-hot nurse label for patient i (true acuity).</Sym>
+          <Sym code="ŷ_i">Model predicted probability for the correct class.</Sym>
+          <Sym code="ℒ">Training penalty — high when model is wrong or unconfident.</Sym>
+        </Symbols>
+        <Why>Fine-tuning aligns BioBERT predictions with ~80k historical nurse decisions.</Why>
+      </>
+    ),
+  },
+  gradientDescent: {
+    title: 'Gradient descent update',
+    body: (
+      <>
+        <Formula><code>W_new = W_old − α ∂ℒ/∂W</code></Formula>
+        <Symbols>
+          <Sym code="W">Any learnable weight (embedding, attention, classifier head).</Sym>
+          <Sym code="α">Learning rate — small step size (e.g. 2e-5).</Sym>
+          <Sym code="∂ℒ/∂W">Gradient from backprop — direction to reduce loss.</Sym>
+        </Symbols>
+        <Why>Repeated updates over 3 epochs teach the model our KATH triage task.</Why>
+      </>
+    ),
+  },
+  bagOfWords: {
+    title: 'Bag-of-words vs deep learning',
+    body: (
+      <>
+        <Formula>Word counts ignore order and negation.</Formula>
+        <Symbols>
+          <Sym code="BoW">Counts how often each word appears — no context.</Sym>
+          <Sym code="not fever">Same counts as do fever if words overlap.</Sym>
+        </Symbols>
+        <Why>Chief complaints need context; BioBERT attention captures negation and symptom clusters.</Why>
+      </>
+    ),
+  },
+  fusionSafetyNlp: {
+    title: 'Fusion safety rule',
+    body: (
+      <>
+        <Formula><code>ord(C) ≥ max(ord(C_disc), ord(C_TEWS), ord(C_Bayes))</code></Formula>
+        <Symbols>
+          <Sym code="C">Final fused SATS colour.</Sym>
+          <Sym code="ord(·)">Urgency ordering — Red &gt; Orange &gt; Yellow &gt; Green.</Sym>
+          <Sym code="C_disc">NLP / language pathway colour from BioBERT.</Sym>
+        </Symbols>
+        <Why>Fusion never downgrades a strong language signal — safety over convenience.</Why>
+      </>
+    ),
+  },
 };
 
 export default INFO;

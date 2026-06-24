@@ -4,19 +4,19 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import PresentationScreen from './PresentationScreen';
-import PdfSlideViewer from './PdfSlideViewer';
 import {
   NLP_TOTAL_PAGES,
   nlpPresentationOrder,
   getSlideByPath,
 } from './nlpPresentationSlides';
+import { getNlpSlideComponent } from './nlpSlideRegistry';
 
 const NavigationFooter = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: ${(props) => (props.$pdfMode ? '0.65rem' : '2rem')};
-  padding-top: ${(props) => (props.$pdfMode ? '0.5rem' : '1.5rem')};
+  margin-top: ${(props) => (props.$compact ? '0.65rem' : '2rem')};
+  padding-top: ${(props) => (props.$compact ? '0.5rem' : '1.5rem')};
   border-top: 1px solid #f1f5f9;
   flex-shrink: 0;
 `;
@@ -25,22 +25,22 @@ const NavButton = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: ${(props) => (props.$pdfMode ? '8px 16px' : '10px 20px')};
+  padding: ${(props) => (props.$compact ? '8px 16px' : '10px 20px')};
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
   color: #1e293b;
   font-weight: 600;
-  font-size: ${(props) => (props.$pdfMode ? '0.88rem' : '0.95rem')};
+  font-size: ${(props) => (props.$compact ? '0.88rem' : '0.95rem')};
   cursor: pointer;
   transition: all 0.2s ease;
-  visibility: ${(props) => (props.hidden ? 'hidden' : 'visible')};
+  visibility: ${(props) => (props.$hidden ? 'hidden' : 'visible')};
 
   &:hover {
     background: #f0fdf4;
     border-color: #bbf7d0;
     color: #166534;
-    transform: ${(props) => (props.direction === 'prev' ? 'translateX(-2px)' : 'translateX(2px)')};
+    transform: ${(props) => (props.$direction === 'prev' ? 'translateX(-2px)' : 'translateX(2px)')};
   }
 
   span.sub-text {
@@ -48,17 +48,13 @@ const NavButton = styled.button`
     font-size: 0.72rem;
     color: #94a3b8;
     font-weight: 500;
-    text-align: ${(props) => (props.direction === 'prev' ? 'left' : 'right')};
+    text-align: ${(props) => (props.$direction === 'prev' ? 'left' : 'right')};
   }
 `;
 
 const PresentationPages = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  if (location.pathname === '/dashboard' || location.pathname === '/dashboard/') {
-    return <Navigate to="/dashboard/nlp/1" replace />;
-  }
 
   const currentSlide = useMemo(() => {
     const match = getSlideByPath(location.pathname);
@@ -71,6 +67,10 @@ const PresentationPages = () => {
     return nlpPresentationOrder[0];
   }, [location.pathname]);
 
+  if (location.pathname === '/dashboard' || location.pathname === '/dashboard/') {
+    return <Navigate to="/dashboard/nlp/1" replace />;
+  }
+
   const currentIndex = nlpPresentationOrder.findIndex((s) => s.page === currentSlide.page);
   const prevSlide = currentIndex > 0 ? nlpPresentationOrder[currentIndex - 1] : null;
   const nextSlide =
@@ -78,11 +78,13 @@ const PresentationPages = () => {
       ? nlpPresentationOrder[currentIndex + 1]
       : null;
 
+  const SlideComponent = getNlpSlideComponent(currentSlide.page);
+
   const footer = (
-    <NavigationFooter $pdfMode>
+    <NavigationFooter $compact>
       <NavButton
-        direction="prev"
-        hidden={!prevSlide}
+        $direction="prev"
+        $hidden={!prevSlide}
         onClick={() => prevSlide && navigate(prevSlide.path)}
       >
         <ChevronLeft size={20} />
@@ -93,8 +95,8 @@ const PresentationPages = () => {
       </NavButton>
 
       <NavButton
-        direction="next"
-        hidden={!nextSlide}
+        $direction="next"
+        $hidden={!nextSlide}
         onClick={() => nextSlide && navigate(nextSlide.path)}
       >
         <div style={{ textAlign: 'right' }}>
@@ -108,7 +110,7 @@ const PresentationPages = () => {
 
   return (
     <PresentationScreen
-      mode="pdf"
+      mode="fixedAspect"
       title={currentSlide.title}
       subtitle={currentSlide.subtitle}
       slideKey={currentSlide.id}
@@ -121,7 +123,7 @@ const PresentationPages = () => {
       onNext={() => nextSlide && navigate(nextSlide.path)}
       footer={footer}
     >
-      <PdfSlideViewer pageNumber={currentSlide.page} />
+      <SlideComponent />
     </PresentationScreen>
   );
 };
