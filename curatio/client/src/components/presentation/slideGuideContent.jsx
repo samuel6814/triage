@@ -12,8 +12,14 @@ const Sym = ({ code, children }) => (
   <li><code>{code}</code> — {children}</li>
 );
 
+const FormulaHint = () => (
+  <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '0.75rem' }}>
+    For symbol-by-symbol formula definitions, use the green <strong>?</strong> next to each equation on the slide.
+  </p>
+);
+
 /**
- * Per-page help for the NLP PDF presentation (? button).
+ * Per-page presentation Q&A (header Q&A button).
  * Keys: page1 … page28 — match guideTopic in nlpPresentationSlides.js
  */
 export const SLIDE_GUIDE = {
@@ -133,6 +139,7 @@ export const SLIDE_GUIDE = {
         <p><strong>Where do the 768 numbers come from?</strong> Not from PubMed text directly — they are <strong>learned weights</strong> updated during pre-training and fine-tuning. Row &quot;headache&quot; holds 768 numbers that the model learned represent that word.</p>
         <p><strong>D1, D2, … D768:</strong> Dimension labels — not named clinical features. Each dimension is one axis in learned space; the model discovers which combinations encode medical meaning.</p>
         <SayLive>&quot;Embedding is a dictionary: word ID → 768 numbers. Those numbers were learned from millions of medical sentences.&quot;</SayLive>
+        <FormulaHint />
       </>
     ),
   },
@@ -242,6 +249,7 @@ export const SLIDE_GUIDE = {
         <Idea>Every token queries every other token: split into Q (query), K (key), V (value) → score with QKᵀ → softmax → weighted blend of V.</Idea>
         <p>For &quot;headache&quot;: high attention to &quot;feverish&quot; (0.41), itself (0.32), &quot;weak&quot; (0.18); filler words ≈ 0.02.</p>
         <SayLive>Walk the four diagram steps: split → score → softmax → blend. &quot;Words interview each other.&quot;</SayLive>
+        <FormulaHint />
       </>
     ),
   },
@@ -322,6 +330,7 @@ export const SLIDE_GUIDE = {
           <li>Class indices 0–4 map to acuity levels 1–5 in the deployed Curatio model.</li>
         </ul>
         <SayLive>&quot;This is the verdict slide — the whole complaint compressed to one vector, then five probabilities.&quot;</SayLive>
+        <FormulaHint />
       </>
     ),
   },
@@ -334,6 +343,7 @@ export const SLIDE_GUIDE = {
         <p>With one-hot nurse label, loss simplifies to −log(ŷ_correct class).</p>
         <p><strong>Example:</strong> true = Yellow, model predicts Green 90% (Yellow only 5%) → ℒ = −log(0.05) ≈ 3.0 — large penalty for confident wrong answer.</p>
         <SayLive>&quot;Forward pass produces the guess; cross-entropy grades it against the nurse&apos;s label.&quot;</SayLive>
+        <FormulaHint />
       </>
     ),
   },
