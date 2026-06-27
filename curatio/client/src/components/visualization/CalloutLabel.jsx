@@ -27,7 +27,7 @@ const Badge = styled.span`
   background: ${(p) => (p.$accent ? '#166534' : '#ffffff')};
   color: ${(p) => (p.$accent ? '#ffffff' : '#166534')};
   border: 2px solid #166534;
-  font-size: 0.95rem;
+  font-size: calc(1.15rem * var(--viz-font-scale, 1));
   font-weight: 700;
   white-space: nowrap;
   box-shadow: 0 4px 14px rgba(22, 101, 52, 0.15);
