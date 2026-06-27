@@ -1,42 +1,38 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
+  BeamerSlideContainer,
   LeadText,
   SectionTitle,
+  BodyText,
 } from '../../../../components/presentation/SlideLayout';
 import { OUTLINE_SECTIONS } from './nlpShared';
 
 export const Page01 = () => (
-  <CompactSlideContainer>
-    <SectionTitle style={{ fontSize: '1.35rem', margin: 0 }}>NLP Patient Description to Acuity</SectionTitle>
-    <LeadText style={{ fontSize: '1rem', color: '#64748b' }}>
-      Deep Learning and Mathematical Triage
-    </LeadText>
-    <LeadText>
+  <BeamerSlideContainer style={{ justifyContent: 'center' }}>
+    <SectionTitle style={{ fontSize: '1.75rem' }}>NLP Patient Description to Acuity</SectionTitle>
+    <LeadText style={{ color: '#64748b' }}>Deep Learning and Mathematical Triage</LeadText>
+    <BodyText>
       <strong>Authors:</strong> Quaigraine Samuel &amp; Twum Samuel
       <br />
       <strong>Institute:</strong> Department of Mathematics, KNUST
-    </LeadText>
-    <LeadText style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: 'auto' }}>
-      Curatio interactive deck — flip cards and formula ? tooltips on math slides.
-    </LeadText>
-  </CompactSlideContainer>
+    </BodyText>
+  </BeamerSlideContainer>
 );
 
 export const Page02 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
     <SectionTitle>Outline</SectionTitle>
     {OUTLINE_SECTIONS.map((sec) => (
       <div key={sec.title}>
-        <LeadText style={{ fontWeight: 700, color: '#166534', marginBottom: '0.25rem' }}>
+        <BodyText style={{ fontWeight: 700, color: '#166534', marginBottom: '0.25rem' }}>
           {sec.title}
-        </LeadText>
-        <ul style={{ margin: '0 0 0.75rem', paddingLeft: '1.25rem', color: '#475569', fontSize: '0.88rem' }}>
+        </BodyText>
+        <ul style={{ margin: '0 0 0.85rem', paddingLeft: '1.35rem', color: '#475569', fontSize: '1.05rem', lineHeight: 1.6 }}>
           {sec.items.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
       </div>
     ))}
-  </CompactSlideContainer>
+  </BeamerSlideContainer>
 );

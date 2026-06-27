@@ -1,73 +1,74 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
+  BeamerSlideContainer,
   LeadText,
-  TwoColumn,
+  BodyText,
+  BulletList,
+  DiagramBox,
+  PlainEnglishBlock,
+  VariableTable,
 } from '../../../../components/presentation/SlideLayout';
 import MathSection from '../../../../components/presentation/MathSection';
 import { MlmMask } from '../../../../components/presentation/diagrams/NlpDiagrams';
 import { MLM_LOSS } from '../../../../components/presentation/equations';
 
 export const Page20 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
     <LeadText>
-      Before triage fine-tuning, BioBERT learned medical language on PubMed via Masked Language Modelling —
-      ~15% of words hidden per sentence; model predicts the missing token from context.
+      Before triage fine-tuning, BioBERT learns medical English from PubMed via <strong>Masked Language Modeling (MLM)</strong>:
     </LeadText>
-    <MlmMask />
-    <LeadText style={{ fontSize: '0.85rem' }}>
-      Example: &quot;The patient presented with severe [MASK] pain&quot; → model learns chest, abdominal, etc.
-      from surrounding clinical context.
-    </LeadText>
-  </CompactSlideContainer>
+    <DiagramBox $minHeight="100px">
+      <MlmMask />
+    </DiagramBox>
+    <BulletList>
+      <li>15% of tokens randomly masked; model predicts them from <strong>bidirectional</strong> context</li>
+      <li>Teaches medical vocabulary (&quot;feverish&quot;, &quot;headache&quot;, &quot;tachycardia&quot;) before any triage labels</li>
+      <li>BioBERT = BERT pre-trained on PubMed + PMC biomedical abstracts</li>
+    </BulletList>
+  </BeamerSlideContainer>
 );
 
 export const Page21 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
     <MathSection
-      title="MLM loss (Phase 1 — medical school)"
+      title="Masked Language Modeling Loss"
       equations={[{
         latex: MLM_LOSS,
         label: 'ℒ_LM',
         info: 'mlmLoss',
       }]}
       compact
-      flipMinHeight={180}
-      explanation={
-        <p>
-          Sum of −log P over all masked positions M. High penalty when the model guesses the wrong medical word.
-        </p>
-      }
+      flipMinHeight={120}
     />
-    <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.85rem', color: '#475569' }}>
-      <li><strong>i ∈ M</strong> — masked word positions only</li>
-      <li><strong>t_i</strong> — true hidden word (ground truth)</li>
-      <li><strong>H^(L)</strong> — full context after 12 layers</li>
-      <li><strong>θ</strong> — all weights updated during pre-training</li>
-    </ul>
-  </CompactSlideContainer>
+    <VariableTable>
+      <thead>
+        <tr><th>Variable</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>ℳ</td><td>Set of masked token positions in the sentence</td></tr>
+        <tr><td>t_i</td><td>The true (correct) word at masked position i</td></tr>
+        <tr><td>H⁽ᴸ⁾</td><td>Final hidden states from all 12 layers — the context</td></tr>
+        <tr><td>θ</td><td>All model parameters (weights + biases)</td></tr>
+        <tr><td>P(t_i | ·)</td><td>Softmax probability the model assigns to the correct word</td></tr>
+        <tr><td>ℒ_LM</td><td>Total penalty — lower = better word predictions</td></tr>
+      </tbody>
+    </VariableTable>
+  </BeamerSlideContainer>
 );
 
 export const Page22 = () => (
-  <CompactSlideContainer>
-    <TwoColumn>
-      <div>
-        <LeadText style={{ fontWeight: 700, color: '#166534' }}>Independent vs dependent</LeadText>
-        <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.85rem', color: '#475569' }}>
-          <li><strong>Independent (input):</strong> visible tokens + position of [MASK]</li>
-          <li><strong>Dependent (target):</strong> true word at masked position t_i</li>
-          <li><strong>Prediction:</strong> P(t_i | context) from softmax over vocabulary</li>
-        </ul>
-      </div>
-      <div style={{ background: '#f8fafc', borderRadius: '8px', padding: '0.75rem', fontSize: '0.82rem' }}>
-        <div><strong>Context:</strong> &quot;patient severe ___ pain&quot;</div>
-        <div><strong>Target t_i:</strong> chest</div>
-        <div><strong>P(chest)</strong> = 0.82 → penalty = −log(0.82) ≈ 0.20</div>
-        <div><strong>P(abdominal)</strong> = 0.05 → if wrong, penalty ≈ 3.0</div>
-      </div>
-    </TwoColumn>
-    <LeadText style={{ fontSize: '0.85rem' }}>
-      After millions of PubMed sentences, BioBERT understands clinical grammar — then we fine-tune on triage labels.
-    </LeadText>
-  </CompactSlideContainer>
+  <BeamerSlideContainer>
+    <BulletList>
+      <li><strong>Independent variable (H⁽ᴸ⁾):</strong> The surrounding, unmasked context the model is allowed to read bidirectionally</li>
+      <li><strong>Dependent variable (ℒ_LM):</strong> The loss penalty — its size depends entirely on P(t_i) the model assigned to the correct hidden word</li>
+    </BulletList>
+    <BodyText style={{ fontWeight: 700, marginTop: '0.5rem' }}>Numerical example:</BodyText>
+    <BulletList>
+      <li>Correct word = &quot;headache&quot;; model assigns P = 0.92 ⇒ contribution = −log(0.92) ≈ 0.08 (small penalty)</li>
+      <li>Model assigns P = 0.01 to correct word ⇒ −log(0.01) ≈ 4.6 (large penalty)</li>
+    </BulletList>
+    <PlainEnglishBlock>
+      After MLM pre-training on PubMed, BioBERT is fine-tuned on 80,000 triage-labeled chief complaints using cross-entropy loss — covered next.
+    </PlainEnglishBlock>
+  </BeamerSlideContainer>
 );

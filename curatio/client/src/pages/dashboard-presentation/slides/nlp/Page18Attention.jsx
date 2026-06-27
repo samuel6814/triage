@@ -1,7 +1,10 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
-  LeadText,
+  BeamerSlideContainer,
+  BodyText,
+  CaptionText,
+  DiagramBox,
+  VariableTable,
 } from '../../../../components/presentation/SlideLayout';
 import MathSection from '../../../../components/presentation/MathSection';
 import { AttentionFlow } from '../../../../components/presentation/diagrams/NlpDiagrams';
@@ -10,26 +13,17 @@ import {
   ATTENTION_QKV,
 } from '../../../../components/presentation/equations';
 
-const VARS = [
-  ['Q', 'Query — what is this token looking for?'],
-  ['K', 'Key — what does each token offer?'],
-  ['V', 'Value — content mixed after weights'],
-  ['d_k', 'Key dimension — √d_k scales dot products'],
-  ['H', 'Hidden state matrix from previous layer'],
-  ['W_Q, W_K, W_V', 'Learned projection matrices'],
-];
-
 export const Page18 = () => (
-  <CompactSlideContainer>
-    <AttentionFlow />
-    <LeadText style={{ fontSize: '0.85rem' }}>
-      For our complaint, tokens like feverish and weak attend strongly to headache — building clinical context.
-    </LeadText>
-  </CompactSlideContainer>
+  <BeamerSlideContainer>
+    <DiagramBox $minHeight="380px" $maxHeight="480px">
+      <AttentionFlow />
+    </DiagramBox>
+  </BeamerSlideContainer>
 );
 
 export const Page19 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
+    <BodyText>From Vaswani et al. (2017):</BodyText>
     <MathSection
       title="Self-attention equation"
       equations={[
@@ -37,25 +31,23 @@ export const Page19 = () => (
         { latex: ATTENTION, label: 'Attention output', info: 'attention' },
       ]}
       compact
-      flipMinHeight={160}
+      flipMinHeight={120}
     />
-    <dl style={{
-      display: 'grid',
-      gridTemplateColumns: 'auto 1fr',
-      gap: '0.3rem 1rem',
-      margin: 0,
-      padding: '0.75rem',
-      background: '#f8fafc',
-      borderRadius: '8px',
-      fontSize: '0.82rem',
-    }}
-    >
-      {VARS.map(([sym, desc]) => (
-        <React.Fragment key={sym}>
-          <dt style={{ fontWeight: 700, color: '#166534' }}>{sym}</dt>
-          <dd style={{ margin: 0, color: '#475569' }}>{desc}</dd>
-        </React.Fragment>
-      ))}
-    </dl>
-  </CompactSlideContainer>
+    <VariableTable>
+      <thead>
+        <tr><th>Symbol</th><th>Definition</th><th>Role in triage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Q</td><td>Query matrix = H W_Q</td><td>&quot;What is this token looking for?&quot;</td></tr>
+        <tr><td>K</td><td>Key matrix = H W_K</td><td>&quot;What does each token offer?&quot;</td></tr>
+        <tr><td>V</td><td>Value matrix = H W_V</td><td>Semantic content passed forward</td></tr>
+        <tr><td>d_k</td><td>Key dimension (= 64 per head)</td><td>Scaling factor</td></tr>
+        <tr><td>QKᵀ</td><td>Pairwise relevance scores</td><td>&quot;headache&quot; ↔ &quot;feverish&quot; co-attend</td></tr>
+        <tr><td>√d_k</td><td>Prevents dot products exploding</td><td>Training stability</td></tr>
+      </tbody>
+    </VariableTable>
+    <CaptionText>
+      Worked weights for query &quot;headache&quot;: feverish 0.41, headache 0.32, weak 0.18, filler words ≈ 0.02.
+    </CaptionText>
+  </BeamerSlideContainer>
 );

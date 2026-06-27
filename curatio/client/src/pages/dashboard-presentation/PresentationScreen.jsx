@@ -186,19 +186,23 @@ const AspectViewport = styled.div`
   width: 100%;
   max-height: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   overflow: hidden;
-  --slide-font-scale: 0.92;
+  --math-scale: 1.08;
 `;
 
-const SlideScaleWrapper = styled.div`
-  width: 100%;
-  max-width: 100%;
-  transform-origin: top center;
+const DESIGN_W = 1280;
+const DESIGN_H = 720;
+
+const SlideDesignCanvas = styled.div`
+  width: ${DESIGN_W}px;
+  height: ${DESIGN_H}px;
+  flex-shrink: 0;
   overflow: hidden;
-  padding: 1.25rem 1.75rem;
+  padding: 1rem 1.25rem;
   box-sizing: border-box;
+  transform-origin: center center;
 `;
 
 const KeyboardHint = styled.span`
@@ -252,15 +256,14 @@ const useSlideAutoScale = (slideKey, enabled) => {
     const content = contentRef.current;
     if (!viewport || !content) return;
 
-    const vh = viewport.clientHeight;
-    const ch = content.scrollHeight;
     const vw = viewport.clientWidth;
-    const cw = content.scrollWidth;
+    const vh = viewport.clientHeight;
     if (vh === 0 || vw === 0) return;
 
-    const scaleY = ch > vh ? vh / ch : 1;
-    const scaleX = cw > vw ? vw / cw : 1;
-    setScale(Math.min(1, scaleY, scaleX));
+    const fitScale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+    const ch = content.scrollHeight;
+    const overflowScale = ch > DESIGN_H ? DESIGN_H / ch : 1;
+    setScale(fitScale * overflowScale);
   }, []);
 
   useLayoutEffect(() => {
@@ -427,12 +430,12 @@ const PresentationScreen = ({
         <SlideCanvas $fixedAspect={fixedAspect}>
           {fixedAspect ? (
             <AspectViewport ref={viewportRef}>
-              <SlideScaleWrapper
+              <SlideDesignCanvas
                 ref={contentRef}
-                style={{ transform: scale < 1 ? `scale(${scale})` : undefined }}
+                style={{ transform: `scale(${scale})` }}
               >
                 {children}
-              </SlideScaleWrapper>
+              </SlideDesignCanvas>
             </AspectViewport>
           ) : (
             <SlideScrollArea ref={scrollRef}>{children}</SlideScrollArea>

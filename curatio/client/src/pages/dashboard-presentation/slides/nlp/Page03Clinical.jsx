@@ -1,40 +1,44 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
+  BeamerSlideContainer,
+  BeamerColumns,
   LeadText,
+  BodyText,
+  CaptionText,
   ComplaintQuote,
-  TwoColumn,
+  SlideFigure,
+  DiagramBox,
 } from '../../../../components/presentation/SlideLayout';
 import { SatsBar } from '../../../../components/presentation/diagrams/NlpDiagrams';
 import { RUNNING_COMPLAINT } from './nlpShared';
 
 export const Page03 = () => (
-  <CompactSlideContainer>
-    <TwoColumn $ratio="1.1fr 0.9fr">
+  <BeamerSlideContainer>
+    <BeamerColumns>
       <div>
-        <img
-          src="/assets/convo.jpg"
-          alt="Patient chat conversation"
-          style={{ width: '100%', maxHeight: '140px', objectFit: 'contain', borderRadius: '8px' }}
-        />
-        <SatsBar />
+        <SlideFigure>
+          <img src="/assets/convo.jpg" alt="Patient chat conversation" />
+        </SlideFigure>
+        <DiagramBox $minHeight="100px">
+          <SatsBar />
+        </DiagramBox>
       </div>
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.75rem' }}>
         <LeadText>
-          <strong>Setting:</strong> Komfo Anokye Teaching Hospital (KATH), Kumasi — SATS triage.
+          <strong>Setting:</strong> Komfo Anokye Teaching Hospital (KATH), Kumasi — <strong>SATS</strong> triage.
         </LeadText>
-        <LeadText>
+        <BodyText>
           <strong>Chief complaint (running example):</strong>
-        </LeadText>
+        </BodyText>
         <ComplaintQuote>{RUNNING_COMPLAINT}</ComplaintQuote>
-        <LeadText>
-          How does a computer mathematically interpret this unstructured complaint and convert it
+        <BodyText>
+          How does a computer mathematically interpret this simple, unstructured complaint and convert it
           into a triage colour?
-        </LeadText>
-        <LeadText style={{ fontSize: '0.82rem', fontStyle: 'italic', color: '#64748b' }}>
+        </BodyText>
+        <CaptionText>
           The system supports triage staff; it does not diagnose disease or replace clinical judgment.
-        </LeadText>
+        </CaptionText>
       </div>
-    </TwoColumn>
-  </CompactSlideContainer>
+    </BeamerColumns>
+  </BeamerSlideContainer>
 );

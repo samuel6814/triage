@@ -2,7 +2,7 @@ import React, { useRef, useLayoutEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
-import { Activity, Clock, Users, ArrowRight, ShieldCheck, Home, Plus, Menu, Sparkles } from 'lucide-react';
+import { Activity, Clock, Users, ArrowRight, ShieldCheck, Home, Plus, Menu, Sparkles, PlayCircle } from 'lucide-react';
 
 // ==========================================
 // 1. STYLED COMPONENTS & ANIMATIONS
@@ -490,9 +490,12 @@ const Hero = () => {
           your hospital's operational capacity.
         </Paragraph>
         <ButtonRow className="animate-text">
-          <Button to="/dashboard">
+          <Button to="/dashboard/nlp/1">
             Presentation <ArrowRight size={18} />
           </Button>
+          <OutlineButton to="/visualization/1">
+            Visualization <PlayCircle size={18} />
+          </OutlineButton>
           <OutlineButton to="/test">
             Test Model <Sparkles size={18} />
           </OutlineButton>

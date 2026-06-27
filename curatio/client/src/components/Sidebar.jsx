@@ -33,6 +33,10 @@ const presentationData = nlpPresentationSections.map((section) => ({
   ],
 }));
 
+const sidebarNavData = [
+  { sectionLabel: 'Slides', groups: presentationData },
+];
+
 const MobileToggleBtn = styled.button`
   display: none;
   position: fixed;
@@ -215,6 +219,11 @@ const Sidebar = () => {
     pretraining: false,
     learning: false,
     summary: true,
+    'viz-clinical': true,
+    'viz-pipeline': false,
+    'viz-pretraining': false,
+    'viz-learning': false,
+    'viz-summary': true,
   });
   const location = useLocation();
 
@@ -258,11 +267,18 @@ const Sidebar = () => {
         </SidebarHeader>
 
         <NavContent>
-          {presentationData.map((section, idx) => (
-            <div key={idx}>
-              <NavSectionTitle>{section.section}</NavSectionTitle>
+          {sidebarNavData.map((block, blockIdx) => (
+            <div key={block.sectionLabel}>
+              <NavSectionTitle>{block.sectionLabel}</NavSectionTitle>
+              {block.groups.map((section, idx) => (
+                <div key={`${block.sectionLabel}-${idx}`}>
+                  {section.section && block.groups.length > 1 && (
+                    <NavSectionTitle style={{ marginTop: '8px', fontSize: '0.7rem' }}>
+                      {section.section}
+                    </NavSectionTitle>
+                  )}
 
-              {section.items.map((item) => {
+                  {section.items.map((item) => {
                 const Icon = item.icon;
                 const hasSubPages = !!item.subPages;
                 const active = isParentActive(item);
@@ -309,6 +325,8 @@ const Sidebar = () => {
                   </NavItemWrapper>
                 );
               })}
+                </div>
+              ))}
             </div>
           ))}
         </NavContent>
