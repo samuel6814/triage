@@ -1,11 +1,15 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
+  BeamerSlideContainer,
   LeadText,
+  BodyText,
+  CaptionText,
   DataTable,
+  DiagramBox,
 } from '../../../../components/presentation/SlideLayout';
 import MathSection from '../../../../components/presentation/MathSection';
-import { INPUT_MATRIX, CLS_HEAD } from '../../../../components/presentation/equations';
+import { InputMatrixFlowDiagram } from '../../../../components/presentation/diagrams/NlpDiagrams';
+import { INPUT_MATRIX, CLS_OUTPUT } from '../../../../components/presentation/equations';
 
 const MATRIX_ROWS = [
   ['0', '[CLS]', '0.02', '0.11', '-0.05', '0.33'],
@@ -16,36 +20,34 @@ const MATRIX_ROWS = [
 ];
 
 export const Page13 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
+    <LeadText>
+      After embedding every token, the full sentence becomes a matrix:
+    </LeadText>
     <MathSection
       title="Input matrix"
       equations={[{
         latex: INPUT_MATRIX,
-        label: 'H^(0) shape',
+        label: 'H⁽⁰⁾ shape',
         info: 'inputMatrix',
       }]}
       compact
       flipMinHeight={100}
     />
-    <LeadText style={{ fontSize: '0.85rem' }}>
-      Each <strong>row</strong> = one token&apos;s 768-d embedding. Each <strong>column</strong> = one feature
-      dimension across all tokens. Row 0 = [CLS] → becomes triage summary.
-    </LeadText>
-    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.78rem', flexWrap: 'wrap' }}>
-      <span style={{ padding: '0.5rem', background: '#f8fafc', borderRadius: '6px' }}>IDs: 101, 1045, 2031…</span>
-      <span>→</span>
-      <span style={{ padding: '0.5rem', background: '#f0fdf4', borderRadius: '6px' }}>E_word lookup</span>
-      <span>→</span>
-      <span style={{ padding: '0.5rem', background: '#fef9c3', borderRadius: '6px', fontWeight: 700 }}>H^(0) M×768</span>
-    </div>
-    <LeadText style={{ fontSize: '0.82rem' }}>
-      Matrix shape stays M×768 through all 12 layers — only the values inside change.
-    </LeadText>
-  </CompactSlideContainer>
+    <BodyText>
+      Each <strong>row</strong> = one token&apos;s 768-dimensional embedding. Each <strong>column</strong> = one feature dimension across all tokens.
+    </BodyText>
+    <DiagramBox $minHeight="80px">
+      <InputMatrixFlowDiagram />
+    </DiagramBox>
+    <CaptionText>
+      The matrix shape stays M × 768 through all 12 layers — only the <em>values</em> inside change.
+    </CaptionText>
+  </BeamerSlideContainer>
 );
 
 export const Page14 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
     <LeadText><strong>Example submatrix</strong> (first 4 of 768 dimensions shown):</LeadText>
     <DataTable>
       <thead>
@@ -63,15 +65,8 @@ export const Page14 = () => (
         <tr><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr>
       </tbody>
     </DataTable>
-    <MathSection
-      title="After 12 layers"
-      equations={[{
-        latex: CLS_HEAD,
-        label: 'h_[CLS] from row 0',
-        info: 'cls768',
-      }]}
-      compact
-      flipMinHeight={100}
-    />
-  </CompactSlideContainer>
+    <BodyText>
+      After L = 12 transformer layers: h_[CLS] = H⁽¹²⁾ subscript (0,:) — the first row of the final layer output, a single 768-dim vector summarising the complaint.
+    </BodyText>
+  </BeamerSlideContainer>
 );

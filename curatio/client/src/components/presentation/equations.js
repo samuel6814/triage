@@ -98,4 +98,14 @@ export const GRADIENT_DESCENT = String.raw`W_{\mathrm{new}} = W_{\mathrm{old}} -
 
 export const CHAIN_RULE = String.raw`\frac{\partial \mathcal{L}}{\partial W} = \frac{\partial \mathcal{L}}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial h_{\mathrm{[CLS]}}} \cdot \frac{\partial h_{\mathrm{[CLS]}}}{\partial W}`;
 
-export const BAG_OF_WORDS_FAIL = String.raw`\text{BoW: ``not fever''} \approx \text{``do fever''} \;\Rightarrow\; \text{same word counts}`;
+export const BAG_OF_WORDS_FAIL = String.raw`\text{BoW: "not fever"} \approx \text{"do fever"} \;\Rightarrow\; \text{same word counts}`;
+
+export const TEWS_NLP_SUM = String.raw`T = \sum_k w_k f_k(v_k)`;
+
+export const FORWARD_PASS = String.raw`y = Wx + b, \quad x = h_{\mathrm{[CLS]}}`;
+
+export const CROSS_ENTROPY_SINGLE = String.raw`\mathcal{L} = -\sum_{i=1}^{C} y_i \log(\hat{y}_i), \quad C = 5`;
+
+export const TRIAGE_FINETUNE_LOSS = String.raw`\mathcal{L}_{\mathrm{triage}} = -\sum_{i=1}^{N} \log P(y_i \mid X_i;\, \theta), \quad N \approx 80{,}000`;
+
+export const CLS_OUTPUT = String.raw`h_{\mathrm{[CLS]}} = H^{(12)}_{0,:} \in \mathbb{R}^{768}`;

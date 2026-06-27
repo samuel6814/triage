@@ -1,62 +1,54 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
+  BeamerSlideContainer,
   LeadText,
+  BodyText,
+  CaptionText,
+  DiagramBox,
+  VariableTable,
 } from '../../../../components/presentation/SlideLayout';
 import MathSection from '../../../../components/presentation/MathSection';
-import { CONTEXTUAL_SUM, TOKEN_EMBED } from '../../../../components/presentation/equations';
+import { ContextualMappingDiagram } from '../../../../components/presentation/diagrams/NlpDiagrams';
+import { TOKEN_EMBED } from '../../../../components/presentation/equations';
 
 export const Page11 = () => (
-  <CompactSlideContainer>
-    <LeadText>
-      Before attention, each token gets three learned vectors summed element-wise: word meaning,
-      position in sentence, and segment ID.
-    </LeadText>
-    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center', fontSize: '0.78rem' }}>
-      {['E_word(t_i)', '+', 'E_pos(i)', '+', 'E_seg(t_i)', '=', 'H^(0)[i]'].map((part) => (
-        <span
-          key={part}
-          style={{
-            padding: '0.35rem 0.6rem',
-            background: part === '=' ? 'transparent' : '#f0fdf4',
-            border: part === '=' ? 'none' : '1px solid #bbf7d0',
-            borderRadius: '6px',
-            fontWeight: part.includes('H') ? 700 : 500,
-          }}
-        >
-          {part}
-        </span>
-      ))}
-    </div>
-    <LeadText style={{ fontSize: '0.85rem' }}>
-      For &quot;headache&quot; at position 4: word vector + position-4 vector + segment-0 vector → one 768-d input row.
-    </LeadText>
-  </CompactSlideContainer>
+  <BeamerSlideContainer>
+    <DiagramBox $minHeight="120px" $maxHeight="160px">
+      <ContextualMappingDiagram />
+    </DiagramBox>
+    <BodyText>
+      Three separate learned vectors are <strong>added element-wise</strong> for each token position i to produce the input embedding E(t_i).
+    </BodyText>
+  </BeamerSlideContainer>
 );
 
 export const Page12 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
     <MathSection
       title="Contextual mapping formula"
-      equations={[
-        {
-          latex: CONTEXTUAL_SUM,
-          label: 'H^(0)[i] sum',
-          info: 'contextualSum',
-        },
-        {
-          latex: TOKEN_EMBED,
-          label: 'Equivalent notation',
-          info: 'tokenEmbed',
-        },
-      ]}
+      equations={[{
+        latex: TOKEN_EMBED,
+        label: 'E(t_i) sum',
+        info: 'tokenEmbed',
+      }]}
       compact
-      flipMinHeight={140}
-      explanation={
-        <p>
-          Same formula as standard BERT — three embeddings added per token before the first encoder layer.
-        </p>
-      }
+      flipMinHeight={100}
     />
-  </CompactSlideContainer>
+    <VariableTable>
+      <thead>
+        <tr><th>Term</th><th>Meaning</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>E_word</td><td>Token identity — what word is this?</td><td>&quot;headache&quot; vs &quot;feverish&quot;</td></tr>
+        <tr><td>E_pos(i)</td><td>Position in sentence — order matters</td><td>&quot;head ache&quot; ≠ &quot;ache head&quot;</td></tr>
+        <tr><td>E_seg</td><td>Which sentence (A or B)</td><td>0 for our single complaint</td></tr>
+      </tbody>
+    </VariableTable>
+    <BodyText style={{ marginTop: '0.5rem' }}>
+      <strong>Bidirectional reading:</strong> BERT sees all tokens left <em>and</em> right — &quot;feel feverish&quot; informs &quot;headache&quot; in both directions.
+    </BodyText>
+    <CaptionText>
+      The word &quot;feel&quot; at position 6 gets a different E_pos than at position 12 in a longer sentence.
+    </CaptionText>
+  </BeamerSlideContainer>
 );

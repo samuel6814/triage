@@ -1,89 +1,82 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
-  LeadText,
-  TwoColumn,
+  BeamerSlideContainer,
+  BodyText,
+  CaptionText,
+  BulletList,
+  DataTable,
+  PlainEnglishBlock,
+  SlideFigure,
 } from '../../../../components/presentation/SlideLayout';
 import MathSection from '../../../../components/presentation/MathSection';
-import { EncoderStack } from '../../../../components/presentation/diagrams/NlpDiagrams';
 import {
   ENCODER_Z,
   ENCODER_H,
-  FFN,
   STACK_LAYERS,
-  CLS_HEAD,
 } from '../../../../components/presentation/equations';
 
 export const Page15 = () => (
-  <CompactSlideContainer>
-    <TwoColumn $ratio="0.45fr 1fr">
-      <EncoderStack />
-      <div>
-        <LeadText>
-          Each block = one encoder layer (self-attention + feed-forward). BioBERT-base uses L = 12 layers.
-        </LeadText>
-        <img
-          src="/assets/bert_encoder.pdf"
-          alt="BERT encoder stack diagram"
-          style={{ width: '100%', maxHeight: '200px', objectFit: 'contain' }}
-          onError={(e) => { e.target.style.display = 'none'; }}
-        />
-        <LeadText style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-          Diagram: Zhang et al., d2l-ai, CC BY-SA 4.0
-        </LeadText>
-      </div>
-    </TwoColumn>
-  </CompactSlideContainer>
+  <BeamerSlideContainer style={{ justifyContent: 'center' }}>
+    <SlideFigure style={{ height: '520px', marginBottom: '0.5rem' }}>
+      <img src="/assets/bert_encoder.png" alt="BERT encoder stack diagram" />
+    </SlideFigure>
+    <CaptionText>
+      Diagram: Zhang et al., d2l-ai, CC BY-SA 4.0. Each block = one encoder layer (self-attention + feed-forward).
+    </CaptionText>
+  </BeamerSlideContainer>
 );
 
 export const Page16 = () => (
-  <CompactSlideContainer>
-    <LeadText>
-      Each layer ℓ = 1, …, 12 performs two sub-steps with residual connections and layer normalisation.
-    </LeadText>
+  <BeamerSlideContainer>
+    <BodyText>
+      Each layer ℓ = 1, …, 12 performs two sub-steps with <strong>residual connections</strong>:
+    </BodyText>
     <MathSection
       title="Inside one encoder layer"
       equations={[
-        { latex: ENCODER_Z, label: 'Attention sub-layer Z^(ℓ)', info: 'encoderStack' },
-        { latex: ENCODER_H, label: 'FFN sub-layer H^(ℓ)', info: 'transformerLayer' },
-        { latex: FFN, label: 'Feed-forward network', info: 'encoderStack' },
+        { latex: ENCODER_Z, label: 'Attention sub-layer Z⁽ℓ⁾', info: 'encoderStack' },
+        { latex: ENCODER_H, label: 'FFN sub-layer H⁽ℓ⁾', info: 'transformerLayer' },
       ]}
       compact
-      flipMinHeight={160}
+      flipMinHeight={120}
     />
-    <table style={{ width: '100%', fontSize: '0.78rem', borderCollapse: 'collapse' }}>
+    <DataTable>
       <thead>
-        <tr style={{ background: '#f0fdf4' }}>
-          <th style={{ padding: '0.35rem', textAlign: 'left' }}>Component</th>
-          <th style={{ padding: '0.35rem', textAlign: 'left' }}>What it does</th>
-        </tr>
+        <tr><th>Component</th><th>What it does</th></tr>
       </thead>
       <tbody>
-        <tr><td style={{ padding: '0.35rem' }}>MultiHeadAttention</td><td>12 parallel heads — different word relationships</td></tr>
-        <tr><td style={{ padding: '0.35rem' }}>FFN</td><td>Two linear layers with ReLU between</td></tr>
-        <tr><td style={{ padding: '0.35rem' }}>LayerNorm</td><td>Stabilises training across 12 layers</td></tr>
-        <tr><td style={{ padding: '0.35rem' }}>Residual (+)</td><td>Prevents information loss in deep stacks</td></tr>
+        <tr><td>MultiHeadAttention</td><td>12 parallel self-attention heads; each learns different word relationships</td></tr>
+        <tr><td>FFN</td><td>Two linear layers: FFN(x) = W₂ ReLU(W₁x + b₁) + b₂</td></tr>
+        <tr><td>LayerNorm</td><td>Normalises activations — stabilises training across 12 layers</td></tr>
+        <tr><td>Residual (+)</td><td>Adds input back to output — prevents information loss in deep stacks</td></tr>
       </tbody>
-    </table>
-  </CompactSlideContainer>
+    </DataTable>
+  </BeamerSlideContainer>
 );
 
 export const Page17 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
     <MathSection
       title="Stacking 12 layers"
-      equations={[
-        { latex: STACK_LAYERS, label: 'Layer chain', info: 'encoderLayers' },
-        { latex: CLS_HEAD, label: 'Final [CLS] output', info: 'cls768' },
-      ]}
+      equations={[{
+        latex: STACK_LAYERS,
+        label: 'Layer chain',
+        info: 'encoderLayers',
+      }]}
       compact
-      flipMinHeight={140}
+      flipMinHeight={100}
     />
-    <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.85rem', color: '#475569' }}>
-      <li><strong>Shallow layers (1–4):</strong> individual words and simple phrases</li>
-      <li><strong>Middle layers (5–8):</strong> combine headache + feverish + weak</li>
-      <li><strong>Deep layers (9–12):</strong> abstract clinical urgency patterns</li>
-      <li><strong>Parallel:</strong> all M tokens processed simultaneously — not left-to-right</li>
-    </ul>
-  </CompactSlideContainer>
+    <BulletList>
+      <li><strong>Shallow layers</strong> (1–4): recognise individual words and simple phrases</li>
+      <li><strong>Middle layers</strong> (5–8): combine symptoms — &quot;headache&quot; + &quot;feverish&quot; + &quot;weak&quot;</li>
+      <li><strong>Deep layers</strong> (9–12): abstract clinical urgency patterns</li>
+      <li><strong>Parallel processing:</strong> all M tokens processed simultaneously (not left-to-right)</li>
+    </BulletList>
+    <BodyText>
+      <strong>Output:</strong> h_[CLS] = H⁽ᴸ⁾ row 0 ∈ ℝ⁷⁶⁸ → fed to the classification head.
+    </BodyText>
+    <PlainEnglishBlock>
+      Stacking layers is like reading a complaint once for words, once for phrases, and once for overall urgency.
+    </PlainEnglishBlock>
+  </BeamerSlideContainer>
 );

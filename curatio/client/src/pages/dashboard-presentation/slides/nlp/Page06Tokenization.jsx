@@ -1,16 +1,19 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
+  BeamerSlideContainer,
+  BeamerColumns,
   LeadText,
+  BodyText,
+  CaptionText,
+  BulletList,
   DataTable,
-  TwoColumn,
+  DiagramBox,
+  PlainEnglishBlock,
 } from '../../../../components/presentation/SlideLayout';
-import MathSection from '../../../../components/presentation/MathSection';
 import {
   TokenizationPipeline,
   ClsTokenDiagram,
 } from '../../../../components/presentation/diagrams/NlpDiagrams';
-import { TOKENIZATION_TAU, CLS_HEAD } from '../../../../components/presentation/equations';
 
 const ID_TABLE_LEFT = [
   ['0', '—', '[CLS]', '101'],
@@ -43,66 +46,59 @@ const IdTable = ({ rows }) => (
 );
 
 export const Page06 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
     <LeadText>
-      Computers cannot read English — they only understand numbers. WordPiece splits rare words;
-      vocabulary 𝒱 has ~30,000 entries.
+      Computers cannot read English — they only understand numbers.
+      X → τ → (t₁, …, t_M), M ≤ 128.
     </LeadText>
-    <MathSection
-      title="Tokenization"
-      equations={[{
-        latex: TOKENIZATION_TAU,
-        label: 'X → τ → IDs',
-        info: 'tokenizationTau',
-      }]}
-      compact
-      flipMinHeight={100}
-    />
-    <TokenizationPipeline />
-  </CompactSlideContainer>
+    <BulletList>
+      <li><strong>WordPiece:</strong> common words whole; rare words split (&quot;headache&quot; → head+##ache)</li>
+      <li>Vocabulary 𝒱: ~30,000 entries; each ID = row index in embedding table</li>
+    </BulletList>
+    <DiagramBox $minHeight="70px">
+      <TokenizationPipeline />
+    </DiagramBox>
+  </BeamerSlideContainer>
 );
 
 export const Page07 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
     <LeadText>
-      <strong>Input:</strong> &quot;I have a headache and feel feverish.&quot; — each ID maps to a row in E_word.
+      <strong>Input:</strong> &quot;I have a headache and feel feverish.&quot; — Each ID → row in E_word.
     </LeadText>
-    <TwoColumn>
+    <BeamerColumns $ratio="1fr 1fr">
       <IdTable rows={ID_TABLE_LEFT} />
       <IdTable rows={ID_TABLE_RIGHT} />
-    </TwoColumn>
-    <LeadText style={{ fontSize: '0.82rem' }}>
+    </BeamerColumns>
+    <CaptionText>
       Reserved: [CLS]=101 (classification summary), [SEP]=102 (sentence end).
-    </LeadText>
-  </CompactSlideContainer>
+    </CaptionText>
+  </BeamerSlideContainer>
 );
 
 export const Page08 = () => (
-  <CompactSlideContainer>
-    <TwoColumn>
+  <BeamerSlideContainer>
+    <BeamerColumns>
       <div>
-        <LeadText style={{ fontWeight: 700, color: '#166534' }}>[CLS] = Classification token</LeadText>
-        <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.85rem', color: '#475569' }}>
-          <li>Artificial token — not from the patient&apos;s words</li>
-          <li>Always at position i = 0 before any real text</li>
-          <li>After 12 layers, h_[CLS] becomes a 768-dim summary of the entire complaint</li>
-          <li>Multiplied by classification weights to predict acuity</li>
-        </ul>
-        <LeadText style={{ fontSize: '0.85rem' }}>
-          Think of [CLS] as an empty notebook filled as the model reads every word.
-        </LeadText>
+        <BodyText style={{ fontWeight: 700, color: '#166534', marginBottom: '0.5rem' }}>
+          [CLS] = Classification token
+        </BodyText>
+        <BulletList>
+          <li>Artificial token — <em>not</em> from the patient&apos;s words</li>
+          <li>Always inserted at position i = 0 before any real text</li>
+          <li><strong>Purpose:</strong> After 12 transformer layers, h_[CLS] becomes a 768-dimensional <strong>summary</strong> of the entire complaint</li>
+          <li>This summary vector is multiplied by classification weights to predict acuity</li>
+        </BulletList>
+        <BodyText style={{ marginTop: '0.5rem' }}>
+          [SEP] (ID 102) marks the end of the sentence — a boundary marker.
+        </BodyText>
+        <PlainEnglishBlock>
+          Think of [CLS] as an empty notebook at the start. As the model reads every word, it fills that notebook with a compressed summary used for the final triage decision.
+        </PlainEnglishBlock>
       </div>
-      <ClsTokenDiagram />
-    </TwoColumn>
-    <MathSection
-      title="[CLS] summary vector"
-      equations={[{
-        latex: CLS_HEAD,
-        label: 'h_[CLS]',
-        info: 'clsToken',
-      }]}
-      compact
-      flipMinHeight={100}
-    />
-  </CompactSlideContainer>
+      <DiagramBox $minHeight="180px">
+        <ClsTokenDiagram />
+      </DiagramBox>
+    </BeamerColumns>
+  </BeamerSlideContainer>
 );

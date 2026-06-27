@@ -14,7 +14,7 @@ const Section = styled.div`
 
 const Title = styled.h4`
   margin: 0;
-  font-size: 0.95rem;
+  font-size: calc(1.05rem * var(--math-scale, 1));
   font-weight: 700;
   color: #166534;
   display: flex;
@@ -24,7 +24,7 @@ const Title = styled.h4`
 const EqLabelRow = styled.div`
   display: flex;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: calc(0.9rem * var(--math-scale, 1));
   font-weight: 700;
   color: #166534;
   text-transform: uppercase;
@@ -40,7 +40,7 @@ const VariableGrid = styled.dl`
   background: #f8fafc;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
-  font-size: 0.88rem;
+  font-size: calc(0.95rem * var(--math-scale, 1));
 
   dt {
     font-family: 'KaTeX_Main', 'Times New Roman', serif;
@@ -110,7 +110,7 @@ const MathSection = ({
           return (
             <FlipMathCard
               key={i}
-              minHeight={flipMinHeight || (compact ? 180 : 220)}
+              minHeight={flipMinHeight || (compact ? 200 : 240)}
               front={renderFront(eq)}
               back={renderExample(ex)}
             />

@@ -29,6 +29,7 @@ export const SLIDE_GUIDE = {
       <>
         <Idea>This deck walks from a patient&apos;s words to a SATS acuity colour using BioBERT — tokenization, 12 transformer layers, pre-training, and fine-tuning.</Idea>
         <p>Running example throughout: <em>&quot;I have a headache and feel feverish. My body aches and I feel weak.&quot;</em></p>
+        <p><strong>Curatio interactive deck:</strong> Use flip cards on equation slides and the green <strong>?</strong> next to formulas for symbol-by-symbol definitions. This Q&amp;A button gives presenter notes only — not shown on the slide.</p>
         <SayLive>Introduce the project, authors, and that you will follow one complaint end-to-end through the maths.</SayLive>
       </>
     ),
@@ -60,11 +61,12 @@ export const SLIDE_GUIDE = {
   },
 
   page4: {
-    title: 'Page 4 — Fusion safety rule',
+    title: 'Page 4 — Dual pathway (TEWS vs NLP)',
     body: (
       <>
         <Idea>Two parallel pathways — TEWS (vitals) and NLP (words) — are fused. A safety rule prevents under-triage when language is strongly urgent.</Idea>
-        <p><strong>&quot;Fusion assigns a less urgent colour than a strong signal requires&quot;</strong> means: if BioBERT is very confident about high urgency (e.g. crushing chest pain language), fusion must not downgrade to Green just because vitals look normal.</p>
+        <p><strong>TEWS formula (not on slide):</strong> T = Σₖ wₖ fₖ(vₖ) — deterministic sum of vital-sign points from SATS tables.</p>
+        <p><strong>Fusion safety rule (not on slide):</strong> ord(C) ≥ max{'{'}ord(C_disc), ord(C_TEWS), ord(C_Bayes){'}'} — fusion never assigns a less urgent colour than a strong language signal requires. Use the formula <strong>?</strong> on other fusion slides for the full ordering notation.</p>
         <ul>
           <li>Fusion is a <strong>priority checklist</strong>, not an average of scores.</li>
           <li>Strong NLP signal can pull the final colour upward; weak vitals alone cannot pull a strong language signal downward past the safety floor.</li>
@@ -380,8 +382,31 @@ export const SLIDE_GUIDE = {
       <>
         <Idea>Full path: complaint text → tokenize → embed → 12 layers → h_[CLS] → softmax → Level 3 Yellow at 72%.</Idea>
         <p>This closes the loop opened on page 3 — same headache/fever complaint, now with a mathematical story behind the colour.</p>
+        <p><strong>If asked for the full chain (not on slide):</strong> X → τ → (t_i) → E → H⁽⁰⁾ → 12 layers → H⁽ᴸ⁾ → ŷ = softmax(Wh_[CLS] + b). Fusion with TEWS may adjust the final colour C.</p>
         <SayLive>Recap in 30 seconds: clinical scenario → NLP pipeline → pre-training → fine-tuning → Yellow at 72%. Open for questions.</SayLive>
       </>
     ),
   },
+
+  viz1: { title: 'Visualization 1 — Clinical scenario', body: (<><Idea>Watch the running complaint appear — same text used in all 28 slides.</Idea><SayLive>Point at the SATS bar: Orange→Yellow→Green is decreasing urgency for living patients.</SayLive></>) },
+  viz2: { title: 'Visualization 2 — Dual pathway', body: (<><Idea>TEWS (vitals) and NLP (text) run in parallel before fusion.</Idea><SayLive>Trace both arrows into the Fusion box.</SayLive></>) },
+  viz3: { title: 'Visualization 3 — Supervised pipeline', body: (<><Idea>Full chain preview — each box will be animated in later steps.</Idea></>) },
+  viz4: { title: 'Visualization 4 — Tokenization', body: (<><Idea>IDs appear row-by-row — each is a row index in the 30k vocabulary.</Idea><FormulaHint /></>) },
+  viz5: { title: 'Visualization 5 — [CLS] token', body: (<><Idea>[CLS] prepends the sequence — its final vector becomes the triage summary.</Idea></>) },
+  viz6: { title: 'Visualization 6 — Embedding lookup', body: (<><Idea>Matrix row highlight → 768 numbers pulled from E_word.</Idea><FormulaHint /></>) },
+  viz7: { title: 'Visualization 7 — Vector space', body: (<><Idea>Clinical words cluster after training — contextual BERT refines per sentence.</Idea></>) },
+  viz8: { title: 'Visualization 8 — Contextual sum', body: (<><Idea>Three embeddings add before layer 1.</Idea><FormulaHint /></>) },
+  viz9: { title: 'Visualization 9 — Input matrix', body: (<><Idea>Numeric cells populate — row 0 is [CLS].</Idea><FormulaHint /></>) },
+  viz10: { title: 'Visualization 10 — Encoder stack', body: (<><Idea>Green pulse travels upward through 12 layers.</Idea></>) },
+  viz11: { title: 'Visualization 11 — Inside one layer', body: (<><Idea>Numeric walkthrough: headache 2.0 + 0.5 from feverish → updated hidden state.</Idea></>) },
+  viz12: { title: 'Visualization 12 — Layer phases', body: (<><Idea>Shallow → middle → deep layers build clinical understanding.</Idea></>) },
+  viz13: { title: 'Visualization 13 — Self-attention', body: (<><Idea>Weight bars: feverish 0.41, headache 0.32, weak 0.18.</Idea><FormulaHint /></>) },
+  viz14: { title: 'Visualization 14 — MLM', body: (<><Idea>Pre-training on PubMed — predict masked words before triage labels exist.</Idea></>) },
+  viz15: { title: 'Visualization 15 — MLM loss', body: (<><Idea>Compare small vs large −log penalty for correct word probability.</Idea><FormulaHint /></>) },
+  viz16: { title: 'Visualization 16 — Attention softmax', body: (<><Idea>α weights sum to 1 over tokens — filler words get ~0.01.</Idea><FormulaHint /></>) },
+  viz17: { title: 'Visualization 17 — Classification', body: (<><Idea>Bars grow to Yellow 72% — this is the live inference output.</Idea><FormulaHint /></>) },
+  viz18: { title: 'Visualization 18 — Cross-entropy', body: (<><Idea>Training penalty when model is confidently wrong.</Idea><FormulaHint /></>) },
+  viz19: { title: 'Visualization 19 — Backprop', body: (<><Idea>Red pulse flows backward — error finds which weights caused the mistake.</Idea><FormulaHint /></>) },
+  viz20: { title: 'Visualization 20 — Gradient descent', body: (<><Idea>80k complaints, 13.500 steps, eval_loss 0.001812.</Idea><FormulaHint /></>) },
+  viz21: { title: 'Visualization 21 — End-to-end', body: (<><Idea>Full animated recap — complaint to Yellow (72%).</Idea><SayLive>Use Play to auto-advance or step through manually.</SayLive></>) },
 };

@@ -14,15 +14,13 @@ const DashboardWrapper = styled.div`
   font-family: 'Plus Jakarta Sans', sans-serif;
 `;
 
-const DashboardLayout = () => {
-  return (
-    <SidebarProvider>
-      <DashboardWrapper>
-        <Sidebar />
-        <PresentationPages />
-      </DashboardWrapper>
-    </SidebarProvider>
-  );
-};
+const DashboardLayout = () => (
+  <SidebarProvider>
+    <DashboardWrapper>
+      <Sidebar />
+      <PresentationPages />
+    </DashboardWrapper>
+  </SidebarProvider>
+);
 
 export default DashboardLayout;

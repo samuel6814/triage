@@ -1,125 +1,187 @@
 import React from 'react';
 import {
-  CompactSlideContainer,
-  LeadText,
+  BeamerSlideContainer,
+  BodyText,
+  CaptionText,
+  InfoBox,
+  PlainEnglishBlock,
+  VariableTable,
+  WorkedExampleBlock,
+  ComplaintQuote,
 } from '../../../../components/presentation/SlideLayout';
 import MathSection from '../../../../components/presentation/MathSection';
 import {
   ATTENTION_SOFTMAX,
   ACUITY_SOFTMAX,
-  CROSS_ENTROPY,
   CHAIN_RULE,
   GRADIENT_DESCENT,
-  TRAINING_LOSS,
+  TRIAGE_FINETUNE_LOSS,
 } from '../../../../components/presentation/equations';
+import { RUNNING_COMPLAINT } from './nlpShared';
+import { SATS_COLORS } from '../../../../components/presentation/satsColors';
 
 export const Page23 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
+    <BodyText>To assign mathematical weight to each word, raw scores are normalised:</BodyText>
     <MathSection
-      title="Attention softmax — the probability filter"
+      title="Attention softmax"
       equations={[{
         latex: ATTENTION_SOFTMAX,
         label: 'α_j weights',
         info: 'attentionSoftmax',
       }]}
       compact
-      flipMinHeight={120}
-      explanation={
-        <p>
-          Softmax converts raw compatibility scores e_j into weights that sum to 1 — a probability
-          distribution over which tokens to listen to.
-        </p>
-      }
+      flipMinHeight={100}
     />
-  </CompactSlideContainer>
+    <VariableTable>
+      <thead>
+        <tr><th>Variable</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>e_j</td><td>Raw attention score for token j (before normalisation)</td></tr>
+        <tr><td>exp(e_j)</td><td>Forces positive values; amplifies large scores</td></tr>
+        <tr><td>Σ_k exp(e_k)</td><td>Normalising constant — ensures all weights sum to 1</td></tr>
+        <tr><td>α_j</td><td>Final attention weight for token j (a probability)</td></tr>
+        <tr><td>m</td><td>Sequence length (number of tokens)</td></tr>
+      </tbody>
+    </VariableTable>
+    <BodyText>
+      <strong>Effect:</strong> &quot;I&quot;, &quot;a&quot;, &quot;and&quot; → α ≈ 0.01; &quot;headache&quot;, &quot;feverish&quot; → α ≈ 0.35+.
+    </BodyText>
+  </BeamerSlideContainer>
 );
 
 export const Page24 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
+    <BodyText>The summary vector is mapped to triage class probabilities:</BodyText>
     <MathSection
-      title="Classification softmax — acuity probabilities"
+      title="Classification softmax"
       equations={[{
         latex: ACUITY_SOFTMAX,
         label: 'ŷ over 5 levels',
         info: 'softmaxHead',
       }]}
       compact
-      flipMinHeight={140}
-      explanation={
-        <p>
-          For our headache/fever complaint: ŷ might show Yellow ≈ 72%, Green ≈ 18%, Orange ≈ 7% —
-          argmax picks Yellow for routing.
-        </p>
-      }
+      flipMinHeight={100}
     />
-    <LeadText style={{ fontSize: '0.85rem' }}>
-      Five outputs map to SATS colours: L1–2 → Red/Orange; L3 → Yellow; L4–5 → Green.
-    </LeadText>
-  </CompactSlideContainer>
+    <VariableTable>
+      <thead>
+        <tr><th>Variable</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>h_[CLS]</td><td>768-dim summary vector from final layer</td></tr>
+        <tr><td>W ∈ ℝ⁵ˣ⁷⁶⁸</td><td>Learned classification weight matrix</td></tr>
+        <tr><td>b ∈ ℝ⁵</td><td>Per-class bias terms</td></tr>
+        <tr><td>ŷ_c</td><td>Probability of acuity level c ∈ {'{1, …, 5}'}</td></tr>
+        <tr><td>Σ_c ŷ_c = 1</td><td>Valid probability distribution over 5 classes</td></tr>
+      </tbody>
+    </VariableTable>
+    <WorkedExampleBlock>
+      Worked example — our running complaint
+      <ComplaintQuote style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>{RUNNING_COMPLAINT}</ComplaintQuote>
+      Level 3 (Moderate): <strong>72%</strong> ⇒ maps to <span style={{ color: SATS_COLORS.yellow, fontWeight: 700 }}>Yellow</span>
+    </WorkedExampleBlock>
+  </BeamerSlideContainer>
 );
 
 export const Page25 = () => (
-  <CompactSlideContainer>
-    <MathSection
-      title="Forward pass & cross-entropy (Phase 2 — residency)"
-      equations={[
-        { latex: TRAINING_LOSS, label: 'Fine-tune loss L', info: 'fineTuneLoss' },
-        { latex: CROSS_ENTROPY, label: 'Per-class form', info: 'crossEntropy' },
-      ]}
-      compact
-      flipMinHeight={160}
-      explanation={
-        <p>
-          For each of ~80k training rows, compare nurse label y_i to model prediction ŷ_i.
-          Wrong or low-confidence guesses produce large −log penalties.
-        </p>
-      }
-    />
-  </CompactSlideContainer>
+  <BeamerSlideContainer>
+    <InfoBox style={{ marginBottom: '0.5rem' }}>
+      <BodyText style={{ fontWeight: 700, color: '#166534' }}>1. Forward Pass</BodyText>
+      <BodyText>y = Wx + b — where x = h_[CLS], y = predicted logits, W and b are learned.</BodyText>
+    </InfoBox>
+    <InfoBox style={{ marginBottom: '0.5rem' }}>
+      <BodyText style={{ fontWeight: 700, color: '#166534' }}>2. Cross-Entropy Loss (The Penalty)</BodyText>
+      <BodyText>ℒ = −Σᵢ yᵢ log(ŷᵢ) — where C = 5 acuity classes.</BodyText>
+    </InfoBox>
+    <VariableTable>
+      <thead>
+        <tr><th>Symbol</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>x</td><td>Input vector (h_[CLS] — the complaint summary)</td></tr>
+        <tr><td>W, b</td><td>Weights and bias the model must learn</td></tr>
+        <tr><td>y</td><td>True one-hot nurse label (e.g. Level 3 = Yellow)</td></tr>
+        <tr><td>ŷ</td><td>Model&apos;s predicted probability distribution</td></tr>
+        <tr><td>ℒ</td><td>Loss — 0 if perfect; large if wrong with high confidence</td></tr>
+      </tbody>
+    </VariableTable>
+    <CaptionText>
+      Example: true label = Yellow, model predicts Green at 90% ⇒ ℒ = −log(0.05) ≈ 3.0.
+    </CaptionText>
+  </BeamerSlideContainer>
 );
 
 export const Page26 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
+    <InfoBox style={{ marginBottom: '0.5rem' }}>
+      <BodyText style={{ fontWeight: 700, color: '#166534' }}>3. Backpropagation (The Investigation)</BodyText>
+    </InfoBox>
     <MathSection
-      title="Backpropagation — the chain rule"
-      equations={[
-        { latex: CHAIN_RULE, label: 'Chain rule', info: 'backprop' },
-      ]}
+      title="Chain rule"
+      equations={[{
+        latex: CHAIN_RULE,
+        label: '∂ℒ/∂W',
+        info: 'backprop',
+      }]}
       compact
-      flipMinHeight={120}
-      explanation={
-        <p>
-          Loss flows backward through softmax → classifier head → [CLS] → all 12 layers → embeddings.
-          Each weight gets a gradient showing how to reduce ℒ.
-        </p>
-      }
+      flipMinHeight={100}
     />
-    <LeadText style={{ fontSize: '0.85rem' }}>
-      Repeated over 13,500 steps × 3 epochs on mini-batches of 16 complaints.
-    </LeadText>
-  </CompactSlideContainer>
+    <BulletListCompat />
+    <PlainEnglishBlock>
+      If the model confidently assigns 90% to Green when the nurse labeled Yellow, backprop finds exactly which weights in layers 8–12 over-weighted non-urgent patterns.
+    </PlainEnglishBlock>
+  </BeamerSlideContainer>
+);
+
+const BulletListCompat = () => (
+  <ul style={{ margin: '0.5rem 0', paddingLeft: '1.35rem', fontSize: '1.05rem', color: '#475569', lineHeight: 1.65 }}>
+    <li>Uses the <strong>chain rule</strong> of calculus to travel backward through all 12 layers + classification head</li>
+    <li>z = Wh + b — pre-softmax logits (raw scores before probability conversion)</li>
+    <li>Each partial derivative pinpoints which specific weight caused the bad guess</li>
+    <li>Gradients flow from the loss at the top back to every embedding and attention weight</li>
+  </ul>
 );
 
 export const Page27 = () => (
-  <CompactSlideContainer>
+  <BeamerSlideContainer>
+    <InfoBox style={{ marginBottom: '0.5rem' }}>
+      <BodyText style={{ fontWeight: 700, color: '#166534' }}>4. Optimization (The Correction)</BodyText>
+    </InfoBox>
     <MathSection
-      title="Gradient descent — weight update"
+      title="Gradient descent"
       equations={[{
         latex: GRADIENT_DESCENT,
         label: 'W_new',
         info: 'gradientDescent',
       }]}
       compact
-      flipMinHeight={120}
-      explanation={
-        <p>
-          Learning rate α ≈ 2×10⁻⁵ — small steps so weights do not overshoot. After many updates,
-          BioBERT aligns with KATH nurse triage decisions.
-        </p>
-      }
+      flipMinHeight={100}
     />
-    <LeadText style={{ fontSize: '0.85rem' }}>
-      Base checkpoint: Yuvrajxms09/biobert-triage-classifier — transfer learning from PubMed + triage pre-training.
-    </LeadText>
-  </CompactSlideContainer>
+    <VariableTable>
+      <thead>
+        <tr><th>Variable</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>α</td><td>Learning rate (step size; e.g. 2 × 10⁻⁵)</td></tr>
+        <tr><td>∂ℒ/∂W</td><td>Gradient — direction of steepest loss increase</td></tr>
+        <tr><td>Minus sign (−)</td><td>Move opposite to gradient — go downhill on the loss surface</td></tr>
+      </tbody>
+    </VariableTable>
+    <BodyText style={{ marginTop: '0.5rem' }}>
+      <strong>Fine-tuning loss</strong> on triage data:
+    </BodyText>
+    <MathSection
+      equations={[{
+        latex: TRIAGE_FINETUNE_LOSS,
+        label: 'ℒ_triage',
+        info: 'fineTuneLoss',
+      }]}
+      compact
+      flipMinHeight={80}
+    />
+    <CaptionText>
+      Best eval_loss = 0.001812 after 3 epochs (13,500 steps) on nurse-labeled chief complaints.
+    </CaptionText>
+  </BeamerSlideContainer>
 );
