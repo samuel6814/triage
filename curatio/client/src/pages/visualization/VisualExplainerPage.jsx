@@ -32,10 +32,10 @@ const SceneArea = styled.div`
 
 const BottomBar = styled.div`
   flex-shrink: 0;
-  padding: 0.65rem 0 0.25rem;
+  padding: 0.4rem 0 0.15rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
 `;
 
 const ProgressTrack = styled.div`

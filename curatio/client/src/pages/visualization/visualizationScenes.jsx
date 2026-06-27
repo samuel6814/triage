@@ -10,7 +10,7 @@ import { ProbabilityBars } from '../../components/visualization/ProbabilityBars'
 import { DiagramBox } from '../../components/presentation/SlideLayout';
 import {
   SatsBar, DualPathwayDiagram, NlpPipelineDiagram, ClsTokenDiagram,
-  EmbeddingLookupDiagram, InputMatrixFlowDiagram, AttentionFlow, MlmMask,
+  InputMatrixFlowDiagram, AttentionFlow, MlmMask,
 } from '../../components/presentation/diagrams/NlpDiagrams';
 import { SATS_COLORS } from '../../components/presentation/satsColors';
 import FlowDot from '../../components/visualization/animated/FlowDot';
@@ -20,8 +20,10 @@ import DrawingArc from '../../components/visualization/animated/DrawingArc';
 import LossCompare from '../../components/visualization/animated/LossCompare';
 import LossCurve from '../../components/visualization/animated/LossCurve';
 import AnimatedCounter from '../../components/visualization/animated/AnimatedCounter';
+import EmbeddingLookupViz from '../../components/visualization/animated/EmbeddingLookupViz';
+import VizDataGrid from '../../components/visualization/animated/VizDataGrid';
 import { getStepMeta } from './visualizationSteps';
-import { animateCounter, drawArc, fillBar, fillWidthBar, typeText } from './sceneHelpers';
+import { animateCounter, drawArc, fillBar, fillWidthBar, typeText, formulaHighlight } from './sceneHelpers';
 import {
   COMPLAINT_TEXT, TOKEN_ROWS, MATRIX_ROWS, ATTENTION_WEIGHTS,
   SOFTMAX_OUTPUT, MLM_EXAMPLE, ENCODER_LAYER_PHASES, LAYER_WALKTHROUGH,
@@ -30,40 +32,41 @@ import {
 
 const PatientRow = styled.div` display: flex; align-items: flex-start; gap: 1.25rem; `;
 const PatientAvatar = styled.div`
-  width: 72px; height: 72px; border-radius: 50%; background: #dcfce7;
+  width: 96px; height: 96px; border-radius: 50%; background: #dcfce7;
   border: 3px solid #166534; display: flex; align-items: center; justify-content: center; color: #166534;
 `;
 const SpeechBubble = styled.div`
-  max-width: 520px; padding: 1rem 1.25rem; background: #fff; border: 2px solid #166534;
-  border-radius: 16px 16px 16px 4px; font-size: 1.05rem; font-style: italic; color: #166534; min-height: 3.5rem;
+  max-width: 640px; padding: 1.15rem 1.5rem; background: #fff; border: 2px solid #166534;
+  border-radius: 16px 16px 16px 4px; font-size: calc(1.2rem * var(--viz-font-scale, 1)); font-style: italic; color: #166534; min-height: 3.5rem;
 `;
 const WeightBar = styled.div`
-  display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.45rem; opacity: 0; width: 100%; max-width: 420px;
-  span.label { width: 80px; font-size: 0.95rem; font-weight: 700; }
-  span.track { flex: 1; height: 18px; background: #f1f5f9; border-radius: 6px; overflow: hidden; }
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.55rem; opacity: 0; width: 100%; max-width: 560px;
+  span.label { width: 96px; font-size: calc(1.05rem * var(--viz-font-scale, 1)); font-weight: 700; }
+  span.track { flex: 1; height: 24px; background: #f1f5f9; border-radius: 6px; overflow: hidden; }
   span.fill { display: block; height: 100%; width: 0%; background: #166534; border-radius: 6px; }
-  span.pct { font-size: 0.9rem; font-weight: 700; color: #166534; width: 44px; }
+  span.pct { font-size: calc(1rem * var(--viz-font-scale, 1)); font-weight: 700; color: #166534; width: 52px; }
 `;
 const LayerPulse = styled.div`
   position: absolute; left: 0; right: 0; height: 5px; background: #22c55e; opacity: 0; box-shadow: 0 0 14px #22c55e;
 `;
 const EncoderWrap = styled.div`
   position: relative; width: 100%; display: flex; align-items: center; justify-content: center;
-  img { max-height: min(400px, 48vh); width: auto; object-fit: contain; }
+  img { max-height: min(480px, 55vh); width: auto; object-fit: contain; }
 `;
 const YellowBadge = styled.div`
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-  background: ${SATS_COLORS.yellow}; color: #1e293b; font-size: 2.5rem; font-weight: 900;
-  padding: 1rem 2rem; border-radius: 20px; border: 4px solid #ca8a04;
+  background: ${SATS_COLORS.yellow}; color: #1e293b; font-size: calc(3.5rem * var(--viz-font-scale, 1)); font-weight: 900;
+  padding: 1.25rem 2.5rem; border-radius: 20px; border: 4px solid #ca8a04;
   box-shadow: 0 12px 40px rgba(202, 138, 4, 0.35); z-index: 5;
 `;
 const FinalBadge = styled.div`
-  background: ${SATS_COLORS.yellow}; color: #1e293b; font-size: 2.2rem; font-weight: 900;
-  padding: 0.85rem 1.75rem; border-radius: 20px; border: 4px solid #ca8a04; transform: scale(0);
+  background: ${SATS_COLORS.yellow}; color: #1e293b; font-size: calc(2.8rem * var(--viz-font-scale, 1)); font-weight: 900;
+  padding: 1rem 2rem; border-radius: 20px; border: 4px solid #ca8a04; transform: scale(0);
 `;
 const PhaseBlock = styled.div`
-  padding: 0.85rem 1.1rem; border-radius: 12px; background: #fff; border: 2px solid #e2e8f0;
-  opacity: 0; transform: translateY(24px); margin-bottom: 0.5rem; width: 100%; max-width: 480px;
+  padding: 1rem 1.25rem; border-radius: 12px; background: #fff; border: 2px solid #e2e8f0;
+  opacity: 0; transform: translateY(24px); margin-bottom: 0.65rem; width: 100%; max-width: 640px;
+  font-size: calc(1.15rem * var(--viz-font-scale, 1));
   strong { color: #166534; }
 `;
 const LayerNode = styled.div`
@@ -72,13 +75,15 @@ const LayerNode = styled.div`
 const Node = styled.div`
   padding: 0.85rem 1.25rem; border-radius: 12px; background: #dcfce7; border: 2px solid #166534;
   font-weight: 800; color: #166534; opacity: 0; transform: scale(0.8);
+  font-size: calc(1.15rem * var(--viz-font-scale, 1));
 `;
 const NodeArrow = styled.div`
   font-size: 1.5rem; color: #166534; opacity: 0; font-weight: 800;
 `;
 const ClusterToken = styled.div`
-  position: absolute; padding: 0.4rem 0.75rem; border-radius: 8px; background: #dcfce7;
-  border: 2px solid #166534; font-weight: 700; color: #166534; font-size: 0.9rem;
+  position: absolute; padding: 0.65rem 1rem; border-radius: 10px; background: #dcfce7;
+  border: 2px solid #166534; font-weight: 700; color: #166534;
+  font-size: calc(1.1rem * var(--viz-font-scale, 1));
 `;
 const MlmWord = styled.span`
   display: inline-block; padding: 0.35rem 0.65rem; margin: 0 0.2rem; border-radius: 8px;
@@ -88,7 +93,7 @@ const LayerNum = styled.span`
   position: absolute; right: 8%; font-size: 0.75rem; font-weight: 700; color: #166534; opacity: 0;
 `;
 const E2EStage = styled.div`
-  opacity: 0; transform: translateY(16px); width: 100%; max-width: 640px;
+  opacity: 0; transform: translateY(16px); width: 100%; max-width: 900px;
   text-align: center; padding: 0.75rem;
 `;
 
@@ -104,7 +109,8 @@ const makeScene = (stepNum, buildAnim, animContent) => {
     return (
       <div ref={rootRef} style={{ height: '100%' }}>
         <PictorialFrame step={stepMeta.step} section={stepMeta.section} caption={stepMeta.caption}
-          stageLabel={stepMeta.stageLabel} equations={stepMeta.equations}>
+          stageLabel={stepMeta.stageLabel} equations={stepMeta.equations}
+          formulaTerms={stepMeta.formulaTerms}>
           {animContent()}
         </PictorialFrame>
       </div>
@@ -124,11 +130,11 @@ export const VizScene01 = makeScene(1, (tl, el) => {
 }, () => (
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', width: '100%' }}>
     <PatientRow>
-      <PatientAvatar className="viz-avatar"><User size={36} /></PatientAvatar>
+      <PatientAvatar className="viz-avatar"><User size={48} /></PatientAvatar>
       <SpeechBubble className="viz-bubble-wrap"><span className="viz-typed" /></SpeechBubble>
     </PatientRow>
-    <div className="viz-sats" style={{ width: '100%', maxWidth: 640 }}>
-      <DiagramBox $minHeight="90px"><SatsBar /></DiagramBox>
+    <div className="viz-sats" style={{ width: '100%', maxWidth: 800 }}>
+      <DiagramBox $minHeight="240px"><SatsBar /></DiagramBox>
     </div>
     <CalloutLabel className="viz-yellow-pulse" position="bottom" accent>Moderate urgency → Yellow</CalloutLabel>
   </div>
@@ -171,9 +177,12 @@ export const VizScene03 = makeScene(3, (tl, el) => {
 ));
 
 export const VizScene04 = makeScene(4, (tl, el) => {
+  formulaHighlight(tl, el, 'tau', 'WordPiece splits the complaint into subword tokens');
   tl.from(el.querySelector('.viz-full-sentence'), { opacity: 1, duration: 0.8 })
-    .to(el.querySelector('.viz-full-sentence'), { opacity: 0, y: -20, duration: 0.5 })
-    .to(el.querySelectorAll('.viz-flying-chip'), { opacity: 1, scale: 1, duration: 0.45, stagger: 0.08, ease: 'back.out' });
+    .to(el.querySelector('.viz-full-sentence'), { opacity: 0, y: -20, duration: 0.5 });
+  formulaHighlight(tl, el, 'id', 'Each token maps to a row index in the 30k vocabulary', '-=0.2');
+  tl.to(el.querySelectorAll('.viz-flying-chip'), { opacity: 1, scale: 1, duration: 0.45, stagger: 0.08, ease: 'back.out' });
+  formulaHighlight(tl, el, 'vocab', 'IDs feed the embedding lookup table next', '-=0.3');
   el.querySelectorAll('.viz-flying-chip').forEach((chip, i) => {
     tl.to(chip.querySelector('.viz-chip-id'), {
       duration: 0.01,
@@ -193,7 +202,7 @@ export const VizScene05 = makeScene(5, (tl, el) => {
     .from(el.querySelector('.viz-callout'), { opacity: 0, scale: 0.9, duration: 0.4 });
 }, () => (
   <div style={{ position: 'relative', width: '100%' }}>
-    <DiagramBox $minHeight="150px">
+    <DiagramBox $minHeight="240px">
       <div style={{ position: 'relative' }}>
         <span className="viz-cls-slide" data-token="cls" style={{ display: 'inline-block' }}>
           <ClsTokenDiagram />
@@ -206,21 +215,19 @@ export const VizScene05 = makeScene(5, (tl, el) => {
 ));
 
 export const VizScene06 = makeScene(6, (tl, el) => {
-  tl.from(el.querySelector('.viz-embed'), { opacity: 0, duration: 0.5 })
-    .fromTo(el.querySelector('.viz-highlight-row'), { scaleX: 0 }, { scaleX: 1, duration: 0.7, transformOrigin: 'left' })
-    .from(el.querySelectorAll('.viz-vec-num'), { opacity: 0, y: 8, stagger: 0.04, duration: 0.25 })
-    .from(el.querySelector('.viz-callout'), { opacity: 0, duration: 0.4 });
+  formulaHighlight(tl, el, 'E_word', 'E_word is the lookup table — V rows × 768 columns');
+  tl.to(el.querySelector('.viz-embed-matrix'), { opacity: 1, duration: 0.6 })
+    .add(() => {
+      el.querySelectorAll('.viz-embed-row').forEach((r) => r.classList.remove('viz-embed-row-active'));
+      el.querySelector('.viz-embed-row[data-row-id="7994"]')?.classList.add('viz-embed-row-active');
+    });
+  formulaHighlight(tl, el, 'id', 'Token ID 7994 selects the headache row', '-=0.2');
+  tl.to(el.querySelector('.viz-embed-arrow'), { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out' })
+    .to(el.querySelector('.viz-embed-vec-title'), { opacity: 1, duration: 0.4 }, '-=0.3');
+  formulaHighlight(tl, el, 'e_i', 'That row becomes the 768-D embedding vector e_i', '-=0.2');
+  tl.from(el.querySelectorAll('.viz-embed-vec-cell'), { opacity: 0, x: 16, stagger: 0.06, duration: 0.35, ease: 'power2.out' });
 }, () => (
-  <div style={{ width: '100%' }}>
-    <DiagramBox $minHeight="160px" className="viz-embed"><EmbeddingLookupDiagram /></DiagramBox>
-    <TokenRow style={{ marginTop: '0.75rem', justifyContent: 'center' }}>
-      {[0.02, 0.11, -0.05, 0.33, 0.08, -0.12, 0.21, 0.04].map((n, i) => (
-        <NumericCell key={i} className="viz-vec-num">{n}</NumericCell>
-      ))}
-      <span style={{ color: '#94a3b8', fontSize: '0.85rem' }} className="viz-vec-num">…768</span>
-    </TokenRow>
-    <CalloutLabel className="viz-callout" position="bottom" accent>768 numbers = meaning</CalloutLabel>
-  </div>
+  <EmbeddingLookupViz className="viz-embed" />
 ));
 
 export const VizScene07 = makeScene(7, (tl, el) => {
@@ -230,25 +237,29 @@ export const VizScene07 = makeScene(7, (tl, el) => {
     .to(el.querySelector('.viz-tok-weak'), { x: 0, y: 0, duration: 1, ease: 'power2.inOut' }, '-=0.9')
     .to(el.querySelector('.viz-cluster-ring'), { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out' });
 }, () => (
-  <div className="viz-cluster-wrap" style={{ position: 'relative', width: 280, height: 200 }}>
-    <ClusterToken className="viz-tok-head" style={{ left: -60, top: 20 }}>headache</ClusterToken>
-    <ClusterToken className="viz-tok-fever" style={{ left: 180, top: 10 }}>feverish</ClusterToken>
-    <ClusterToken className="viz-tok-weak" style={{ left: 100, top: 120 }}>weak</ClusterToken>
+  <div className="viz-cluster-wrap" style={{ position: 'relative', width: 'min(520px, 80vw)', height: 320, margin: '0 auto' }}>
+    <ClusterToken className="viz-tok-head" style={{ left: -40, top: 30 }}>headache</ClusterToken>
+    <ClusterToken className="viz-tok-fever" style={{ left: 320, top: 20 }}>feverish</ClusterToken>
+    <ClusterToken className="viz-tok-weak" style={{ left: 160, top: 200 }}>weak</ClusterToken>
     <div className="viz-cluster-ring" style={{
       position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%) scale(0)',
-      width: 140, height: 140, borderRadius: '50%', border: '3px dashed #166534', opacity: 0,
+      width: 200, height: 200, borderRadius: '50%', border: '3px dashed #166534', opacity: 0,
     }} />
-    <CalloutLabel position="bottom">Symptoms cluster in embedding space</CalloutLabel>
+    <CalloutLabel position="bottom">Similar symptoms cluster in embedding space</CalloutLabel>
   </div>
 ));
 
 export const VizScene08 = makeScene(8, (tl, el) => {
+  formulaHighlight(tl, el, 'E_word', 'Word embedding captures token meaning');
   tl.from(el.querySelector('.viz-block-word'), { opacity: 0, y: 20, duration: 0.45 })
-    .from(el.querySelectorAll('.viz-plus'), { opacity: 0, scale: 0, duration: 0.25, stagger: 0.1 }, '-=0.2')
-    .from(el.querySelector('.viz-block-pos'), { opacity: 0, y: 20, duration: 0.45 }, '-=0.3')
-    .from(el.querySelector('.viz-block-seg'), { opacity: 0, y: 20, duration: 0.45 }, '-=0.3')
+    .from(el.querySelectorAll('.viz-plus'), { opacity: 0, scale: 0, duration: 0.25, stagger: 0.1 }, '-=0.2');
+  formulaHighlight(tl, el, 'E_pos', 'Position embedding encodes where the token sits', '-=0.2');
+  tl.from(el.querySelector('.viz-block-pos'), { opacity: 0, y: 20, duration: 0.45 }, '-=0.3');
+  formulaHighlight(tl, el, 'E_seg', 'Segment embedding marks sentence A vs B', '-=0.2');
+  tl.from(el.querySelector('.viz-block-seg'), { opacity: 0, y: 20, duration: 0.45 }, '-=0.3')
     .to(el.querySelector('.viz-merge-result'), { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out' })
     .to(el.querySelector('.viz-merge-flash'), { opacity: 0.6, duration: 0.15, yoyo: true, repeat: 1 });
+  formulaHighlight(tl, el, 'E', 'Sum yields the final input vector E(t_i)', '-=0.3');
 }, () => (
   <div style={{ position: 'relative' }}>
     <StackMerge className="viz-stack" />
@@ -259,19 +270,35 @@ export const VizScene08 = makeScene(8, (tl, el) => {
 ));
 
 export const VizScene09 = makeScene(9, (tl, el) => {
-  tl.from(el.querySelector('.viz-flow'), { opacity: 0, duration: 0.4 })
-    .from(el.querySelectorAll('.viz-mat-row'), { opacity: 0, x: -16, stagger: 0.2, duration: 0.4 })
-    .from(el.querySelectorAll('.viz-cell'), { scale: 0, stagger: 0.04, duration: 0.15 }, '-=0.3');
+  formulaHighlight(tl, el, 'H0', 'All token vectors stack into matrix H⁽⁰⁾');
+  tl.from(el.querySelector('.viz-flow'), { opacity: 0, duration: 0.4 });
+  formulaHighlight(tl, el, 'M', 'One row per token — M rows total', '-=0.2');
+  tl.from(el.querySelectorAll('.viz-data-grid tbody tr'), { opacity: 0, x: -16, stagger: 0.2, duration: 0.4 });
+  formulaHighlight(tl, el, '768', 'Each row has 768 learned dimensions', '-=0.2');
 }, () => (
   <>
-    <DiagramBox $minHeight="70px" className="viz-flow"><InputMatrixFlowDiagram /></DiagramBox>
-    <div style={{ marginTop: '0.75rem' }}>
-      {MATRIX_ROWS.map((r) => (
-        <div key={r.i} className="viz-mat-row" style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.35rem', opacity: 0 }}>
-          <span style={{ width: 56, fontWeight: 700, fontSize: '0.82rem' }}>{r.token}</span>
-          {r.dims.map((d, j) => <NumericCell key={j} className="viz-cell">{d}</NumericCell>)}
-        </div>
-      ))}
+    <DiagramBox $minHeight="240px" className="viz-flow"><InputMatrixFlowDiagram /></DiagramBox>
+    <div style={{ marginTop: '0.75rem', width: '100%', maxWidth: 720 }}>
+      <VizDataGrid
+        columns={[
+          { key: 'token', label: 'Token', width: '80px' },
+          { key: 'd1', label: 'D₁', width: '72px' },
+          { key: 'd2', label: 'D₂', width: '72px' },
+          { key: 'd3', label: 'D₃', width: '72px' },
+          { key: 'd4', label: 'D₄', width: '72px' },
+        ]}
+        rows={MATRIX_ROWS.map((r) => ({
+          id: String(r.i),
+          token: r.token,
+          d1: r.dims[0],
+          d2: r.dims[1],
+          d3: r.dims[2],
+          d4: r.dims[3],
+          className: 'viz-mat-row',
+        }))}
+        rowClassName="viz-mat-row"
+        animateRows
+      />
     </div>
   </>
 ));
@@ -291,12 +318,15 @@ export const VizScene10 = makeScene(10, (tl, el) => {
 ));
 
 export const VizScene11 = makeScene(11, (tl, el) => {
+  formulaHighlight(tl, el, 'attn', 'Self-attention mixes context between tokens');
   tl.from(el.querySelector('.viz-node-headache'), { opacity: 0, scale: 0.7, duration: 0.5, ease: 'back.out' })
     .from(el.querySelector('.viz-arrow-add'), { opacity: 0, x: -10, duration: 0.4 })
     .from(el.querySelector('.viz-node-fever'), { opacity: 0, scale: 0.7, duration: 0.5, ease: 'back.out' }, '-=0.2');
   animateCounter(tl, el, '.viz-add-counter .viz-counter-value', LAYER_WALKTHROUGH.attentionAdd, { duration: 0.8, decimals: 1 });
+  formulaHighlight(tl, el, 'Z', 'Attention output Z⁽ℓ⁾ updates the hidden state', '-=0.4');
   tl.from(el.querySelector('.viz-node-result'), { opacity: 0, scale: 0.8, duration: 0.5, ease: 'back.out' })
     .to(el.querySelector('.viz-residual'), { opacity: 1, x: 0, duration: 0.4 });
+  formulaHighlight(tl, el, 'H', 'Residual connection produces H⁽ℓ⁾ — information preserved', '-=0.2');
 }, () => (
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
     <LayerNode>
@@ -312,10 +342,13 @@ export const VizScene11 = makeScene(11, (tl, el) => {
 ));
 
 export const VizScene12 = makeScene(12, (tl, el) => {
-  tl.from(el.querySelectorAll('.viz-phase-block'), { opacity: 0, y: 30, stagger: 0.45, duration: 0.55, ease: 'power2.out' })
-    .to(el.querySelectorAll('.viz-phase-block'), { borderColor: '#166534', duration: 0.3, stagger: 0.15 });
+  formulaHighlight(tl, el, 'H0', 'Layer 1 reads individual words');
+  tl.from(el.querySelectorAll('.viz-phase-block'), { opacity: 0, y: 30, stagger: 0.45, duration: 0.55, ease: 'power2.out' });
+  formulaHighlight(tl, el, 'layers', 'Middle layers combine symptoms; deep layers encode urgency', '-=1');
+  tl.to(el.querySelectorAll('.viz-phase-block'), { borderColor: '#166534', duration: 0.3, stagger: 0.15 });
+  formulaHighlight(tl, el, 'H12', 'H⁽¹²⁾ at the top holds the triage-ready summary', '-=0.3');
 }, () => (
-  <div style={{ width: '100%', maxWidth: 480 }}>
+  <div style={{ width: '100%', maxWidth: 640 }}>
     {ENCODER_LAYER_PHASES.map((p) => (
       <PhaseBlock key={p.range} className="viz-phase-block">
         <strong>Layers {p.range} ({p.label})</strong> — {p.focus}
@@ -325,12 +358,16 @@ export const VizScene12 = makeScene(12, (tl, el) => {
 ));
 
 export const VizScene13 = makeScene(13, (tl, el) => {
+  formulaHighlight(tl, el, 'Q', 'Query: what context does this token need?');
   tl.from(el.querySelector('.viz-arcs'), { opacity: 0, duration: 0.4 });
+  formulaHighlight(tl, el, 'K', 'Key: what context can other tokens offer?', '-=0.2');
   drawArc(tl, el, 'viz-arc-1', { duration: 0.7 });
   drawArc(tl, el, 'viz-arc-2', { duration: 0.7, position: '-=0.3' });
+  formulaHighlight(tl, el, 'V', 'Value: blend information from attended tokens', '-=0.5');
   drawArc(tl, el, 'viz-arc-3', { duration: 0.7, position: '-=0.3' });
   tl.from(el.querySelectorAll('.viz-weight'), { opacity: 0, x: -8, stagger: 0.1, duration: 0.35 });
   fillWidthBar(tl, el, '.viz-weight .fill', { duration: 0.55, stagger: 0.08 });
+  formulaHighlight(tl, el, 'alpha', 'α weights (41% feverish) sum to 1 — symptoms linked', '-=0.3');
 }, () => (
   <>
     <DrawingArc className="viz-arcs" />
@@ -357,7 +394,7 @@ export const VizScene14 = makeScene(14, (tl, el) => {
     .to(el.querySelector('.viz-lock'), { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out' }, '-=0.1');
 }, () => (
   <div className="viz-mlm-wrap" style={{ textAlign: 'center' }}>
-    <DiagramBox $minHeight="90px"><MlmMask /></DiagramBox>
+    <DiagramBox $minHeight="240px"><MlmMask /></DiagramBox>
     <div style={{ marginTop: '0.75rem', fontSize: '1.1rem' }}>
       {MLM_EXAMPLE.tokens.map((t) => (
         <MlmWord key={t} className={t === '[MASK]' ? 'viz-mask' : ''}>{t === '[MASK]' ? '[MASK]' : t}</MlmWord>
@@ -376,8 +413,11 @@ export const VizScene14 = makeScene(14, (tl, el) => {
 ));
 
 export const VizScene15 = makeScene(15, (tl, el) => {
+  formulaHighlight(tl, el, 'L', 'MLM loss penalises wrong word predictions');
   tl.from(el.querySelector('.viz-loss-compare'), { opacity: 0, y: 12, duration: 0.4 });
+  formulaHighlight(tl, el, 'P', 'High P(correct) → small −log penalty', '-=0.2');
   fillBar(tl, el, '.viz-loss-left', 15, { duration: 0.9 });
+  formulaHighlight(tl, el, 'log', 'Low P(correct) → large −log penalty', '-=0.5');
   fillBar(tl, el, '.viz-loss-right', 95, { duration: 1.1, position: '-=0.5' });
 }, () => (
   <LossCompare
@@ -392,16 +432,19 @@ export const VizScene15 = makeScene(15, (tl, el) => {
 ));
 
 export const VizScene16 = makeScene(16, (tl, el) => {
+  formulaHighlight(tl, el, 'exp', 'Raw attention scores e_j');
   tl.from(el.querySelectorAll('.viz-raw-score'), { opacity: 0, y: 8, stagger: 0.08, duration: 0.35 })
-    .to(el.querySelectorAll('.viz-raw-score'), { opacity: 0, duration: 0.3, stagger: 0.05 })
-    .from(el.querySelectorAll('.viz-weight'), { opacity: 0, duration: 0.3, stagger: 0.06 });
+    .to(el.querySelectorAll('.viz-raw-score'), { opacity: 0, duration: 0.3, stagger: 0.05 });
+  formulaHighlight(tl, el, 'alpha', 'Softmax converts scores to probabilities α_j', '-=0.2');
+  tl.from(el.querySelectorAll('.viz-weight'), { opacity: 0, duration: 0.3, stagger: 0.06 });
   fillWidthBar(tl, el, '.viz-weight .fill', { duration: 0.5, stagger: 0.07 });
+  formulaHighlight(tl, el, 'sum', 'All α weights sum to exactly 1.00', '-=0.3');
   tl.from(el.querySelector('.viz-sum-check'), { opacity: 0, scale: 0.8, duration: 0.4, ease: 'back.out' });
 }, () => (
-  <div style={{ width: '100%', maxWidth: 440 }}>
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '0.75rem', justifyContent: 'center' }}>
+  <div style={{ width: '100%', maxWidth: 560 }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginBottom: '0.75rem', justifyContent: 'center' }}>
       {ATTENTION_WEIGHTS.map((w) => (
-        <span key={w.token} className="viz-raw-score" style={{ padding: '0.25rem 0.5rem', background: '#f1f5f9', borderRadius: 6, fontSize: '0.82rem' }}>
+        <span key={w.token} className="viz-raw-score" style={{ padding: '0.35rem 0.65rem', background: '#f1f5f9', borderRadius: 8, fontSize: 'calc(1rem * var(--viz-font-scale, 1))' }}>
           {w.token}: { (w.weight * 10).toFixed(1) }
         </span>
       ))}
@@ -418,14 +461,17 @@ export const VizScene16 = makeScene(16, (tl, el) => {
 ));
 
 export const VizScene17 = makeScene(17, (tl, el) => {
+  formulaHighlight(tl, el, 'h', '[CLS] summary vector h from 12 encoder layers');
   const fills = el.querySelectorAll('.viz-prob-fill');
   tl.from(el.querySelector('.viz-bars'), { opacity: 0, duration: 0.35 })
-    .to(fills, { width: (i, t) => `${t.dataset.target}%`, duration: 0.85, stagger: 0.1, ease: 'power2.out' })
-    .to(el.querySelectorAll('.viz-prob-label'), { opacity: 1, duration: 0.25, stagger: 0.05 }, '-=0.5')
+    .to(fills, { width: (i, t) => `${t.dataset.target}%`, duration: 0.85, stagger: 0.1, ease: 'power2.out' });
+  formulaHighlight(tl, el, 'W', 'Linear layer W·h + b produces class scores', '-=0.6');
+  tl.to(el.querySelectorAll('.viz-prob-label'), { opacity: 1, duration: 0.25, stagger: 0.05 }, '-=0.5')
     .to(el.querySelector('.viz-yellow-badge'), { scale: 1, duration: 0.65, ease: 'back.out' }, '-=0.3')
     .to(el.querySelector('.viz-ring'), { opacity: 1, scale: 1.4, duration: 0.6, ease: 'power2.out' });
+  formulaHighlight(tl, el, 'y', 'Softmax → ŷ = 72% Yellow — routing colour chosen', '-=0.4');
 }, () => (
-  <div className="viz-bars" style={{ position: 'relative', width: '100%', maxWidth: 480 }}>
+  <div className="viz-bars" style={{ position: 'relative', width: '100%', maxWidth: 620 }}>
     <ProbabilityBars items={SOFTMAX_OUTPUT.map((x) => ({ ...x }))} />
     <YellowBadge className="viz-yellow-badge">Yellow 72%</YellowBadge>
     <div className="viz-ring" style={{
@@ -436,9 +482,12 @@ export const VizScene17 = makeScene(17, (tl, el) => {
 ));
 
 export const VizScene18 = makeScene(18, (tl, el) => {
+  formulaHighlight(tl, el, 'y', 'True nurse label: Yellow');
   tl.from(el.querySelector('.viz-loss-compare'), { opacity: 0, duration: 0.4 });
+  formulaHighlight(tl, el, 'yhat', 'Model wrongly predicts Green at 90%', '-=0.2');
   fillBar(tl, el, '.viz-loss-left', 25, { duration: 0.7 });
   fillBar(tl, el, '.viz-loss-right', 90, { duration: 0.9, position: '-=0.4' });
+  formulaHighlight(tl, el, 'L', 'Cross-entropy ℒ ≈ 3.0 — large penalty for confident mistake', '-=0.4');
   animateCounter(tl, el, '.viz-loss-final', CROSS_ENTROPY_EXAMPLE.loss, { duration: 1, decimals: 1 });
 }, () => (
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
@@ -460,9 +509,12 @@ export const VizScene18 = makeScene(18, (tl, el) => {
 ));
 
 export const VizScene19 = makeScene(19, (tl, el) => {
+  formulaHighlight(tl, el, 'dL', 'Loss gradient ∂ℒ/∂W starts at the classifier');
   tl.from(el.querySelector('.viz-enc'), { opacity: 0, duration: 0.5 })
     .fromTo(el.querySelector('.viz-pulse'), { top: '12%', opacity: 1 }, { top: '78%', duration: 2.2, ease: 'power1.inOut' })
     .to(el.querySelectorAll('.viz-weight-flash'), { opacity: 1, duration: 0.15, stagger: 0.12, yoyo: true, repeat: 1 }, '-=1.8');
+  formulaHighlight(tl, el, 'chain', 'Chain rule propagates error through each layer', '-=1.5');
+  formulaHighlight(tl, el, 'layers', 'All 12 layers receive update signals', '-=0.5');
 }, () => (
   <EncoderWrap className="viz-enc">
     <img src="/assets/bert_encoder.png" alt="Backprop" />
@@ -478,10 +530,13 @@ export const VizScene19 = makeScene(19, (tl, el) => {
 ));
 
 export const VizScene20 = makeScene(20, (tl, el) => {
+  formulaHighlight(tl, el, 'grad', 'Compute gradient ∂ℒ/∂W on each batch');
   tl.from(el.querySelector('.viz-loss-curve'), { opacity: 0, duration: 0.4 })
     .to(el.querySelector('.viz-loss-path'), { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut' })
     .to(el.querySelector('.viz-loss-dot'), { opacity: 1, duration: 0.3 }, '-=0.3');
+  formulaHighlight(tl, el, 'alpha', 'Learning rate α = 2×10⁻⁵ controls step size', '-=1.5');
   animateCounter(tl, el, '.viz-steps-counter .viz-counter-value', GRADIENT_DESCENT_STATS.steps, { duration: 1.5 });
+  formulaHighlight(tl, el, 'W', 'Update weights: W_new = W − α·∂ℒ/∂W', '-=0.8');
   animateCounter(tl, el, '.viz-loss-counter .viz-counter-value', GRADIENT_DESCENT_STATS.evalLoss, { duration: 1, decimals: 6, position: '-=0.8' });
 }, () => (
   <LossCurve className="viz-loss-curve" />
@@ -510,7 +565,7 @@ export const VizScene21 = makeScene(21, (tl, el) => {
       </TokenRow>
     </E2EStage>
     <E2EStage className="viz-e2e-3">
-      <img src="/assets/bert_encoder.png" alt="Encoder" style={{ maxHeight: 180, objectFit: 'contain' }} />
+      <img src="/assets/bert_encoder.png" alt="Encoder" style={{ maxHeight: 280, objectFit: 'contain' }} />
     </E2EStage>
     <E2EStage className="viz-e2e-4">
       <ProbabilityBars items={SOFTMAX_OUTPUT.filter((x) => x.label === 'Yellow' || x.level <= 2)} />

@@ -1,5 +1,21 @@
 /** GSAP helpers for visualization scenes */
 
+export function highlightFormula(el, termId, effectText) {
+  if (!el) return;
+  el.querySelectorAll('.viz-formula-term').forEach((t) => t.classList.remove('viz-formula-term-active'));
+  el.querySelector(`.viz-formula-term[data-term="${termId}"]`)?.classList.add('viz-formula-term-active');
+  const effectEl = el.querySelector('.viz-formula-effect');
+  if (effectEl) {
+    effectEl.textContent = effectText ?? '';
+    effectEl.style.opacity = effectText ? '1' : '0';
+  }
+}
+
+/** Add formula highlight synced to a timeline moment */
+export function formulaHighlight(tl, el, termId, effect, position) {
+  tl.add(() => highlightFormula(el, termId, effect), position);
+}
+
 export function animateCounter(tl, el, selector, target, { duration = 1.2, decimals = 0, position } = {}) {
   const node = el.querySelector(selector);
   if (!node) return;

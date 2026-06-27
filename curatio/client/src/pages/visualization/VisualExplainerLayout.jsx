@@ -17,7 +17,7 @@ const TopBar = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1.5rem;
+  padding: 0.5rem 1rem;
   flex-shrink: 0;
 `;
 
@@ -53,7 +53,7 @@ const Main = styled.main`
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 0 1.5rem 0.75rem;
+  padding: 0 0.75rem 0.4rem;
 `;
 
 const VisualExplainerLayout = () => (

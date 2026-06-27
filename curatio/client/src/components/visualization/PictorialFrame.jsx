@@ -1,8 +1,9 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import CaptionBar from './CaptionBar';
-import DetailsDrawer from './DetailsDrawer';
+import AnimatedFormulaStrip from './AnimatedFormulaStrip';
 import RunningThread from './animated/RunningThread';
+import VizScaleWrapper from './VizScaleWrapper';
 
 const enterAnim = keyframes`
   from { opacity: 0; transform: scale(0.98); }
@@ -13,8 +14,9 @@ const Frame = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   animation: ${enterAnim} 0.45s ease-out;
+  --viz-font-scale: 1.25;
 `;
 
 const Header = styled.div`
@@ -34,7 +36,6 @@ const SectionPill = styled.span`
   border-radius: 999px;
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
 `;
 
 const StepNum = styled.span`
@@ -45,25 +46,22 @@ const StepNum = styled.span`
 
 const Stage = styled.div`
   flex: 1;
-  min-height: 0;
+  min-height: calc(100vh - 200px);
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-`;
-
-const Canvas = styled.div`
-  width: 100%;
-  max-width: 960px;
-  height: 100%;
-  max-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
-  font-size: 1.05rem;
+  padding: 0.25rem 0.5rem;
+`;
+
+const DiagramArea = styled.div`
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const PictorialFrame = React.forwardRef(({
@@ -72,6 +70,7 @@ export const PictorialFrame = React.forwardRef(({
   caption,
   stageLabel,
   equations = [],
+  formulaTerms = [],
   children,
 }, ref) => (
   <Frame ref={ref} key={`frame-${step}`}>
@@ -81,8 +80,12 @@ export const PictorialFrame = React.forwardRef(({
       <RunningThread step={step} stageLabel={stageLabel} />
     </Header>
     <Stage>
-      <Canvas>{children}</Canvas>
-      <DetailsDrawer equations={equations} />
+      <DiagramArea>
+        <VizScaleWrapper contentKey={step}>
+          {children}
+        </VizScaleWrapper>
+      </DiagramArea>
+      <AnimatedFormulaStrip equations={equations} formulaTerms={formulaTerms} />
     </Stage>
     {caption && <CaptionBar>{caption}</CaptionBar>}
   </Frame>

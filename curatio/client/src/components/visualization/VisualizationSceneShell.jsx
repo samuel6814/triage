@@ -80,10 +80,10 @@ export const ComplaintBlock = styled.blockquote`
 
 export const TokenChip = styled.span`
   display: inline-block;
-  padding: 0.35rem 0.6rem;
+  padding: 0.45rem 0.75rem;
   margin: 0.15rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  border-radius: 8px;
+  font-size: calc(1.1rem * var(--viz-font-scale, 1));
   font-weight: ${(p) => (p.$highlight ? 700 : 500)};
   background: ${(p) => {
     if (p.$mask) return '#fef3c7';
@@ -108,10 +108,12 @@ export const TokenRow = styled.div`
 
 export const NumericCell = styled.span`
   display: inline-block;
-  padding: 0.2rem 0.35rem;
-  border-radius: 4px;
-  font-size: 0.82rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  font-size: calc(1.05rem * var(--viz-font-scale, 1));
   font-family: ui-monospace, monospace;
+  min-width: 3.25rem;
+  text-align: center;
   background: ${(p) => (p.$active ? '#fef9c3' : '#f1f5f9')};
   border: 1px solid ${(p) => (p.$active ? '#fde047' : '#e2e8f0')};
 `;
