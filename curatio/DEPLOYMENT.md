@@ -50,20 +50,26 @@ the `MODEL_ID` value below. If the repo is **private**, you must also set an
 ## 1. ML service → Hugging Face Space (Docker SDK)
 
 The Space runs the FastAPI app from `curatio/server/ml/` (free CPU tier has
-16 GB RAM — plenty for BioBERT).
+16 GB RAM). **Baseline BioBERT + always-on OpenMed NER** can exceed free-tier
+memory — if the Space OOMs, set `OPENMED_ENABLED=false` (rules-only medical
+gate) or upgrade the Space hardware.
 
 1. Create a new Space: https://huggingface.co/new-space → **SDK: Docker** → Blank.
 2. Push the contents of `curatio/server/ml/` to the Space repo:
 
 ```bash
 git clone https://huggingface.co/spaces/<your-username>/curatio-ml
-cp curatio/server/ml/{Dockerfile,app.py,predict.py,requirements.txt,README.md,.dockerignore} curatio-ml/
+cp curatio/server/ml/{Dockerfile,app.py,predict.py,openmed_enrich.py,medical_gate.py,voice_pipeline.py,requirements.txt,README.md,.dockerignore} curatio-ml/
 cd curatio-ml && git add . && git commit -m "Curatio ML service" && git push
 ```
 
 3. In the Space → **Settings → Variables and secrets**, add:
-   - `MODEL_ID` = `your-username/curatio-biobert-triage`
+   - `MODEL_ID` = `your-username/curatio-biobert-triage` (baseline weights)
    - `CONFIDENCE_THRESHOLD` = `0.85`
+   - `OPENMED_ENABLED` = `true` (set `false` if the Space runs out of memory)
+   - `OPENMED_ENTITY_PREFIX` = `true`
+   - `WHISPER_MODEL_SIZE` = `small` (use `tiny` if the Space runs out of memory)
+   - `VOICE_TRANSLATION_ENABLED` = `true`
    - `HF_TOKEN` = *(read token, only if the model repo is private)*
 4. Wait for the build, then verify:
 
@@ -125,7 +131,10 @@ Record the API base URL — this is `VITE_API_URL` for the client.
 
 | Service | Variable | Example | Notes |
 |---------|----------|---------|-------|
-| HF Space | `MODEL_ID` | `user/curatio-biobert-triage` | Weights pulled from the Hub |
+| HF Space | `MODEL_ID` | `user/curatio-biobert-triage` | Baseline weights from Hub |
+| HF Space | `OPENMED_ENABLED` | `true` | OpenMed NER on every predict; `false` if OOM |
+| HF Space | `WHISPER_MODEL_SIZE` | `small` | Use `tiny` on free tier if OOM |
+| HF Space | `VOICE_TRANSLATION_ENABLED` | `true` | Twi to English after ASR |
 | HF Space | `HF_TOKEN` | `hf_...` | Only if the model repo is private |
 | HF Space | `CONFIDENCE_THRESHOLD` | `0.85` | |
 | Render | `ML_SERVICE_URL` | `https://user-curatio-ml.hf.space` | No trailing slash |

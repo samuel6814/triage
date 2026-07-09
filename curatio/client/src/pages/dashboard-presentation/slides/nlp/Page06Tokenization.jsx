@@ -28,8 +28,19 @@ const ID_TABLE_RIGHT = [
   ['6', 'feel', 'feel', '2514'],
   ['7', 'feverish', 'fever+##ish', '9643, 6804'],
   ['8', '.', '.', '1012'],
-  ['…', '…', '…', '…'],
-  ['M', '—', '[SEP]', '102'],
+  ['9', '—', '[SEP]', '102'],
+  ['10', '—', '[PAD]', '0'],
+  ['11', '—', '[PAD]', '0'],
+  ['⋮', '⋮', '⋮', '⋮'],
+  ['127', '—', '[PAD]', '0'],
+];
+
+const SPECIAL_TOKENS = [
+  ['[PAD]', '0', 'Padding filler after [SEP]; attention mask = 0 (ignored)'],
+  ['[UNK]', '100', 'Unknown WordPiece piece'],
+  ['[CLS]', '101', 'Classification summary (always i = 0)'],
+  ['[SEP]', '102', 'Sentence boundary'],
+  ['[MASK]', '103', 'MLM pre-training only — not used at triage inference'],
 ];
 
 const IdTable = ({ rows }) => (
@@ -65,14 +76,25 @@ export const Page07 = () => (
   <BeamerSlideContainer>
     <LeadText>
       <strong>Input:</strong> &quot;I have a headache and feel feverish.&quot; — Each ID → row in E_word.
+      Real tokens: M ≈ 12; batches pad to length 128 with filler tokens.
     </LeadText>
     <BeamerColumns $ratio="1fr 1fr">
       <IdTable rows={ID_TABLE_LEFT} />
       <IdTable rows={ID_TABLE_RIGHT} />
     </BeamerColumns>
     <CaptionText>
-      Reserved: [CLS]=101 (classification summary), [SEP]=102 (sentence end).
+      <strong>Vocabulary range:</strong> token IDs 0 … 28,995 (|𝒱| = 28,996); sequence positions i = 0 … 127 (M ≤ 128).
     </CaptionText>
+    <DataTable>
+      <thead>
+        <tr><th>Special token</th><th>ID</th><th>Role</th></tr>
+      </thead>
+      <tbody>
+        {SPECIAL_TOKENS.map(([tok, id, role]) => (
+          <tr key={tok}><td><code>{tok}</code></td><td>{id}</td><td>{role}</td></tr>
+        ))}
+      </tbody>
+    </DataTable>
   </BeamerSlideContainer>
 );
 

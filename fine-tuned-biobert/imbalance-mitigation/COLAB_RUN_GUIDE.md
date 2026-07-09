@@ -2,6 +2,31 @@
 
 **All training runs in Google Colab only.** Do not run ML code on your local machine.
 
+## Recommended: `triage-smote-colab` bundle (one folder upload)
+
+Build a self-contained folder locally, upload to Drive, and run:
+
+```bash
+cd fine-tuned-biobert
+./scripts/build-colab-bundle.sh
+```
+
+Upload `fine-tuned-biobert/triage-smote-colab/` to Google Drive as **`MyDrive/triage-smote-colab/`**.
+
+| What | Google Drive path |
+|------|-------------------|
+| CSV data | `triage-smote-colab/data/` |
+| Notebook + code | `triage-smote-colab/colab/` |
+| **Saved model** | `triage-smote-colab/output/fine_tuned_biobert_triage_smote/` |
+
+Open `colab/triage_smote_augmented.ipynb` in Colab → GPU runtime → Run all.
+
+Cell 2 prints all paths and sets `config.OUTPUT_DIR` from `paths.MODEL_OUTPUT_DIR`. Edit **only** `BUNDLE_ROOT` in `colab/paths.py` if you renamed the Drive folder.
+
+See [`../triage-smote-colab/README.md`](../triage-smote-colab/README.md) after building.
+
+---
+
 ## Before you start
 
 - [ ] Google account with Google Drive space (~2 GB free for model + data)
@@ -15,7 +40,9 @@ Data source: [Triagegeist Kaggle](https://www.kaggle.com/competitions/triagegeis
 
 ---
 
-## Files to upload to Google Drive
+## Files to upload to Google Drive (legacy layout)
+
+> **Prefer the bundle above.** The split-folder layout below still works if you maintain paths manually.
 
 Create a folder on Drive, e.g. `MyDrive/imbalance-mitigation/`:
 
@@ -103,6 +130,8 @@ Exact numbers depend on stratified split and augmentation randomness.
 
 | Problem | Fix |
 |---------|-----|
+| `PyTorch/TorchAudio different CUDA versions` | Do not `pip install torch`. Runtime → Restart session → re-run Cell 1 only |
+| `VideoReader` / `cannot import name 'VideoReader'` | Do not use `set_format("torch")` on datasets; labels read from `train_balanced["label"]` in Cell 8 |
 | `FileNotFoundError` for CSV | Check `paths.py` paths; run `!ls` on DATA_DIR |
 | `ModuleNotFoundError: config` | Set `HELPERS_DIR` in Cell 2 `sys.path` |
 | CUDA OOM | `BATCH_SIZE = 8` in config.py |

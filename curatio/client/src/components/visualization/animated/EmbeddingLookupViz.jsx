@@ -51,7 +51,6 @@ const VecCell = styled.div`
   font-family: ui-monospace, monospace;
   font-size: calc(1.05rem * var(--viz-font-scale, 1));
   text-align: center;
-  opacity: 0;
   transform: translateX(12px);
 `;
 

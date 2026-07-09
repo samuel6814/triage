@@ -10,10 +10,13 @@ ENV PORT=7860 \
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt ./
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY predict.py app.py ./
+COPY predict.py app.py openmed_enrich.py medical_gate.py voice_pipeline.py ./
 
 # Writable cache for model weights pulled from the Hub at startup.
 RUN mkdir -p /app/.cache/huggingface && chmod -R 777 /app/.cache

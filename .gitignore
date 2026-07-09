@@ -51,3 +51,7 @@ fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_b
 # OS
 .DS_Store
 Thumbs.db
+
+# Colab upload bundle (large CSVs + trained weights — rebuild with scripts/build-colab-bundle.sh)
+fine-tuned-biobert/triage-smote-colab/data/*.csv
+fine-tuned-biobert/triage-smote-colab/output/

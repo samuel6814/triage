@@ -10,32 +10,32 @@ pinned: false
 
 # Curatio BioBERT Triage — ML service
 
-FastAPI inference service for the fine-tuned BioBERT triage model.
-
-This folder is also a deployable **Hugging Face Space** (Docker SDK). When pushed
-to a Space repo, Hugging Face builds the `Dockerfile` and serves the app on
-port `7860`.
+FastAPI inference: medical gate → OpenMed NER → baseline BioBERT acuity prediction.
 
 ## Endpoints
 
-- `GET /health` — model/weights status
-- `POST /predict` — body `{ "text": "chief complaint" }` → acuity + SATS colour
+- `GET /health` — model variant, weights, OpenMed + voice status
+- `POST /predict` — chief complaint → acuity + entities (or non-medical rejection)
+- `POST /deidentify` — PII redaction (OpenMed)
+- `POST /analyze` — entity extraction only
+- `POST /voice/intake` — audio upload → Twi transcript + English translation
+- `GET /voice/health` — Whisper model status
 
 ## Configuration
 
-| Variable   | Purpose                                                                 |
-|------------|-------------------------------------------------------------------------|
-| `MODEL_ID` | Hugging Face Hub repo id of the fine-tuned model (used in production).   |
-| `MODEL_PATH` | Local path to the model dir (used for local development only).        |
-| `CONFIDENCE_THRESHOLD` | Below this, a case is flagged as a Bayesian fallback candidate. |
-
-In the Space, set `MODEL_ID` (e.g. `your-username/curatio-biobert-triage`) as a
-**Space variable/secret** so weights are pulled from the Hub on startup.
+| Variable | Purpose |
+|----------|---------|
+| `MODEL_ID` | Hugging Face Hub repo id — **baseline** weights (production) |
+| `MODEL_PATH` | Local model dir (development) |
+| `OPENMED_ENABLED` | OpenMed on every predict (default `true`; `false` if OOM) |
+| `OPENMED_ENTITY_PREFIX` | Prepend `[DISEASE: ...]` before BioBERT (default `true`) |
+| `CONFIDENCE_THRESHOLD` | Bayesian fallback flag threshold |
 
 ## Local development
 
 ```bash
 cd curatio/server/ml
 pip install -r requirements.txt
+export OPENMED_ENABLED=true
 uvicorn app:app --reload --port 8001
 ```

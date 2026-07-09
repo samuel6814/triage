@@ -18,23 +18,31 @@ This folder documents and packages a **Google Colab-only** retraining pipeline t
 
 ## Colab package
 
-Upload the contents of [`colab/`](colab/) plus [`requirements-colab.txt`](requirements-colab.txt) to Google Drive or clone this repo in Colab.
+**Recommended:** build the upload bundle:
+
+```bash
+cd fine-tuned-biobert
+./scripts/build-colab-bundle.sh
+```
+
+This creates [`../triage-smote-colab/`](../triage-smote-colab/) with data, code, and pre-filled `colab/paths.py`. Upload the whole folder to Drive.
 
 | File | Role |
 |------|------|
 | `colab/triage_smote_augmented.ipynb` | Main training notebook |
-| `colab/config.py` | Hyperparameters and target class counts |
+| `colab/paths.py` | Google Drive paths (data + model output) |
+| `colab/config.py` | Hyperparameters; `OUTPUT_DIR` set in notebook Cell 2 |
 | `colab/data_merge.py` | CSV merge and label encoding |
 | `colab/augmentation.py` | Text augmentation for minority classes |
 | `colab/imbalance.py` | Oversampling and optional embedding-SMOTE |
 | `colab/metrics.py` | Confusion matrix and per-class F1 |
-| `colab/paths.example.py` | Copy to `paths.py` and set your Drive paths |
+| `colab/paths.example.py` | Reference copy of paths template |
 
 ## Baseline comparison
 
 The original notebook [`../triage_new.ipynb`](../triage_new.ipynb) is **unchanged** and serves as the baseline (uniform sampling, no stratification, no augmentation).
 
-The new pipeline saves to `fine_tuned_biobert_triage_smote/` on Google Drive.
+The new pipeline saves to `MyDrive/triage-smote-colab/output/fine_tuned_biobert_triage_smote/` on Google Drive.
 
 ## Data required (not in git)
 

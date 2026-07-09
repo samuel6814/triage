@@ -20,7 +20,8 @@ const Table = styled.table`
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
-  tr.viz-grid-row-active td {
+  tr.viz-grid-row-active td,
+  tr.viz-embed-row-active td {
     background: #dcfce7;
     border-color: #166534;
     font-weight: 700;

@@ -40,7 +40,7 @@ const SpeechBubble = styled.div`
   border-radius: 16px 16px 16px 4px; font-size: calc(1.2rem * var(--viz-font-scale, 1)); font-style: italic; color: #166534; min-height: 3.5rem;
 `;
 const WeightBar = styled.div`
-  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.55rem; opacity: 0; width: 100%; max-width: 560px;
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.55rem; width: 100%; max-width: 560px;
   span.label { width: 96px; font-size: calc(1.05rem * var(--viz-font-scale, 1)); font-weight: 700; }
   span.track { flex: 1; height: 24px; background: #f1f5f9; border-radius: 6px; overflow: hidden; }
   span.fill { display: block; height: 100%; width: 0%; background: #166534; border-radius: 6px; }
@@ -65,7 +65,7 @@ const FinalBadge = styled.div`
 `;
 const PhaseBlock = styled.div`
   padding: 1rem 1.25rem; border-radius: 12px; background: #fff; border: 2px solid #e2e8f0;
-  opacity: 0; transform: translateY(24px); margin-bottom: 0.65rem; width: 100%; max-width: 640px;
+  transform: translateY(24px); margin-bottom: 0.65rem; width: 100%; max-width: 640px;
   font-size: calc(1.15rem * var(--viz-font-scale, 1));
   strong { color: #166534; }
 `;
@@ -74,11 +74,11 @@ const LayerNode = styled.div`
 `;
 const Node = styled.div`
   padding: 0.85rem 1.25rem; border-radius: 12px; background: #dcfce7; border: 2px solid #166534;
-  font-weight: 800; color: #166534; opacity: 0; transform: scale(0.8);
+  font-weight: 800; color: #166534; transform: scale(0.8);
   font-size: calc(1.15rem * var(--viz-font-scale, 1));
 `;
 const NodeArrow = styled.div`
-  font-size: 1.5rem; color: #166534; opacity: 0; font-weight: 800;
+  font-size: 1.5rem; color: #166534; font-weight: 800;
 `;
 const ClusterToken = styled.div`
   position: absolute; padding: 0.65rem 1rem; border-radius: 10px; background: #dcfce7;
@@ -93,7 +93,7 @@ const LayerNum = styled.span`
   position: absolute; right: 8%; font-size: 0.75rem; font-weight: 700; color: #166534; opacity: 0;
 `;
 const E2EStage = styled.div`
-  opacity: 0; transform: translateY(16px); width: 100%; max-width: 900px;
+  transform: translateY(16px); width: 100%; max-width: 900px;
   text-align: center; padding: 0.75rem;
 `;
 
@@ -197,7 +197,7 @@ export const VizScene04 = makeScene(4, (tl, el) => {
 
 export const VizScene05 = makeScene(5, (tl, el) => {
   tl.from(el.querySelector('.viz-cls-slide'), { x: -80, opacity: 0, duration: 0.7, ease: 'power3.out' })
-    .to(el.querySelector('.viz-token-row'), { x: 40, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    .from(el.querySelectorAll('.viz-cls-token'), { opacity: 0, y: 12, stagger: 0.06, duration: 0.35, ease: 'power2.out' }, '-=0.35')
     .from(el.querySelector('.viz-summary-arrow'), { opacity: 0, scaleX: 0, duration: 0.5, transformOrigin: 'left' })
     .from(el.querySelector('.viz-callout'), { opacity: 0, scale: 0.9, duration: 0.4 });
 }, () => (
@@ -205,7 +205,7 @@ export const VizScene05 = makeScene(5, (tl, el) => {
     <DiagramBox $minHeight="240px">
       <div style={{ position: 'relative' }}>
         <span className="viz-cls-slide" data-token="cls" style={{ display: 'inline-block' }}>
-          <ClsTokenDiagram />
+          <ClsTokenDiagram className="viz-cls-diagram" />
         </span>
       </div>
     </DiagramBox>
@@ -225,7 +225,9 @@ export const VizScene06 = makeScene(6, (tl, el) => {
   tl.to(el.querySelector('.viz-embed-arrow'), { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out' })
     .to(el.querySelector('.viz-embed-vec-title'), { opacity: 1, duration: 0.4 }, '-=0.3');
   formulaHighlight(tl, el, 'e_i', 'That row becomes the 768-D embedding vector e_i', '-=0.2');
-  tl.from(el.querySelectorAll('.viz-embed-vec-cell'), { opacity: 0, x: 16, stagger: 0.06, duration: 0.35, ease: 'power2.out' });
+  tl.fromTo(el.querySelectorAll('.viz-embed-vec-cell'),
+    { opacity: 0, x: 16 },
+    { opacity: 1, x: 0, stagger: 0.1, duration: 0.45, ease: 'power2.out' });
 }, () => (
   <EmbeddingLookupViz className="viz-embed" />
 ));
@@ -388,10 +390,10 @@ export const VizScene14 = makeScene(14, (tl, el) => {
     .to(el.querySelector('.viz-mask'), { opacity: 0.3, duration: 0.3, yoyo: true, repeat: 3 })
     .from(el.querySelector('.viz-cand-1'), { opacity: 0, duration: 0.2 })
     .to(el.querySelector('.viz-cand-1'), { opacity: 0, duration: 0.15, delay: 0.3 })
-    .from(el.querySelector('.viz-cand-2'), { opacity: 1, duration: 0.2 })
+    .from(el.querySelector('.viz-cand-2'), { opacity: 0, duration: 0.2 })
     .to(el.querySelector('.viz-cand-2'), { opacity: 0, duration: 0.15, delay: 0.3 })
-    .from(el.querySelector('.viz-cand-3'), { opacity: 1, scale: 1.1, duration: 0.4, ease: 'back.out' })
-    .to(el.querySelector('.viz-lock'), { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out' }, '-=0.1');
+    .from(el.querySelector('.viz-cand-3'), { opacity: 0, scale: 0.9, duration: 0.4, ease: 'back.out' })
+    .to(el.querySelector('.viz-lock span'), { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out' }, '-=0.1');
 }, () => (
   <div className="viz-mlm-wrap" style={{ textAlign: 'center' }}>
     <DiagramBox $minHeight="240px"><MlmMask /></DiagramBox>
@@ -403,10 +405,10 @@ export const VizScene14 = makeScene(14, (tl, el) => {
     <p style={{ marginTop: '0.5rem', fontWeight: 800, color: '#64748b' }}>
       Predict:
       <span className="viz-cand-1" style={{ color: '#94a3b8', marginLeft: 6 }}>fever</span>
-      <span className="viz-cand-2" style={{ color: '#94a3b8', marginLeft: 6, opacity: 0 }}>pain</span>
-      <span className="viz-cand-3" style={{ color: '#166534', marginLeft: 6, opacity: 0 }}>{MLM_EXAMPLE.correct}</span>
+      <span className="viz-cand-2" style={{ color: '#94a3b8', marginLeft: 6 }}>pain</span>
+      <span className="viz-cand-3" style={{ color: '#166534', marginLeft: 6 }}>{MLM_EXAMPLE.correct}</span>
     </p>
-    <CalloutLabel className="viz-lock" position="bottom" accent>
+    <CalloutLabel className="viz-lock" position="bottom" accent visible={false}>
       Locked: {MLM_EXAMPLE.correct}
     </CalloutLabel>
   </div>

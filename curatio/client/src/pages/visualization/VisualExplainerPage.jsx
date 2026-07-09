@@ -140,7 +140,7 @@ const VisualExplainerPage = () => {
 
   const { onTimelineComplete } = useCinematicPlayback({
     step: current.step,
-    durationMs: current.durationMs ?? 12000,
+    durationMs: current.durationMs ?? 20000,
     nextPath: next?.path,
     playing,
     setPlaying,

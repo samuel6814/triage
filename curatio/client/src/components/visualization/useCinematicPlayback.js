@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { VIZ_DWELL_MS } from '../../pages/visualization/vizAnimationConfig';
 
-const DWELL_MS = 1500;
+const DWELL_MS = VIZ_DWELL_MS;
 
 /**
  * Cinematic auto-advance: plays scene on mount, advances after timeline + dwell.
