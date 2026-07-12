@@ -55,3 +55,18 @@ Thumbs.db
 # Colab upload bundle (large CSVs + trained weights — rebuild with scripts/build-colab-bundle.sh)
 fine-tuned-biobert/triage-smote-colab/data/*.csv
 fine-tuned-biobert/triage-smote-colab/output/
+
+# Model weights (~414 MB each — exceed GitHub's 100 MB limit; host on Hugging Face Hub; see curatio/DEPLOYMENT.md)
+*.safetensors
+
+# Training / evaluation datasets (rebuild with fine-tuned-biobert scripts or Colab bundle)
+fine-tuned-biobert/csv files/*.csv
+fine-tuned-biobert/train.csv
+fine-tuned-biobert/chief_complaints.csv
+fine-tuned-biobert/test.csv
+fine-tuned-biobert/patient_history.csv
+fine-tuned-biobert/triage_predictions_results.csv
+
+# Personal / ad-hoc notes at repo root
+/Exam Preparation Notes.pdf
+/triage_smote_augmented.ipynb - Colab.pdf

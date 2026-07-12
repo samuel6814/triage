@@ -29,9 +29,9 @@ Open `http://localhost:5173` — use **Test Model** or `/test` to run live predi
 
 ## Model weights
 
-The fine-tuned BioBERT weights (`model.safetensors`, ~414 MB) are tracked with **Git LFS**. After cloning:
+Fine-tuned BioBERT weights (`model.safetensors`, ~414 MB each) are **not stored in Git**. Place them locally under:
 
-```bash
-git lfs install
-git lfs pull
-```
+- `fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_biobert_triage/` (baseline)
+- `fine-tuned-biobert/fine_tuned_biobert_triage_smote/` (SMOTE variant, optional)
+
+For deployment, publish to the Hugging Face Hub — see [curatio/DEPLOYMENT.md](curatio/DEPLOYMENT.md).
