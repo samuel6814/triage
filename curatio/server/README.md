@@ -76,7 +76,7 @@ Open `http://localhost:5173/test` or click **Test Model** on the home page.
 |--------|------|-------------|
 | GET | `/api/health` | Express health |
 | GET | `/api/triage/health` | ML model status |
-| POST | `/api/triage/predict` | Chief complaint → acuity (`?gate=true` / `?openmed=true` opt-in) |
+| POST | `/api/triage/predict` | Chief complaint → acuity (gate + OpenMed on by default; `?gate=false` / `?openmed=false`) |
 | POST | `/api/triage/analyze` | OpenMed entity extraction only |
 | POST | `/api/triage/deidentify` | Body: `{ "text": "...", "method": "mask" }` |
 | POST | `/api/voice/intake` | Multipart `audio` + `language=tw` → Twi transcript + English translation |

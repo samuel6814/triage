@@ -491,8 +491,8 @@ const TriageTestPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  const [useGate, setUseGate] = useState(false);
-  const [useOpenMed, setUseOpenMed] = useState(false);
+  const [useGate, setUseGate] = useState(true);
+  const [useOpenMed, setUseOpenMed] = useState(true);
   const [showVoice, setShowVoice] = useState(false);
   const [sideResult, setSideResult] = useState(null);
   const [sideLoading, setSideLoading] = useState(null);
@@ -517,8 +517,8 @@ const TriageTestPage = () => {
 
   const buildPredictUrl = () => {
     const params = new URLSearchParams();
-    if (useGate) params.set('gate', 'true');
-    if (useOpenMed) params.set('openmed', 'true');
+    params.set('gate', useGate ? 'true' : 'false');
+    params.set('openmed', useOpenMed ? 'true' : 'false');
     const qs = params.toString();
     return `${API_BASE}/api/triage/predict${qs ? `?${qs}` : ''}`;
   };
@@ -603,8 +603,8 @@ const TriageTestPage = () => {
 
         <Title>Test BioBERT Triage</Title>
         <Subtitle>
-          Default mode runs baseline BioBERT acuity only (fast). Use the demo feature toggles
-          below to enable medical input filtering, OpenMed entities, voice intake, or PII tools.
+          Medical gate and OpenMed enrichment are on by default.
+          Use the toggles below for voice intake or to turn features off; PII tools are below.
         </Subtitle>
 
         {mlHealth && (

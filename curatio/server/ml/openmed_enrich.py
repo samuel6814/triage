@@ -49,6 +49,8 @@ def _ensure_openmed():
         raise RuntimeError(
             "OpenMed is disabled. Set OPENMED_ENABLED=true to use entity enrichment."
         )
+    # DeBERTa-v2 PII models reject SDPA; OpenMed auto-picks sdpa when available.
+    os.environ.setdefault("OPENMED_TORCH_ATTENTION_BACKEND", "eager")
     try:
         import openmed  # noqa: F401
     except ImportError as exc:

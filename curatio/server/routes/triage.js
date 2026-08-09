@@ -26,12 +26,26 @@ router.post('/predict', async (req, res) => {
     }
 
     const url = new URL(`${ML_SERVICE_URL}/predict`);
-    if (req.query.openmed === 'true' || req.query.openmed === '1' || req.query.enrich === 'true') {
+    // OpenMed enrichment is on by default; pass openmed=false to disable.
+    const openmedOff =
+      req.query.openmed === 'false' ||
+      req.query.openmed === '0' ||
+      req.query.enrich === 'false';
+    const openmedOn =
+      req.query.openmed === 'true' ||
+      req.query.openmed === '1' ||
+      req.query.enrich === 'true';
+    if (openmedOff) {
+      url.searchParams.set('openmed', 'false');
+    } else if (openmedOn || req.query.openmed == null) {
+      // Default on when query omitted (matches ML default).
       url.searchParams.set('openmed', 'true');
     }
-    if (req.query.gate === 'true' || req.query.gate === '1') {
-      url.searchParams.set('gate', 'true');
-    }
+
+    // Medical gate is on by default; pass gate=false to disable for demos.
+    const gateOff =
+      req.query.gate === 'false' || req.query.gate === '0';
+    url.searchParams.set('gate', gateOff ? 'false' : 'true');
 
     const useGate = url.searchParams.get('gate') === 'true';
     const useOpenMed = url.searchParams.get('openmed') === 'true';

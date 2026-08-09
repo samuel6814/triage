@@ -1,0 +1,37 @@
+\chapter{CONCLUSION AND FUTURE WORK}
+\label{ch:conclusion}
+
+\section{Conclusion}
+
+This thesis addressed \textbf{Hospital Chatbot for Color-Coded Clinical Pathways} in two parts. Part~1 delivered a working Digital Acuity Engine: medical gating, optional clinical NER, fine-tuned BioBERT acuity prediction, and deterministic SATS colour mapping, with strong holdout colour-routing performance. Part~2 specified protocol-mapped pathways so each colour carries destination, time target, and actions---including Green diversion and Blue dignity---thereby attacking acuity discontinuity without pretending that a badge alone is a pathway.
+
+We explicitly \textbf{did not} implement Bayesian fusion. Softmax already yields an acuity distribution from text; pathways attach by \(f_{\mathrm{SATS}}\) and \(P(C)\). That answers RQ10 with a lean LMIC intake architecture.
+
+\section{Answers to research questions (summary)}
+
+\begin{itemize}
+  \item \textbf{RQ1--RQ2:} Yes---high holdout acuity/colour accuracy under fixed \(f_{\mathrm{SATS}}\).
+  \item \textbf{RQ3, RQ9:} Pathways defined as protocol table including Green diversion.
+  \item \textbf{RQ4:} Curatio chatbot/API demonstrates pre-desk delivery of acuity and colour (pathway card as design completion).
+  \item \textbf{RQ5--RQ6:} Gate and OpenMed behave as intended in system tests.
+  \item \textbf{RQ7--RQ8:} Red recall and calibration overconfidence require safety-aware deployment.
+  \item \textbf{RQ10:} NLP\(\to\)colour\(\to\)\(P(C)\) is a defensible intake stack without TEWS--Bayes.
+\end{itemize}
+
+\section{Contributions restated}
+
+\begin{enumerate}
+  \item Implemented and evaluated text-to-SATS-colour triage NLP.
+  \item Formalised colour-coded clinical pathway protocols for chatbot output.
+  \item Scoped mathematics honestly: softmax + deterministic maps in; Bayesian fusion out.
+\end{enumerate}
+
+\section{Future work}
+
+\begin{itemize}
+  \item Instrument pathway cards and timers in the live API/UI.
+  \item Optional nurse-desk TEWS calculator after vitals capture (not Bayesian-by-default).
+  \item Prospective evaluation with KATH clinicians; measure under-triage and time-to-provider.
+  \item Domain adaptation to Ghanaian informal English / Twi-translated complaints.
+  \item Only if justified: compare Bayesian multimodal fusion as a \emph{post-vitals} research extension---not a rewrite of Part~1.
+\end{itemize}

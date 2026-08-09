@@ -137,8 +137,8 @@ def _fetch_entities(text: str, *, enabled: bool) -> dict | None:
         return None
 
 
-def predict(text: str, *, openmed: bool = False, gate: bool = False) -> dict:
-    """Run optional medical gate, optional OpenMed enrichment, then BioBERT inference."""
+def predict(text: str, *, openmed: bool = True, gate: bool = True) -> dict:
+    """Run medical gate + OpenMed enrichment (both default on), then BioBERT inference."""
     text = (text or "").strip()
     if not text:
         raise ValueError("text must not be empty")

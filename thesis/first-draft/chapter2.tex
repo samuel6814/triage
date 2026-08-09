@@ -1,0 +1,52 @@
+\chapter{LITERATURE REVIEW}
+\label{ch:lit}
+
+\section{Introduction}
+
+This chapter situates the project in emergency triage practice (SATS), LMIC overcrowding, clinical NLP for triage, and conversational systems. Systematic-review reporting can follow PRISMA~2020 templates archived under \texttt{systematic-review-prisma/}. Detailed paper notes belong in \texttt{research-findings/}.
+
+\section{Emergency overcrowding and the Green Tag Burden}
+
+Emergency departments worldwide face overcrowding. A structural driver is the influx of non-urgent patients into acute facilities---the so-called Green Tag Burden. In LMICs, understaffing and limited diagnostics worsen the competition for beds and clinician time. Digital diversion of Green patients to OPD, Minors, or Polyclinic streams is therefore not only a convenience feature but a flow-management requirement for colour-coded pathways.
+
+Waiting time interacts with colour assignment and outcomes; literature on waiting time and triage colour codes informs why pathway timers (\(T_{\max}\)) matter after a colour is assigned.
+
+\section{SATS in LMIC and Ghanaian practice}
+
+SATS combines physiological early warning (TEWS) with clinical discriminators that can override mild vital-sign scores when high-risk symptoms are present (e.g.\ central chest pain). Implementation studies at Komfo Anokye Teaching Hospital (KATH) and in other LMIC ambulance/ED settings demonstrate that SATS is operationally relevant beyond South Africa.
+
+\textbf{Implication for this thesis:} Colour codes already exist in hospital policy. The research gap is not inventing colours, but (i)~assigning them from free-text complaints before full vitals, and (ii)~binding colours to pathway protocols so acuity does not disappear after the desk.
+
+\section{Triage Early Warning Score (TEWS) --- context only}
+
+TEWS aggregates mobility, respiratory rate, heart rate, temperature, AVPU, and trauma into a sum that maps to colour bands. It is central to bedside SATS. However, chatbot intake often lacks complete vitals. This thesis therefore does \textbf{not} implement TEWS algebra in the chatbot. TEWS remains the nurse-side gold-standard overlay after arrival.
+
+\section{Why Bayesian fusion is deferred}
+
+Multimodal Bayesian triage models appear in the literature as ways to combine uncertain evidence. Older project materials sketched \(P(C\mid E)\) fusion with TEWS and NLP. For this thesis we defer Bayesian fusion because:
+
+\begin{itemize}
+  \item BioBERT already maps text to a full acuity distribution via softmax;
+  \item duplicating a second probabilistic layer at intake expands scope without matching the deployed prototype;
+  \item deterministic \(f_{\mathrm{SATS}}\) and \(P(C)\) already produce actionable colour pathways.
+\end{itemize}
+
+Bayesian papers are retained as related work (skim) and future research, not methodology requirements.
+
+\section{Clinical NLP and BioBERT}
+
+Transformer models---BERT and domain-adapted BioBERT---enable contextual embeddings for biomedical text. Deep attention models have been applied to ED triage notes. Reviews of NLP at ED triage (e.g.\ Stewart and colleagues) summarise opportunities and risks. Classification with a fixed label set reduces open-ended generative hallucination risk compared with unconstrained large language models.
+
+Our pipeline fine-tunes BioBERT for five-class acuity prediction on chief complaints, optionally enriched with OpenMed NER tags for diseases and medications.
+
+\section{Conversational agents and digital triage tools}
+
+Symptom-assessment applications and ED prediction chatbots show that conversational NLP can support triage-like advice. Validation studies emphasise safety, under-triage monitoring, and comparison with conventional triage. Our chatbot is constrained: it outputs acuity, colour, and pathway cards aligned to SATS---not free-form diagnosis essays.
+
+\section{From colour labels to clinical pathways}
+
+Clinical pathways are step-by-step care roadmaps. Synopsis and clinical protocol materials in this project define Five-Path logic: Red resuscitation, Orange countdown, Yellow parallel standing orders, Green diversion, Blue dignity. The literature supports treating colour as operational, not decorative.
+
+\section{Summary of the gap}
+
+Prior art provides SATS colours, TEWS bedside scoring, and growing NLP triage evidence. Missing for LMIC chatbot intake is an integrated story: accurate text\(\to\)acuity\(\to\)colour \textbf{plus} explicit pathway protocols, without mandating Bayesian TEWS fusion before the nurse has vitals. Chapters~\ref{ch:method}--\ref{ch:results} address that gap.

@@ -38,8 +38,8 @@ def health():
 @app.post("/predict")
 def predict_endpoint(
     body: PredictRequest,
-    openmed: bool = Query(False, description="Run OpenMed NER and optional entity prefix"),
-    gate: bool = Query(False, description="Reject non-medical input before BioBERT"),
+    openmed: bool = Query(True, description="Run OpenMed NER and optional entity prefix"),
+    gate: bool = Query(True, description="Reject non-medical input before BioBERT"),
     enrich: bool = Query(False, description="Deprecated; use openmed=true"),
 ):
     try:

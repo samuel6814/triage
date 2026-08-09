@@ -6,7 +6,8 @@ ENV PORT=7860 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     HF_HOME=/app/.cache/huggingface \
-    TRANSFORMERS_CACHE=/app/.cache/huggingface
+    TRANSFORMERS_CACHE=/app/.cache/huggingface \
+    OPENMED_TORCH_ATTENTION_BACKEND=eager
 
 WORKDIR /app
 

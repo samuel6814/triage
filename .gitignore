@@ -28,11 +28,14 @@ build/
 *.nav
 *.snm
 *.toc
+*.lof
+*.lot
 *.fls
 *.fdb_latexmk
 *.synctex.gz
 *.bbl
 *.blg
+**/_build/
 
 # Duplicate CSVs inside the exported model folder (originals kept in "csv files/")
 fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_biobert_triage/train.csv
