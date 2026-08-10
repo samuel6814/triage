@@ -12,4 +12,8 @@ Structured pack for **Hospital Chatbot for Color-Coded Clinical Pathways**.
 | [05-thesis-outline.md](05-thesis-outline.md) | KNUST chapter map |
 | [06-roadmap.md](06-roadmap.md) | Next writing / build steps |
 
+**Part 2 implementation spec** (TEWS, discriminators, tabular Bayes, \(f_{\mathrm{fusion}}\), \(P(C)\)): [`../triage-fusion/`](../triage-fusion/) — start at [`../triage-fusion/README.md`](../triage-fusion/README.md).
+
+**Community Hospital presentation** (synthetic case study + slides): [`../community-hospital/`](../community-hospital/) — slides at [`../community-hospital/slides/main.pdf`](../community-hospital/slides/main.pdf).
+
 Reading notes and paper discoveries live in `../research-findings/`.

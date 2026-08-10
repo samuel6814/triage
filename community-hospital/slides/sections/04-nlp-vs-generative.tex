@@ -1,0 +1,38 @@
+% =============================================================================
+\section{NLP triage design}
+% =============================================================================
+
+\begin{frame}{Conversational NLP supports triage}
+  \small
+  \begin{itemize}
+    \item Chat interface collects chief complaint in the patient's own words (Ghanaian English, local context) \citep{Stewart2023, An2025}.
+    \item Optional: voice intake (Twi $\to$ English), medical gate, OpenMed entity tags \citep{Lee2020, thisstudy2026}.
+    \item Conversation clarifies symptoms, but \textbf{output is not free-form medical advice} \citep{Cheng2025, Stewart2023}.
+  \end{itemize}
+
+  \vspace{0.15cm}
+  \begin{block}{Fixed outputs}
+    \begin{enumerate}
+      \item Predicted acuity level $\hat{c} \in \{1,\ldots,5\}$ \citep{Gligorijevic2018, Lee2020}
+      \item SATS colour $C = f_{\mathrm{SATS}}(\hat{c})$ \citep{SATS2012, Rominski2014}
+      \item Pathway card $P(C)$: destination, $T_{\max}$, actions, escalation \citep{Sundstrom2014}
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Versus generative clinical chatbots}
+  \footnotesize
+  \begin{tabular}{@{}p{4.2cm}p{4.2cm}@{}}
+    \toprule
+    Generative LLM & Curatio (this project) \\
+    \midrule
+    Open-ended text reply \citep{An2025} & Fixed class + pathway card \citep{Stewart2023} \\
+    Hallucination risk \citep{Stewart2023} & Bounded output set \citep{thisstudy2026} \\
+    Hard to audit \citep{Cheng2025} & Confidence + per-level metrics \citep{thisstudy2026} \\
+    ``You might have\ldots'' & ``Orange $\to$ acute bed, 10 min'' \citep{SATS2012} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.2cm}
+  \plain{Nurse remains in the loop. Chatbot pre-triages and routes; it does not replace clinical judgment \citep{Cheng2025, Rominski2014}.}
+\end{frame}

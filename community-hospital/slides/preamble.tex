@@ -1,0 +1,31 @@
+% KNUST Beamer (Gabby.sty) + presentation extras
+\PassOptionsToPackage{round,authoryear}{natbib}
+\RequirePackage{Gabby}
+\AtBeginSection[]{}  % override Gabby: no mini-outline before each section
+\setcitestyle{aysep={,},yysep={;}}
+
+\usepackage{booktabs}
+\usepackage{array}
+
+\usetikzlibrary{arrows.meta,positioning}
+
+\graphicspath{{figures/}{./}}
+
+% No custom footline text; Gabby default page numbers only
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{triageRed}{RGB}{220,20,60}
+\definecolor{triageOrange}{RGB}{255,140,0}
+\definecolor{triageYellow}{RGB}{255,200,0}
+\definecolor{triageGreen}{RGB}{34,139,34}
+
+\newcommand{\plain}[1]{\begin{block}{Simple meaning}\footnotesize #1\end{block}}
+\newcommand{\sats}[2]{\textcolor{#1}{\textbf{#2}}}
+\newcommand{\bcol}[2][blue]{\textcolor{#1}{#2}}
+
+\tikzset{
+  flowbox/.style={rectangle, draw=green!50!black, rounded corners=3pt,
+    fill=green!6, minimum height=0.65cm, minimum width=1.4cm,
+    align=center, font=\scriptsize, inner sep=2pt},
+  flowarr/.style={-{Stealth[length=2mm]}, thick, draw=green!50!black},
+}

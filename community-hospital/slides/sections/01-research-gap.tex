@@ -1,0 +1,32 @@
+% =============================================================================
+\section{Research gaps}
+% =============================================================================
+
+\begin{frame}{ED overcrowding and waiting for care}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{image1.jpg}\\[0.08cm]
+    {\tiny Source: Longdon (2026), Citi Newsroom.\\
+    \url{https://www.citinewsroom.com/2026/01/queue-for-care-the-doctor-gap-bervelyn-longdon-writes/}}
+    \column{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{image2.jpg}\\[0.08cm]
+    {\tiny Source: Aminu (2021), Ghana Fact.\\
+    \url{https://ghanafact.com/fact-check-korle-bu-teaching-hospital-overwhelmed-with-patients/}}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Research gaps in prior work}
+  \footnotesize
+  We aim to infer acuity from free-form chief complaints to reduce ED overcrowding and waiting times \citep{Mitchell2023, Yilmaz2021}.
+
+  \vspace{0.06cm}
+  \begin{enumerate}\setlength{\itemsep}{0.12em}
+    \item \textbf{Vitals-first bias.} SATS and TEWS set acuity from bedside physiology, not from chief-complaint text when vitals are still unknown \citep{SATS2012, Rominski2014, Stewart2023}.
+    \item \textbf{Pathway discontinuity.} Triage colours are assigned at the desk, but waiting-time and destination protocols are not consistently carried forward in digital workflows \citep{Nurchis2025, Sundstrom2014}.
+    \item \textbf{Overcrowding without text pre-triage.} Priority-3/Green patients congest acute ED zones and extend waits for critical cases \citep{Yilmaz2021, Mitchell2023}.
+    \item \textbf{Generative vs constrained NLP.} Open-ended conversational triage raises hallucination and audit concerns compared with fixed acuity-class outputs \citep{Stewart2023, Cheng2025}.
+    \item \textbf{Class imbalance.} NLP triage papers often emphasize overall accuracy while under-reporting recall on rare high-acuity arrivals \citep{Stewart2023, Berkowitz2019}.
+  \end{enumerate}
+\end{frame}
