@@ -1,0 +1,7 @@
+# Evaluation harness dependencies (run from fine-tuned-biobert/)
+pandas>=2.0.0
+scikit-learn>=1.3.0
+matplotlib>=3.7.0
+seaborn>=0.13.0
+transformers>=4.46.0
+torch>=2.0.0

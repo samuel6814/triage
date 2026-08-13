@@ -1,5 +1,7 @@
 /** GSAP helpers for visualization scenes */
 
+import { VIZ_DURATION } from './vizAnimationConfig';
+
 export function highlightFormula(el, termId, effectText) {
   if (!el) return;
   el.querySelectorAll('.viz-formula-term').forEach((t) => t.classList.remove('viz-formula-term-active'));
@@ -16,7 +18,7 @@ export function formulaHighlight(tl, el, termId, effect, position) {
   tl.add(() => highlightFormula(el, termId, effect), position);
 }
 
-export function animateCounter(tl, el, selector, target, { duration = 1.2, decimals = 0, position } = {}) {
+export function animateCounter(tl, el, selector, target, { duration = VIZ_DURATION(1.2), decimals = 0, position } = {}) {
   const node = el.querySelector(selector);
   if (!node) return;
   const proxy = { val: parseFloat(node.textContent) || 0 };
@@ -30,7 +32,7 @@ export function animateCounter(tl, el, selector, target, { duration = 1.2, decim
   }, position);
 }
 
-export function drawArc(tl, el, cls, { duration = 0.8, position } = {}) {
+export function drawArc(tl, el, cls, { duration = VIZ_DURATION(0.8), position } = {}) {
   const path = el.querySelector(`.${cls}`);
   if (!path) return;
   tl.to(path, { strokeDashoffset: 0, duration, ease: 'power2.inOut' }, position);
@@ -38,7 +40,7 @@ export function drawArc(tl, el, cls, { duration = 0.8, position } = {}) {
   if (label) tl.to(label, { opacity: 1, duration: 0.35 }, `-=${duration * 0.4}`);
 }
 
-export function fillBar(tl, el, selector, pct, { duration = 0.7, position, stagger = 0.1 } = {}) {
+export function fillBar(tl, el, selector, pct, { duration = VIZ_DURATION(0.7), position, stagger = 0.14 } = {}) {
   const bars = el.querySelectorAll(selector);
   if (!bars.length) return;
   tl.to(bars, {
@@ -49,18 +51,21 @@ export function fillBar(tl, el, selector, pct, { duration = 0.7, position, stagg
   }, position);
 }
 
-export function fillWidthBar(tl, el, selector, { duration = 0.6, stagger = 0.08, position } = {}) {
+export function fillWidthBar(tl, el, selector, { duration = VIZ_DURATION(0.6), stagger = 0.12, position } = {}) {
   const fills = el.querySelectorAll(selector);
   if (!fills.length) return;
   tl.to(fills, {
-    width: (i, t) => `${t.dataset.pct ?? t.dataset.target ?? 0}%`,
+    width: (i, t) => {
+      const host = t.closest('[data-pct]');
+      return `${host?.dataset.pct ?? t.dataset.pct ?? t.dataset.target ?? 0}%`;
+    },
     duration,
     stagger,
     ease: 'power2.out',
   }, position);
 }
 
-export function typeText(tl, el, selector, text, { duration = 2, position } = {}) {
+export function typeText(tl, el, selector, text, { duration = VIZ_DURATION(2.5), position } = {}) {
   const node = el.querySelector(selector);
   if (!node) return;
   node.textContent = '';

@@ -1,5 +1,6 @@
 import { useRef, useLayoutEffect, useCallback, useImperativeHandle } from 'react';
 import { gsap } from 'gsap';
+import { VIZ_TIME_SCALE } from '../../pages/visualization/vizAnimationConfig';
 
 /**
  * GSAP timeline hook for visualization scenes.
@@ -20,6 +21,7 @@ export function useSceneTimeline(buildTimeline, deps = [], { onComplete, autoPla
       timelineRef.current?.kill();
       const tl = gsap.timeline({
         paused: true,
+        timeScale: VIZ_TIME_SCALE,
         onComplete: () => onCompleteRef.current?.(),
       });
       buildTimeline(tl, el);
@@ -46,7 +48,11 @@ export function useSceneTimeline(buildTimeline, deps = [], { onComplete, autoPla
     timelineRef.current?.restart(true);
   }, []);
 
-  const getDuration = useCallback(() => timelineRef.current?.duration() ?? 0, []);
+  const getDuration = useCallback(() => {
+    const dur = timelineRef.current?.duration() ?? 0;
+    const scale = timelineRef.current?.timeScale?.() ?? 1;
+    return scale > 0 ? dur / scale : dur;
+  }, []);
 
   return { rootRef, play, pause, restart, getDuration, timelineRef };
 }

@@ -1,0 +1,38 @@
+\chapter{CONCLUSION AND FUTURE WORK}
+\label{ch:conclusion}
+
+\section{Conclusion}
+
+This thesis addressed \textbf{Hospital Chatbot for Color-Coded Clinical Pathways} in two parts. Part~1 delivered a working Digital Acuity Engine: medical gating, optional clinical NER, fine-tuned BioBERT acuity prediction, and deterministic SATS colour mapping, with strong holdout colour-routing performance. Part~2 specified protocol-mapped pathways and implemented multi-signal fusion \(f_{\mathrm{fusion}}\) (TEWS, discriminators, tabular Bayes, max-urgency) so each fused colour carries destination, time target, and actions---including Green diversion and Blue dignity---thereby attacking acuity discontinuity.
+
+Softmax still yields the primary language distribution \(C_{\mathrm{NLP}}\); pathways on \texttt{/fuse} attach to the \textbf{fused} colour. That answers RQ10--RQ11 with a practical LMIC intake stack that can escalate when vitals or discriminators demand it, without claiming a full EMR-trained Bayesian network.
+
+\section{Answers to research questions (summary)}
+
+\begin{itemize}
+  \item \textbf{RQ1--RQ2:} Yes---high holdout acuity/colour accuracy under fixed \(f_{\mathrm{SATS}}\).
+  \item \textbf{RQ3, RQ9:} Pathways defined as protocol table including Green diversion.
+  \item \textbf{RQ4:} Curatio chatbot/API demonstrates pre-desk delivery of acuity, fusion audit, and pathway cards.
+  \item \textbf{RQ5--RQ6:} Gate and OpenMed behave as intended in system tests (NER timeout-hardened).
+  \item \textbf{RQ7--RQ8:} Red recall and calibration overconfidence require safety-aware deployment.
+  \item \textbf{RQ10:} Fusion max-urgency is at least as urgent as NLP when TEWS/discriminators/Bayes escalate.
+  \item \textbf{RQ11:} \texttt{/fuse} attaches \(P(C)\) to fused colour in API/unit tests.
+\end{itemize}
+
+\section{Contributions restated}
+
+\begin{enumerate}
+  \item Implemented and evaluated text-to-SATS-colour triage NLP.
+  \item Formalised colour-coded clinical pathway protocols for chatbot output.
+  \item Implemented TEWS + discriminators + tabular Bayes + max-urgency fusion (\texttt{/fuse}).
+\end{enumerate}
+
+\section{Future work}
+
+\begin{itemize}
+  \item Instrument pathway timers and HIS escalation in live hospital middleware.
+  \item Calibrate tabular Bayes priors on local EMR / prospective KATH data.
+  \item Prospective evaluation with clinicians; measure under-triage and time-to-provider.
+  \item Domain adaptation to Ghanaian informal English / Twi-translated complaints.
+  \item Optional: full BN structure learning or a learned discriminator head---only if justified against the tabular baseline.
+\end{itemize}

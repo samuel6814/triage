@@ -1,0 +1,66 @@
+\chapter{RESULTS AND DISCUSSION}
+\label{ch:results}
+
+\section{Holdout classification performance}
+
+Evaluation used a stratified \(10\%\) holdout of \(n=8{,}000\) complaints. Summary metrics:
+
+\begin{table}[h]
+\centering
+\caption{Baseline vs SMOTE BioBERT on stratified holdout.}
+\label{tab:metrics}
+\begin{tabular}{lrr}
+\hline
+Metric & Baseline & SMOTE \\
+\hline
+Accuracy & 0.9992 & 0.9985 \\
+Macro-F1 & 0.9977 & 0.9954 \\
+Recall L1 (Red) & 0.9814 & 1.0000 \\
+Mean confidence & 0.9997 & 0.9992 \\
+\% confidence \(=1.0\) & 79.05\% & 82.99\% \\
+Latency p50 (ms/sample) & 100.3 & 95.5 \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{RQ1:} Baseline BioBERT maps complaints to acuity with very high holdout accuracy. \textbf{RQ2:} With fixed \(f_{\mathrm{SATS}}\), colour-routing accuracy matches acuity accuracy (\(7{,}994/8{,}000=0.9992\)).
+
+Default inference uses the baseline checkpoint (slightly higher overall accuracy/macro-F1). SMOTE maximises Red recall on this holdout at a small cost to overall metrics---a clinical trade-off for RQ7.
+
+\section{Errors and Red safety}
+
+All six baseline errors on the reported holdout involved true Level~1 (Red) cases routed to a less urgent colour (\(TP=316\), \(FN=6\), \(FP=0\) for L1). This underscores why Red recall and nurse oversight matter even when overall accuracy is high.
+
+\section{Calibration and confidence}
+
+Mean confidence is extremely high; about \(79\%\) of baseline predictions have confidence exactly \(1.0\). Calibration plots show overconfidence. \textbf{RQ8:} pathway assignment should remain advisory to clinicians; low-confidence or safety-critical presentations warrant bedside TEWS and human confirmation. Overconfidence is \textbf{not} solved by adding Bayesian fusion in this thesis; it motivates process controls.
+
+\section{Medical gate and OpenMed (qualitative / system tests)}
+
+Non-clinical prompts (e.g.\ sports, streaming) are rejected with explanatory messages when the gate is enabled (RQ5). OpenMed enrichment surfaces disease and drug spans (e.g.\ chest pain, dyspnoea, metformin) alongside acuity, improving interpretability without replacing BioBERT (RQ6).
+
+\section{Pathway and fusion scenarios (Part~2)}
+
+\texttt{POST /fuse} returns layer votes and a pathway on fused colour. Representative cases (unit-tested; NLP colour mocked where noted):
+
+\begin{itemize}
+  \item \textbf{Chest pain + partial vitals:} \(C_{\mathrm{NLP}}\) Orange, \(C_{\mathrm{TEWS}}\) Yellow (\(T=4\)), \(C_{\mathrm{disc}}\) Orange, \(C_{\mathrm{Bayes}}\) Orange \(\approx 0.89\) \(\to\) fused \textbf{Orange}, \(T_{\max}=10\)~min.
+  \item \textbf{Mild language + critical vitals:} fusion follows TEWS urgency (Red/Orange) over mild NLP wording (RQ10).
+  \item \textbf{Green diversion:} mild rash + normal full vitals \(\to\) Green \(\to\) OPD/Polyclinic (RQ9).
+\end{itemize}
+
+Full table: \texttt{triage-fusion/fusion-scenario-results.md}. Text-only \texttt{/predict} remains NLP-only (Scenario~8).
+
+\section{Limitations}
+
+\begin{itemize}
+  \item Holdout is in-distribution relative to training complaints; live KATH language may differ.
+  \item Softmax overconfidence limits trustworthy autonomous routing.
+  \item Pathway timers and HIS escalation are designed, not fully instrumented as hospital middleware.
+  \item Tabular Bayes priors are clinician-elicited / literature-plausible, not EMR-calibrated.
+  \item No prospective clinical trial is claimed in this draft.
+\end{itemize}
+
+\section{Discussion relative to hybrid TEWS--Bayes designs}
+
+Hybrid designs that fuse TEWS, Bayes, and NLP are now implemented in Curatio as a \textbf{max-urgency} controller with a \emph{tabular} Bayes fallback. This is deliberately simpler than a full BN: optional vitals at intake escalate safely when present, while text-only patients still receive \(C_{\mathrm{NLP}}\) pathways. Richer BN calibration remains future work if prospectively justified.

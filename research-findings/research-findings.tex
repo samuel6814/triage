@@ -1,0 +1,88 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+
+\title{Research Findings\\[0.4em]\large Hospital Chatbot for Color-Coded Clinical Pathways}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{How to use this pack}
+Working notes for literature and discoveries. Not the thesis itself---feed \texttt{thesis/first-draft/} Chapter~2 from here.
+Existing narrative (read with Bayes-as-required framing disabled): \texttt{papers/archive/info.txt}.
+
+\section{Prioritized reading list}
+
+\subsection*{Tier 1 --- pathways + local SATS}
+\begin{enumerate}
+  \item \texttt{papers/SATS-Manual-A5-LR-spreads.pdf \_ My Library \_ Zotero.pdf} --- official SATS colour / discriminators / TEWS context
+  \item \texttt{papers/The implementation of the south african triage system in kath.pdf} --- KATH / Ghana
+  \item \texttt{papers/Implementation of the South African Triage Scale (SATS) in a New Ambulance System in Beira, Mozambique: \ldots.pdf} --- LMIC SATS
+  \item \texttt{papers/Assessing the Impact of Waiting Time on Triage Color.pdf} (also \texttt{HSR2-8-e71520.pdf}) --- colour $\leftrightarrow$ waiting
+  \item \texttt{papers/Academic Emergency Medicine - 2023 - Mitchell - Systematic review \ldots.pdf} --- triage impact SR / PRISMA practice
+\end{enumerate}
+
+\subsection*{Tier 2 --- NLP $\to$ triage / chatbot}
+\begin{enumerate}
+  \setcounter{enumi}{5}
+  \item \texttt{biobert/papers/Lee2020-BioBERT-arxiv.pdf} --- BioBERT primary paper
+  \item \texttt{biobert/papers/Devlin2018-BERT-arxiv.pdf} --- BERT parent architecture
+  \item \texttt{biobert/papers/Gligorijevic2018-Deep-Attention-Triage-arxiv.pdf} (+ \texttt{papers/deep attention model for triage.pdf})
+  \item \texttt{papers/journal.pone.0279953.pdf} --- Stewart et al., NLP at ED triage
+  \item \texttt{papers/performance\_of\_emergency\_triage\_prediction\_of\_an.4.pdf} --- NLP/chatbot performance
+  \item \texttt{papers/archive/info.txt} --- project NLP narrative (drop Bayes-as-required)
+\end{enumerate}
+
+\subsection*{Tier 3 --- supporting}
+\begin{enumerate}
+  \setcounter{enumi}{11}
+  \item \texttt{papers/under\_triage\_\_a\_new\_trigger\_to\_drive\_quality.9.pdf} --- under-triage safety
+  \item \texttt{papers/validation of a triage tool.pdf} --- validation methods
+  \item \texttt{papers/comparison between smart triage model and a normal triage model.pdf}
+  \item \texttt{papers/conversational agents for older adults.pdf}
+  \item \texttt{biobert/papers/Vaswani2017-Attention-is-All-You-Need-arxiv.pdf} --- Transformer maths
+  \item \texttt{papers/multimodal bayesian network for traige.pdf} --- \textbf{skim only} (why we do not implement Bayes in Part~2)
+  \item \texttt{papers/colloborative medical triage under uncertainties.pdf} --- uncertainty / oversight
+\end{enumerate}
+
+PRISMA blank templates: \texttt{systematic-review-prisma/}.
+
+\section{Note stubs (fill while reading)}
+
+\subsection*{SATS / pathways notes}
+Status: stub. Record key claims, relevance to pathway table $P(C)$, and bib entries.
+
+\subsection*{NLP / triage notes}
+Status: stub. BioBERT, BERT, attention triage, Stewart review takeaways for our pipeline.
+
+\subsection*{Green Tag / flow / waiting-time notes}
+Status: stub. Overcrowding, diversion, waiting-time--colour evidence for Green pathway.
+
+\subsection*{Miscellaneous findings}
+Catch-all table for discoveries that do not fit above.
+
+\begin{tabular}{@{}llp{6cm}@{}}
+\toprule
+Date & Finding & Source / action \\
+\midrule
+ &  &  \\
+\bottomrule
+\end{tabular}
+
+\section*{Related folders}
+\begin{itemize}
+  \item \texttt{project-framing/} --- RQs, pathways, maths scope
+  \item \texttt{thesis/first-draft/} --- KNUST thesis draft
+  \item \texttt{papers/}, \texttt{biobert/papers/} --- PDFs listed above
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,1001 @@
+patient_id,sex,age,chief_complaint,acuity_level,sats_colour,pathway_destination,t_max_minutes,visit_type,location_mention,ambiguity_flag,predicted_acuity,predicted_colour,pathway_correct
+CH-0208,Female,45,"Suspected appendicitis, pain move to right side, vomit twice, came from Ejisu.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0668,Male,6,"Request malaria test, fever mild, feel tired, from Suame, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0525,Female,23,"Mild burn from hot water, small blister, clean, mother from Asokwa want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0018,Female,28,"Snake bite at farm near Ejisu, my mother dizzy, swelling fast, vomiting, weak pulse family say.",1,Red,Resuscitation bay,0,emergency,Ejisu,false,1,Red,true
+CH-0296,Female,69,"Diarrhoea and dehydration, Kejetia child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0437,Female,13,"Fever and body pain from Kejetia, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,true,3,Yellow,true
+CH-0298,Male,32,"Asthma attack at Ejisu, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0469,Male,65,"Deep cut at Tafo workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0271,Male,55,"High fever and rigors three days from Tafo, my wife weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0766,Male,32,"Follow-up BP check, nurse say come back, no new symptoms, live near Ejisu.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0574,Female,45,"Wound check, cut healing, small pain, farmer from Kejetia want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0424,Male,18,"Diarrhoea and dehydration, Ejisu child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0592,Female,60,"Back pain one week, no trauma, can walk, want pain advice at Bantama clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0015,Female,38,"Burn from kerosene fire at Kejetia, my mother scream, skin peel off arm, shock and confusion.",1,Red,Resuscitation bay,0,emergency,Kejetia,false,1,Red,true
+CH-0551,Female,58,"Red eye since yesterday, scratchy, see fine, bought drops at Suame pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0154,Female,58,"Meningococcal purpura, dark spots on skin since leaving Community Hospital, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,2,Orange,true
+CH-0622,Male,55,"Sore throat two days, swallow pain, fever on and off, walk from Suame to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0352,Female,48,"Severe abdominal pain since yesterday, KATH polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0594,Female,44,"Red eye since yesterday, scratchy, see fine, bought drops at Sunyani pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0942,Male,34,"Follow-up BP check, nurse say come back, no new symptoms, live near Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0264,Female,11,"High fever and rigors three days from Sunyani, my father weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0940,Male,28,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0034,Female,25,"my husband choke on food at chop bar near Sunyani, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Sunyani,false,1,Red,true
+CH-0726,Male,29,"Mild rash on arm after farm near Sunyani, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0428,Male,65,"Diarrhoea and dehydration, Sunyani child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0624,Male,51,"Back pain one week, no trauma, can walk, want pain advice at Manhyia clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0232,Female,71,"Severe abdominal pain since yesterday, Bantama polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,2,Orange,false
+CH-0128,Female,62,"Sudden chest and back pain at Asokwa, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0321,Male,69,"Sickle cell crisis from Sunyani, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0286,Female,68,"Asthma attack at Kejetia, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0676,Female,41,"Red eye since yesterday, scratchy, see fine, bought drops at Ejisu pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0801,Male,54,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0515,Female,29,"Cough one week, no breathlessness, sleeping fine, came from Bantama for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0091,Female,25,"Worst headache of life at Manhyia market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0215,Female,17,"Deep cut at Suame workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0404,Male,62,"Moderate head injury at Tafo, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0335,Male,67,"Urinary retention painful, Tafo man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0090,Female,63,"Stroke symptoms at Suame, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0851,Female,54,"Family planning visit, no emergency, contraception advice after injection last year, from Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0025,Female,4,"Snake bite at farm near KATH, my wife dizzy, swelling fast, vomiting, weak pulse family say.",1,Red,Resuscitation bay,0,emergency,KATH,false,1,Red,true
+CH-0218,Female,67,"Severe abdominal pain since yesterday, Bantama polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0238,Male,20,"Stomach pain since yesterday, moderate, came from Community Hospital polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,true,3,Yellow,true
+CH-0327,Female,21,"High fever and rigors three days from Tafo, the patient weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0006,Female,29,"my husband choke on food at chop bar near Tafo, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Tafo,false,1,Red,true
+CH-0003,Male,39,"Gunshot wound at Community Hospital, bleeding won't stop, I pale and confused, need resuscitation.",1,Red,Resuscitation bay,0,emergency,Community Hospital,false,1,Red,true
+CH-0962,Male,36,"Stitches removal only, doctor at Asokwa sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,4,Green,true
+CH-0038,Male,45,"Chest pain and collapse at church in Sunyani, the patient sweat cold, pulse weak, cannot stand.",1,Red,Resuscitation bay,0,emergency,Sunyani,false,1,Red,true
+CH-0626,Female,29,"Request malaria test, fever mild, feel tired, from Sunyani, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0618,Female,23,"Red eye since yesterday, scratchy, see fine, bought drops at Kejetia pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0394,Female,68,"Moderate head injury at KATH, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0430,Female,42,"Sickle cell crisis from Community Hospital, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,2,Orange,false
+CH-1000,Male,28,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0115,Female,45,"Tension pneumothorax, rush from Suame, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0262,Male,48,"Suspected appendicitis, pain move to right side, vomit twice, came from Bantama.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0145,Female,26,"Meningococcal purpura, dark spots on skin since leaving Kejetia, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0819,Female,56,"Suture removal request, small cut, pain small, travel from KATH before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0651,Female,54,"Cough one week, no breathlessness, sleeping fine, came from Kejetia for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0161,Male,38,"Sudden chest and back pain at Bantama, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0921,Female,27,"Administrative visit, transfer notes from Bantama clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0252,Female,75,"Sickle cell crisis from Community Hospital, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0216,Female,32,"Severe abdominal pain since yesterday, Suame polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0802,Male,48,"Suture removal request, small cut, pain small, travel from Community Hospital before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0731,Female,48,"Red eye since yesterday, scratchy, see fine, bought drops at Manhyia pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0972,Female,49,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Kejetia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,true,5,Green,true
+CH-0328,Female,26,"Urinary retention painful, Suame man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0839,Male,68,"Follow-up BP check, nurse say come back, no new symptoms, live near Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0650,Male,63,"Mild rash on arm after farm near Ejisu, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0089,Female,30,"Pregnant woman from Community Hospital, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,3,Yellow,false
+CH-0360,Female,20,"Moderate head injury at Community Hospital, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0876,Female,30,"Stitches removal only, doctor at Ejisu sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,4,Green,true
+CH-0486,Female,5,"High fever and rigors three days from KATH, my father weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0418,Female,45,"Stomach pain since yesterday, moderate, came from Kejetia polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,true,3,Yellow,true
+CH-0590,Male,12,"Request malaria test, fever mild, feel tired, from Community Hospital, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0380,Female,6,"Severe abdominal pain since yesterday, Asokwa polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0994,Female,59,"Administrative visit, transfer notes from Community Hospital clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0072,Female,75,"Pregnant woman from Community Hospital, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,2,Orange,true
+CH-0607,Male,43,"Mild burn from hot water, small blister, clean, mother from Sunyani want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0463,Female,34,"Deep cut at Manhyia workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0543,Male,77,"Sore throat two days, swallow pain, fever on and off, walk from KATH to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0874,Male,66,"Immunization for baby, routine visit, child well, mother from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0625,Female,35,"Cough one week, no breathlessness, sleeping fine, came from Tafo for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0505,Female,50,"Sore throat two days, swallow pain, fever on and off, walk from Bantama to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0749,Male,49,"Cough and mild fever one week, tired from Manhyia, wonder if need ED or can wait OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,true,4,Green,true
+CH-0413,Female,21,"Severe abdominal pain since yesterday, Community Hospital polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0959,Female,25,"Health certificate for work, need medical form, no illness, from Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0660,Male,39,"Mild rash on arm after farm near Suame, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0507,Male,15,"Red eye since yesterday, scratchy, see fine, bought drops at Asokwa pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0810,Male,67,"Follow-up BP check, nurse say come back, no new symptoms, live near Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0444,Male,9,"Suspected appendicitis, pain move to right side, vomit twice, came from Tafo.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0415,Male,10,"Severe abdominal pain since yesterday, Asokwa polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0566,Male,30,"Mild rash on arm after farm near Community Hospital, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0243,Female,16,"Diarrhoea and dehydration, Asokwa child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0174,Female,56,"Crushing central chest pain since Sunyani, the patient sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0593,Male,19,"Wound check, cut healing, small pain, farmer from Asokwa want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0529,Male,76,"Mild burn from hot water, small blister, clean, mother from Tafo want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0315,Male,40,"Urinary retention painful, Ejisu man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0213,Female,5,"Painful rash with shingles on side, nausea and fever, walk from KATH for review.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0059,Female,20,"Severe shortness of breath at Bantama, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0002,Male,64,"my husband collapse at Kejetia market, not breathing proper, lips blue, family carry am here quick.",1,Red,Resuscitation bay,0,emergency,Kejetia,true,2,Orange,false
+CH-0640,Female,63,"Sprained ankle at Bantama football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0602,Male,5,"Ankle pain after football at Sunyani, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,true,5,Green,true
+CH-0414,Male,35,"High fever and rigors three days from KATH, my mother weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0894,Female,41,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Kejetia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0477,Female,41,"Asthma attack at Sunyani, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0549,Female,18,"Red eye since yesterday, scratchy, see fine, bought drops at Tafo pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0917,Male,69,"Administrative visit, transfer notes from Ejisu clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0781,Male,65,"Stitches removal only, doctor at Manhyia sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,true,5,Green,true
+CH-0762,Female,28,"Stitches removal only, doctor at Kejetia sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0889,Male,19,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Kejetia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0234,Female,68,"Deep cut at Community Hospital workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0301,Female,23,"Asthma attack at Ejisu, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0794,Female,60,"Immunization for baby, routine visit, child well, mother from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0905,Male,51,"Medication refill, hypertension tablets finish, stable, walk from Suame for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0040,Male,22,"They rush my child from Asokwa after road accident, blood plenty, my child almost unconscious now.",1,Red,Resuscitation bay,0,emergency,Asokwa,false,1,Red,true
+CH-0760,Male,19,"Family planning visit, no emergency, contraception advice after injection last year, from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0151,Male,23,"Sudden chest and back pain at Community Hospital, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,3,Yellow,false
+CH-0601,Male,64,"Sore throat two days, swallow pain, fever on and off, walk from Kejetia to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0136,Female,66,"Anaphylaxis after groundnut at Sunyani, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0372,Female,63,"Deep cut at Tafo workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0019,Female,64,"Drowning rescue from Asokwa, my child pulled from water, not responsive, breathing shallow.",1,Red,Resuscitation bay,0,emergency,Asokwa,false,1,Red,true
+CH-0384,Female,21,"Painful rash with shingles on side, nausea and fever, walk from Tafo for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0789,Male,25,"Medication refill, hypertension tablets finish, stable, walk from Kejetia for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0672,Female,54,"Wound check, cut healing, small pain, farmer from Bantama want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0111,Male,53,"Severe shortness of breath at Asokwa, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0085,Female,19,"Meningococcal purpura, dark spots on skin since leaving KATH, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0112,Female,20,"Open fracture from fall at KATH, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0576,Male,58,"Back pain one week, no trauma, can walk, want pain advice at Suame clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0989,Female,40,"Family planning visit, no emergency, contraception advice after injection last year, from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0411,Male,48,"Urinary retention painful, Manhyia man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0349,Male,37,"Painful rash with shingles on side, nausea and fever, walk from Suame for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0206,Male,16,"High fever and rigors three days from Manhyia, my brother weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0265,Male,21,"Painful rash with shingles on side, nausea and fever, walk from Manhyia for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0704,Male,74,"Mild rash on arm after farm near Asokwa, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0371,Male,11,"Asthma attack at Suame, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0943,Male,65,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0973,Female,43,"Medication refill, hypertension tablets finish, stable, walk from Suame for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,true,5,Green,true
+CH-0509,Male,45,"Mild burn from hot water, small blister, clean, mother from Kejetia want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0915,Male,31,"Suture removal request, small cut, pain small, travel from Community Hospital before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0152,Male,35,"Worst headache of life at KATH market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0967,Female,27,"Stitches removal only, doctor at Bantama sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0368,Female,30,"Sickle cell crisis from Asokwa, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0743,Male,55,"Ear pain three days, child from Ejisu, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0236,Female,58,"Severe abdominal pain since yesterday, Suame polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0210,Female,25,"Painful rash with shingles on side, nausea and fever, walk from Suame for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0666,Male,67,"Request malaria test, fever mild, feel tired, from Manhyia, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0639,Male,72,"Ear pain three days, child from Sunyani, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0741,Female,39,"Ear pain three days, child from Manhyia, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0758,Female,42,"Family planning visit, no emergency, contraception advice after injection last year, from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0673,Female,45,"Red eye since yesterday, scratchy, see fine, bought drops at Ejisu pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0864,Female,46,"Immunization for baby, routine visit, child well, mother from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0965,Male,50,"Follow-up BP check, nurse say come back, no new symptoms, live near Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0275,Female,25,"Severe abdominal pain since yesterday, KATH polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0814,Male,30,"Stitches removal only, doctor at Asokwa sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0934,Female,67,"Follow-up BP check, nurse say come back, no new symptoms, live near Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0460,Male,58,"Moderate head injury at Suame, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0759,Male,65,"Immunization for baby, routine visit, child well, mother from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0855,Female,51,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Suame sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0350,Female,66,"Deep cut at Bantama workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0490,Female,14,"Diarrhoea and dehydration, Asokwa child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0029,Female,49,"my mother choke on food at chop bar near Kejetia, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Kejetia,false,1,Red,true
+CH-0342,Male,7,"Asthma attack at Community Hospital, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0024,Female,24,"Snake bite at farm near Asokwa, my wife dizzy, swelling fast, vomiting, weak pulse family say.",1,Red,Resuscitation bay,0,emergency,Asokwa,false,1,Red,true
+CH-0201,Male,53,"Urinary retention painful, Bantama man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0225,Male,6,"High fever and rigors three days from Tafo, my mother weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0712,Female,5,"Wound check, cut healing, small pain, farmer from Community Hospital want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0600,Male,53,"Wound check, cut healing, small pain, farmer from Asokwa want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0538,Male,70,"Red eye since yesterday, scratchy, see fine, bought drops at KATH pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0904,Female,40,"Immunization for baby, routine visit, child well, mother from Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0888,Male,53,"Follow-up BP check, nurse say come back, no new symptoms, live near Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0466,Female,14,"Urinary retention painful, Tafo man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0911,Male,26,"Administrative visit, transfer notes from Community Hospital clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0747,Male,41,"Sore throat two days, swallow pain, fever on and off, walk from Suame to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0804,Female,66,"Family planning visit, no emergency, contraception advice after injection last year, from Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0266,Male,4,"Urinary retention painful, Asokwa man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0685,Male,65,"Wound check, cut healing, small pain, farmer from Sunyani want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0241,Male,74,"Deep cut at Asokwa workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,2,Orange,false
+CH-0274,Male,54,"Stomach pain since yesterday, moderate, came from Tafo polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,true,3,Yellow,true
+CH-0049,Female,46,"Baby from KATH, not feeding, floppy, fever very high, mother run to emergency now.",1,Red,Resuscitation bay,0,emergency,KATH,false,1,Red,true
+CH-0821,Female,51,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0619,Female,32,"Ear pain three days, child from Sunyani, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0856,Male,36,"Follow-up BP check, nurse say come back, no new symptoms, live near Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0240,Female,68,"Sickle cell crisis from Asokwa, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0143,Male,31,"Stroke symptoms at Manhyia, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0773,Male,61,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Manhyia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0337,Male,73,"Painful rash with shingles on side, nausea and fever, walk from Tafo for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0348,Male,27,"Stomach pain since yesterday, moderate, came from KATH polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,true,3,Yellow,true
+CH-0932,Female,60,"Administrative visit, transfer notes from Manhyia clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0623,Female,45,"Sore throat two days, swallow pain, fever on and off, walk from KATH to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0209,Male,73,"Diarrhoea and dehydration, KATH child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0700,Female,51,"Red eye since yesterday, scratchy, see fine, bought drops at Suame pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0699,Female,15,"Ankle pain after football at Ejisu, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,true,4,Green,true
+CH-0363,Male,48,"Moderate head injury at Manhyia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0134,Female,39,"Open fracture from fall at Manhyia, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0324,Female,12,"Fever and body pain from Asokwa, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,true,3,Yellow,true
+CH-0322,Female,58,"High fever and rigors three days from Community Hospital, my child weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0435,Female,51,"Suspected appendicitis, pain move to right side, vomit twice, came from KATH.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0474,Female,63,"Severe abdominal pain since yesterday, Suame polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0709,Male,59,"Back pain one week, no trauma, can walk, want pain advice at Ejisu clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0153,Male,70,"Pregnant woman from Suame, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0147,Female,20,"Stroke symptoms at Bantama, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0937,Female,66,"Medication refill, hypertension tablets finish, stable, walk from Bantama for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0667,Female,8,"Sore throat two days, swallow pain, fever on and off, walk from Kejetia to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0457,Male,77,"Diarrhoea and dehydration, Community Hospital child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0742,Female,28,"Red eye since yesterday, scratchy, see fine, bought drops at KATH pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0913,Male,21,"Medication refill, hypertension tablets finish, stable, walk from Manhyia for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,true,5,Green,true
+CH-0436,Male,35,"Fever and body pain from KATH, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,true,3,Yellow,true
+CH-0189,Female,23,"Bad headache two days at Kejetia, worse today, vomiting once but still talking fine.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,true,3,Yellow,false
+CH-0613,Male,37,"Wound check, cut healing, small pain, farmer from Bantama want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0920,Male,19,"Follow-up BP check, nurse say come back, no new symptoms, live near KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0314,Female,16,"Diarrhoea and dehydration, Ejisu child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0688,Male,52,"Red eye since yesterday, scratchy, see fine, bought drops at Bantama pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0644,Male,7,"Mild burn from hot water, small blister, clean, mother from Suame want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0064,Female,30,"Meningococcal purpura, dark spots on skin since leaving KATH, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0118,Female,32,"Worst headache of life at Kejetia market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0084,Male,50,"Pregnant woman from Bantama, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0253,Male,38,"High fever and rigors three days from Ejisu, my father weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0362,Male,42,"Asthma attack at Ejisu, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0659,Male,7,"Ear pain three days, child from Community Hospital, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0113,Female,76,"Crushing central chest pain since Bantama, my sister sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0964,Female,31,"Administrative visit, transfer notes from Manhyia clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0571,Female,66,"Red eye since yesterday, scratchy, see fine, bought drops at Community Hospital pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0053,Male,78,"Open fracture from fall at Kejetia, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0957,Female,55,"Suture removal request, small cut, pain small, travel from Sunyani before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0052,Male,12,"Tension pneumothorax, rush from Asokwa, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0751,Female,52,"Health certificate for work, need medical form, no illness, from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0837,Male,66,"Health certificate for work, need medical form, no illness, from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0963,Male,54,"Medication refill, hypertension tablets finish, stable, walk from Suame for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0975,Female,56,"Stitches removal only, doctor at Tafo sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0284,Female,63,"Sickle cell crisis from KATH, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0004,Male,63,"our neighbour choke on food at chop bar near Suame, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Suame,false,1,Red,true
+CH-0304,Male,72,"Deep cut at Manhyia workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0390,Female,68,"High fever and rigors three days from Kejetia, I weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0861,Female,20,"Stitches removal only, doctor at Bantama sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0533,Female,57,"Sore throat two days, swallow pain, fever on and off, walk from Bantama to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0050,Male,34,"Snake bite at farm near Sunyani, I dizzy, swelling fast, vomiting, weak pulse family say.",1,Red,Resuscitation bay,0,emergency,Sunyani,false,1,Red,true
+CH-0615,Male,51,"Red eye since yesterday, scratchy, see fine, bought drops at Manhyia pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0561,Female,73,"Mild rash on arm after farm near Suame, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0122,Male,24,"Meningococcal purpura, dark spots on skin since leaving Bantama, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0944,Female,64,"Administrative visit, transfer notes from Kejetia clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0609,Male,43,"Red eye since yesterday, scratchy, see fine, bought drops at Bantama pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0854,Female,34,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Manhyia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0048,Male,58,"my father collapse at Asokwa market, not breathing proper, lips blue, family carry am here quick.",1,Red,Resuscitation bay,0,emergency,Asokwa,false,1,Red,true
+CH-0354,Male,19,"Fever and body pain from Ejisu, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,true,2,Orange,false
+CH-0167,Male,38,"Open fracture from fall at Kejetia, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0945,Female,47,"Family planning visit, no emergency, contraception advice after injection last year, from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0893,Male,48,"Advice on skin cream, mild dryness, no rash spread, pharmacy at KATH sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0891,Female,53,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Suame sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0439,Female,70,"Stomach pain since yesterday, moderate, came from Bantama polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,true,4,Green,false
+CH-0722,Male,28,"Cough one week, no breathlessness, sleeping fine, came from Sunyani for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0848,Female,53,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Asokwa sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0748,Female,75,"Red eye since yesterday, scratchy, see fine, bought drops at Tafo pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0200,Male,26,"Chest discomfort and tired since Community Hospital, not sure if emergency, breath a bit short when walking.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,true,2,Orange,true
+CH-0434,Male,32,"Fever and body pain from Suame, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,true,3,Yellow,true
+CH-0701,Female,60,"Cough one week, no breathlessness, sleeping fine, came from Manhyia for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0736,Female,43,"Sprained ankle at Asokwa football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0643,Female,69,"Mild rash on arm after farm near Manhyia, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0503,Male,41,"Back pain one week, no trauma, can walk, want pain advice at Bantama clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0491,Male,32,"Painful rash with shingles on side, nausea and fever, walk from Bantama for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0729,Male,34,"Ear pain three days, child from Suame, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0867,Male,36,"Health certificate for work, need medical form, no illness, from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0658,Female,48,"Ankle pain after football at Asokwa, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,true,4,Green,true
+CH-0513,Male,59,"Sprained ankle at Asokwa football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0560,Male,77,"Cough and mild fever one week, tired from Manhyia, wonder if need ED or can wait OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,true,4,Green,true
+CH-0055,Female,37,"Tension pneumothorax, rush from Tafo, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0546,Female,54,"Wound check, cut healing, small pain, farmer from Bantama want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0309,Male,40,"Severe abdominal pain since yesterday, Ejisu polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0141,Female,43,"Meningococcal purpura, dark spots on skin since leaving Sunyani, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0890,Female,68,"Administrative visit, transfer notes from Sunyani clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0841,Male,42,"Family planning visit, no emergency, contraception advice after injection last year, from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0211,Female,18,"Urinary retention painful, Bantama man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0440,Female,15,"Moderate head injury at Suame, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0508,Female,17,"Cough and mild fever one week, tired from Bantama, wonder if need ED or can wait OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,true,4,Green,true
+CH-0313,Female,14,"Diarrhoea and dehydration, Sunyani child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0690,Male,59,"Red eye since yesterday, scratchy, see fine, bought drops at Community Hospital pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0674,Female,44,"Red eye since yesterday, scratchy, see fine, bought drops at KATH pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0768,Female,64,"Family planning visit, no emergency, contraception advice after injection last year, from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0061,Female,71,"Crushing central chest pain since KATH, my father sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0355,Female,7,"Stomach pain since yesterday, moderate, came from KATH polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,true,3,Yellow,true
+CH-0359,Female,13,"Urinary retention painful, Suame man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0906,Male,22,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Manhyia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0716,Female,8,"Red eye since yesterday, scratchy, see fine, bought drops at Manhyia pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0425,Female,27,"High fever and rigors three days from Tafo, my father weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0447,Female,61,"Suspected appendicitis, pain move to right side, vomit twice, came from Asokwa.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0678,Female,32,"Wound check, cut healing, small pain, farmer from Bantama want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,3,Yellow,false
+CH-0927,Male,46,"Medication refill, hypertension tablets finish, stable, walk from Manhyia for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0582,Male,50,"Sprained ankle at Bantama football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0824,Female,63,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Tafo sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0608,Male,15,"Mild burn from hot water, small blister, clean, mother from Bantama want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0458,Female,34,"Painful rash with shingles on side, nausea and fever, walk from Ejisu for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0341,Male,13,"Suspected appendicitis, pain move to right side, vomit twice, came from Tafo.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0106,Female,57,"Crushing central chest pain since Sunyani, my sister sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0483,Male,33,"Severe abdominal pain since yesterday, Ejisu polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0278,Male,13,"Asthma attack at Suame, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0230,Male,49,"Deep cut at Community Hospital workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0169,Female,66,"Worst headache of life at Suame market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0616,Male,33,"Request malaria test, fever mild, feel tired, from Kejetia, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0219,Male,53,"Urinary retention painful, Tafo man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0527,Female,73,"Mild rash on arm after farm near Tafo, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0912,Male,59,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Kejetia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0516,Female,4,"Mild burn from hot water, small blister, clean, mother from Tafo want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0627,Male,56,"Mild rash on arm after farm near Sunyani, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0117,Male,64,"Crushing central chest pain since KATH, I sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0923,Male,23,"Suture removal request, small cut, pain small, travel from Ejisu before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0196,Female,16,"Worst headache of life at Suame market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0884,Female,33,"Follow-up BP check, nurse say come back, no new symptoms, live near Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0686,Female,13,"Mild rash on arm after farm near Manhyia, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0326,Female,12,"Diarrhoea and dehydration, Sunyani child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0968,Female,58,"Family planning visit, no emergency, contraception advice after injection last year, from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,true,5,Green,true
+CH-0078,Female,39,"Worst headache of life at Manhyia market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0757,Female,59,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0144,Female,16,"Tension pneumothorax, rush from Manhyia, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0285,Female,77,"Deep cut at Tafo workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0752,Male,26,"Follow-up BP check, nurse say come back, no new symptoms, live near Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0393,Female,24,"Suspected appendicitis, pain move to right side, vomit twice, came from Community Hospital.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0132,Female,47,"Crushing central chest pain since Suame, my child sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0032,Female,64,"my mother choke on food at chop bar near KATH, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,KATH,false,1,Red,true
+CH-0541,Male,29,"Cough one week, no breathlessness, sleeping fine, came from Community Hospital for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0580,Male,60,"Cough one week, no breathlessness, sleeping fine, came from Kejetia for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0121,Male,63,"Meningococcal purpura, dark spots on skin since leaving Tafo, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0826,Female,62,"Medication refill, hypertension tablets finish, stable, walk from Ejisu for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0949,Female,68,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0181,Female,57,"Stroke symptoms at Suame, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0528,Male,17,"Back pain one week, no trauma, can walk, want pain advice at Tafo clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0416,Female,16,"Asthma attack at Kejetia, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0522,Male,73,"Red eye since yesterday, scratchy, see fine, bought drops at KATH pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0779,Female,33,"Family planning visit, no emergency, contraception advice after injection last year, from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0251,Female,18,"Painful rash with shingles on side, nausea and fever, walk from Community Hospital for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0589,Female,42,"Red eye since yesterday, scratchy, see fine, bought drops at Asokwa pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0778,Male,54,"Suture removal request, small cut, pain small, travel from Sunyani before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0970,Female,50,"Medication refill, hypertension tablets finish, stable, walk from KATH for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0452,Male,39,"Deep cut at Bantama workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0021,Male,24,"Seizure at home in Ejisu, my sister convulsing, foam at mouth, cannot wake after it stop.",1,Red,Resuscitation bay,0,emergency,Ejisu,false,1,Red,true
+CH-0396,Male,57,"Sickle cell crisis from Manhyia, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0953,Male,48,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0978,Male,50,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,true,5,Green,true
+CH-0471,Male,30,"Suspected appendicitis, pain move to right side, vomit twice, came from Sunyani.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0462,Female,23,"Painful rash with shingles on side, nausea and fever, walk from Asokwa for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0096,Male,4,"Worst headache of life at Asokwa market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0443,Female,36,"High fever and rigors three days from Sunyani, our neighbour weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0617,Male,35,"Mild rash on arm after farm near Suame, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0770,Male,63,"Stitches removal only, doctor at Asokwa sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0772,Male,31,"Family planning visit, no emergency, contraception advice after injection last year, from Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0583,Male,10,"Mild burn from hot water, small blister, clean, mother from Manhyia want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0850,Female,36,"Follow-up BP check, nurse say come back, no new symptoms, live near Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0567,Female,72,"Red eye since yesterday, scratchy, see fine, bought drops at Tafo pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0604,Female,58,"Mild burn from hot water, small blister, clean, mother from Bantama want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0119,Male,29,"Crushing central chest pain since Community Hospital, my wife sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,2,Orange,true
+CH-0603,Male,54,"Request malaria test, fever mild, feel tired, from Manhyia, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0873,Female,53,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Bantama sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0809,Female,64,"Immunization for baby, routine visit, child well, mother from Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0696,Female,65,"Back pain one week, no trauma, can walk, want pain advice at Bantama clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0832,Male,21,"Health certificate for work, need medical form, no illness, from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0588,Female,15,"Cough and mild fever one week, tired from Bantama, wonder if need ED or can wait OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,true,4,Green,true
+CH-0338,Male,45,"Painful rash with shingles on side, nausea and fever, walk from Manhyia for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0478,Male,52,"Sickle cell crisis from Sunyani, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0364,Female,29,"Moderate head injury at Manhyia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0812,Female,63,"Stitches removal only, doctor at Kejetia sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0199,Male,71,"Bad headache two days at Community Hospital, worse today, vomiting once but still talking fine.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,true,2,Orange,true
+CH-0806,Male,69,"Administrative visit, transfer notes from Community Hospital clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0005,Female,4,"Seizure at home in Asokwa, my child convulsing, foam at mouth, cannot wake after it stop.",1,Red,Resuscitation bay,0,emergency,Asokwa,false,1,Red,true
+CH-0432,Female,43,"Asthma attack at Asokwa, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0883,Female,38,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Ejisu.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0408,Female,48,"Moderate head injury at Manhyia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0694,Female,77,"Request malaria test, fever mild, feel tired, from Suame, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0979,Female,41,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0675,Female,32,"Wound check, cut healing, small pain, farmer from Ejisu want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0417,Male,56,"Urinary retention painful, Suame man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0146,Male,39,"Crushing central chest pain since Kejetia, the patient sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0031,Male,26,"Chest pain and collapse at church in KATH, my wife sweat cold, pulse weak, cannot stand.",1,Red,Resuscitation bay,0,emergency,KATH,false,1,Red,true
+CH-0088,Female,55,"Anaphylaxis after groundnut at Kejetia, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0131,Female,35,"Bad headache two days at Community Hospital, worse today, vomiting once but still talking fine.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,true,2,Orange,true
+CH-0419,Male,72,"High fever and rigors three days from Ejisu, my sister weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0681,Male,37,"Back pain one week, no trauma, can walk, want pain advice at Sunyani clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0340,Male,49,"Sickle cell crisis from Asokwa, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0299,Female,16,"Moderate head injury at KATH, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0844,Male,38,"Administrative visit, transfer notes from Kejetia clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0830,Male,42,"Medication refill, hypertension tablets finish, stable, walk from Kejetia for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0520,Female,66,"Cough and mild fever one week, tired from Tafo, wonder if need ED or can wait OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,true,4,Green,true
+CH-0946,Female,30,"Family planning visit, no emergency, contraception advice after injection last year, from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0401,Female,23,"Suspected appendicitis, pain move to right side, vomit twice, came from Sunyani.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0689,Male,47,"Wound check, cut healing, small pain, farmer from Community Hospital want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0374,Male,51,"Moderate head injury at KATH, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0319,Male,10,"Fever and body pain from Asokwa, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,true,3,Yellow,true
+CH-0248,Male,40,"Sickle cell crisis from Manhyia, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0476,Male,22,"High fever and rigors three days from Manhyia, the patient weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0648,Female,13,"Mild rash on arm after farm near Bantama, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0569,Male,56,"Mild rash on arm after farm near Manhyia, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0268,Female,13,"Suspected appendicitis, pain move to right side, vomit twice, came from Kejetia.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0280,Male,60,"Severe abdominal pain since yesterday, Suame polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0836,Female,69,"Immunization for baby, routine visit, child well, mother from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0595,Male,35,"Request malaria test, fever mild, feel tired, from Community Hospital, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0834,Male,66,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Asokwa sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,4,Green,true
+CH-0409,Male,77,"Moderate head injury at Asokwa, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0108,Female,4,"Severe shortness of breath at Manhyia, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0170,Female,46,"Severe shortness of breath at Bantama, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0514,Female,13,"Ankle pain after football at Manhyia, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,true,4,Green,true
+CH-0788,Female,35,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0231,Male,26,"Painful rash with shingles on side, nausea and fever, walk from Kejetia for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0429,Female,53,"Deep cut at Suame workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0057,Female,13,"Crushing central chest pain since Suame, our neighbour sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0713,Female,18,"Mild burn from hot water, small blister, clean, mother from Ejisu want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0176,Female,74,"Sudden chest and back pain at Manhyia, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0895,Male,67,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Ejisu sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0148,Female,64,"Stroke symptoms at Suame, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0484,Male,68,"Urinary retention painful, Tafo man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0935,Female,29,"Immunization for baby, routine visit, child well, mother from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0451,Female,33,"Deep cut at Suame workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0028,Male,51,"Chest pain and collapse at church in Kejetia, my husband sweat cold, pulse weak, cannot stand.",1,Red,Resuscitation bay,0,emergency,Kejetia,false,1,Red,true
+CH-0379,Female,69,"Urinary retention painful, Suame man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0442,Male,75,"Urinary retention painful, Manhyia man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0473,Female,43,"Painful rash with shingles on side, nausea and fever, walk from Tafo for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0670,Female,11,"Mild rash on arm after farm near Ejisu, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0880,Female,26,"Follow-up BP check, nurse say come back, no new symptoms, live near Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0558,Female,8,"Sprained ankle at Sunyani football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0695,Male,50,"Mild rash on arm after farm near Asokwa, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0518,Male,42,"Ear pain three days, child from Community Hospital, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0103,Female,46,"Severe shortness of breath at KATH, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0120,Male,20,"Stroke symptoms at Bantama, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0721,Female,45,"Sprained ankle at Asokwa football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0879,Male,65,"Administrative visit, transfer notes from Suame clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,true,5,Green,true
+CH-0075,Male,17,"Pregnant woman from Kejetia, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0776,Male,57,"Follow-up BP check, nurse say come back, no new symptoms, live near Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0631,Male,9,"Back pain one week, no trauma, can walk, want pain advice at KATH clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0586,Female,5,"Mild rash on arm after farm near Tafo, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0421,Female,8,"High fever and rigors three days from Manhyia, our neighbour weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0455,Male,9,"Stomach pain since yesterday, moderate, came from Suame polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,true,3,Yellow,true
+CH-0180,Male,23,"Stroke symptoms at Manhyia, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0984,Male,59,"Advice on skin cream, mild dryness, no rash spread, pharmacy at KATH sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0998,Female,44,"Medication refill, hypertension tablets finish, stable, walk from Ejisu for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0983,Female,18,"Medication refill, hypertension tablets finish, stable, walk from Asokwa for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0797,Female,27,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Community Hospital sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0336,Female,14,"Suspected appendicitis, pain move to right side, vomit twice, came from Bantama.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0765,Female,67,"Follow-up BP check, nurse say come back, no new symptoms, live near Ejisu.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0177,Female,19,"Crushing central chest pain since Community Hospital, my mother sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,2,Orange,true
+CH-0687,Female,37,"Sore throat two days, swallow pain, fever on and off, walk from Bantama to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0526,Female,65,"Ankle pain after football at KATH, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,true,4,Green,true
+CH-0179,Female,15,"Chest discomfort and tired since Bantama, not sure if emergency, breath a bit short when walking.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,true,2,Orange,true
+CH-0188,Female,9,"Severe shortness of breath at Suame, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,3,Yellow,false
+CH-0217,Female,18,"Asthma attack at Kejetia, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0212,Male,54,"Moderate head injury at Tafo, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0344,Female,53,"Sickle cell crisis from Kejetia, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0521,Female,54,"Ear pain three days, child from Bantama, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0046,Male,21,"my sister choke on food at chop bar near Ejisu, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Ejisu,false,1,Red,true
+CH-0492,Male,55,"Suspected appendicitis, pain move to right side, vomit twice, came from Asokwa.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0822,Male,35,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0166,Female,7,"Worst headache of life at Sunyani market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0221,Female,39,"High fever and rigors three days from Tafo, my mother weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0846,Male,69,"Immunization for baby, routine visit, child well, mother from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0137,Female,61,"Crushing central chest pain since Bantama, my father sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0037,Male,8,"Burn from kerosene fire at Bantama, the patient scream, skin peel off arm, shock and confusion.",1,Red,Resuscitation bay,0,emergency,Bantama,false,2,Orange,false
+CH-0796,Male,46,"Follow-up BP check, nurse say come back, no new symptoms, live near Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0127,Male,57,"Stroke symptoms at Bantama, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0815,Female,69,"Follow-up BP check, nurse say come back, no new symptoms, live near Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0377,Female,53,"Stomach pain since yesterday, moderate, came from Sunyani polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,true,3,Yellow,true
+CH-0926,Female,69,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0288,Male,35,"Urinary retention painful, Suame man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0101,Male,39,"Anaphylaxis after groundnut at Suame, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0958,Female,62,"Suture removal request, small cut, pain small, travel from Community Hospital before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0961,Female,52,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Kejetia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0203,Female,6,"Suspected appendicitis, pain move to right side, vomit twice, came from Manhyia.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0250,Female,32,"Severe abdominal pain since yesterday, Tafo polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0728,Female,63,"Request malaria test, fever mild, feel tired, from Asokwa, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0287,Male,47,"Severe abdominal pain since yesterday, KATH polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0597,Male,54,"Sprained ankle at Kejetia football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0070,Female,20,"Crushing central chest pain since Manhyia, my child sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0523,Female,30,"Cough one week, no breathlessness, sleeping fine, came from Manhyia for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0067,Male,60,"Anaphylaxis after groundnut at Asokwa, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0637,Male,78,"Sore throat two days, swallow pain, fever on and off, walk from Ejisu to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0664,Male,34,"Wound check, cut healing, small pain, farmer from Tafo want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0610,Male,5,"Red eye since yesterday, scratchy, see fine, bought drops at Suame pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0740,Female,42,"Sore throat two days, swallow pain, fever on and off, walk from Suame to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0896,Male,29,"Administrative visit, transfer notes from Community Hospital clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0744,Female,41,"Sprained ankle at Asokwa football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0971,Female,32,"Administrative visit, transfer notes from Ejisu clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0205,Female,32,"Fever and body pain from Community Hospital, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,true,3,Yellow,true
+CH-0281,Female,39,"Fever and body pain from Tafo, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,true,3,Yellow,true
+CH-0499,Male,76,"Stomach pain since yesterday, moderate, came from KATH polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,true,3,Yellow,true
+CH-0382,Male,10,"Painful rash with shingles on side, nausea and fever, walk from Suame for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0293,Male,78,"Asthma attack at Tafo, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0244,Female,51,"Asthma attack at Suame, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0043,Male,34,"Gunshot wound at Suame, bleeding won't stop, my wife pale and confused, need resuscitation.",1,Red,Resuscitation bay,0,emergency,Suame,false,1,Red,true
+CH-0173,Female,18,"Bad headache two days at KATH, worse today, vomiting once but still talking fine.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,true,2,Orange,true
+CH-0068,Male,18,"Worst headache of life at Ejisu market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Ejisu,false,2,Orange,true
+CH-0076,Male,29,"Stroke symptoms at Tafo, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0496,Female,9,"Severe abdominal pain since yesterday, Manhyia polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0403,Female,65,"Moderate head injury at Asokwa, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0149,Male,10,"Meningococcal purpura, dark spots on skin since leaving Suame, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0739,Male,4,"Request malaria test, fever mild, feel tired, from Tafo, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0501,Female,61,"Cough one week, no breathlessness, sleeping fine, came from Sunyani for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0047,Female,72,"I choke on food at chop bar near Asokwa, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Asokwa,false,1,Red,true
+CH-0259,Male,23,"Asthma attack at Community Hospital, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0295,Female,46,"Asthma attack at KATH, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0305,Male,51,"Sickle cell crisis from Suame, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0386,Male,50,"Moderate head injury at Manhyia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0229,Female,26,"Severe abdominal pain since yesterday, Kejetia polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0202,Female,77,"Diarrhoea and dehydration, Community Hospital child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0925,Female,20,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Asokwa sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,true,5,Green,true
+CH-0345,Male,61,"Diarrhoea and dehydration, Tafo child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0026,Male,48,"Gunshot wound at Community Hospital, bleeding won't stop, my mother pale and confused, need resuscitation.",1,Red,Resuscitation bay,0,emergency,Community Hospital,false,1,Red,true
+CH-0079,Female,72,"Severe shortness of breath at Kejetia, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0852,Female,33,"Administrative visit, transfer notes from Community Hospital clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0358,Female,56,"Sickle cell crisis from Bantama, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0258,Female,45,"Sickle cell crisis from Community Hospital, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0886,Female,40,"Health certificate for work, need medical form, no illness, from Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0077,Male,32,"Crushing central chest pain since Sunyani, my sister sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0657,Male,52,"Ear pain three days, child from Suame, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0277,Male,22,"Painful rash with shingles on side, nausea and fever, walk from Sunyani for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0164,Female,68,"Anaphylaxis after groundnut at Suame, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0710,Female,44,"Sore throat two days, swallow pain, fever on and off, walk from Bantama to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0987,Male,34,"Suture removal request, small cut, pain small, travel from Bantama before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0157,Male,24,"Crushing central chest pain since Asokwa, my brother sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0995,Male,23,"Medication refill, hypertension tablets finish, stable, walk from Tafo for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,4,Green,true
+CH-0392,Male,69,"Asthma attack at Tafo, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0012,Female,69,"Burn from kerosene fire at Ejisu, my child scream, skin peel off arm, shock and confusion.",1,Red,Resuscitation bay,0,emergency,Ejisu,false,1,Red,true
+CH-0930,Male,52,"Family planning visit, no emergency, contraception advice after injection last year, from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0124,Male,13,"Open fracture from fall at Sunyani, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0427,Female,15,"Stomach pain since yesterday, moderate, came from Bantama polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,true,2,Orange,false
+CH-0754,Female,39,"Medication refill, hypertension tablets finish, stable, walk from Tafo for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0693,Female,42,"Back pain one week, no trauma, can walk, want pain advice at Bantama clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0343,Male,20,"Severe abdominal pain since yesterday, Sunyani polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0808,Male,32,"Suture removal request, small cut, pain small, travel from Tafo before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0081,Male,59,"Severe shortness of breath at Tafo, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0798,Male,60,"Medication refill, hypertension tablets finish, stable, walk from KATH for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0948,Male,60,"Family planning visit, no emergency, contraception advice after injection last year, from Ejisu.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0535,Female,48,"Cough one week, no breathlessness, sleeping fine, came from Bantama for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0098,Male,19,"Stroke symptoms at Ejisu, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Ejisu,false,2,Orange,true
+CH-0847,Male,52,"Stitches removal only, doctor at KATH sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0178,Male,43,"Anaphylaxis after groundnut at Kejetia, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0495,Male,33,"Deep cut at Community Hospital workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0577,Female,40,"Ear pain three days, child from KATH, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0898,Male,22,"Health certificate for work, need medical form, no illness, from Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0823,Female,26,"Medication refill, hypertension tablets finish, stable, walk from Asokwa for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0410,Female,22,"Painful rash with shingles on side, nausea and fever, walk from Kejetia for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0095,Male,53,"Stroke symptoms at Asokwa, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,3,Yellow,false
+CH-0956,Female,53,"Administrative visit, transfer notes from Manhyia clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0730,Female,26,"Cough one week, no breathlessness, sleeping fine, came from Community Hospital for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0717,Male,55,"Mild rash on arm after farm near Asokwa, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0887,Male,29,"Administrative visit, transfer notes from Bantama clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0632,Female,62,"Sore throat two days, swallow pain, fever on and off, walk from Community Hospital to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0272,Female,50,"Severe abdominal pain since yesterday, Asokwa polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0142,Male,44,"Worst headache of life at KATH market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0922,Female,58,"Administrative visit, transfer notes from Kejetia clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0725,Male,71,"Wound check, cut healing, small pain, farmer from Kejetia want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0902,Male,42,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0039,Male,71,"my sister choke on food at chop bar near Suame, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Suame,false,1,Red,true
+CH-0872,Male,25,"Family planning visit, no emergency, contraception advice after injection last year, from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0684,Female,52,"Ear pain three days, child from KATH, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0524,Female,67,"Red eye since yesterday, scratchy, see fine, bought drops at Manhyia pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0750,Female,51,"Sprained ankle at Community Hospital football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0838,Female,32,"Immunization for baby, routine visit, child well, mother from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0579,Male,16,"Cough one week, no breathlessness, sleeping fine, came from Kejetia for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0570,Male,35,"Red eye since yesterday, scratchy, see fine, bought drops at Tafo pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0228,Male,39,"Asthma attack at Ejisu, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0308,Male,65,"Diarrhoea and dehydration, KATH child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0007,Male,58,"They rush my child from Tafo after road accident, blood plenty, my child almost unconscious now.",1,Red,Resuscitation bay,0,emergency,Tafo,false,1,Red,true
+CH-0310,Female,69,"Asthma attack at Asokwa, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0952,Female,40,"Health certificate for work, need medical form, no illness, from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0531,Male,61,"Ear pain three days, child from Asokwa, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0017,Male,50,"my sister choke on food at chop bar near Suame, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Suame,false,1,Red,true
+CH-0865,Male,53,"Family planning visit, no emergency, contraception advice after injection last year, from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0966,Female,31,"Follow-up BP check, nurse say come back, no new symptoms, live near Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0677,Female,76,"Mild rash on arm after farm near Ejisu, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0992,Female,68,"Suture removal request, small cut, pain small, travel from Bantama before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,true,5,Green,true
+CH-0459,Male,56,"Painful rash with shingles on side, nausea and fever, walk from Manhyia for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0881,Male,30,"Immunization for baby, routine visit, child well, mother from Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,4,Green,true
+CH-0369,Male,67,"Moderate head injury at Manhyia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0261,Female,57,"Painful rash with shingles on side, nausea and fever, walk from Sunyani for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0941,Male,49,"Administrative visit, transfer notes from Asokwa clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0385,Female,9,"Suspected appendicitis, pain move to right side, vomit twice, came from Kejetia.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0220,Female,23,"Suspected appendicitis, pain move to right side, vomit twice, came from Bantama.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,2,Orange,false
+CH-0559,Female,25,"Cough one week, no breathlessness, sleeping fine, came from Community Hospital for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0247,Female,19,"Suspected appendicitis, pain move to right side, vomit twice, came from Tafo.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0692,Male,56,"Request malaria test, fever mild, feel tired, from KATH, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0901,Female,24,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Manhyia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0969,Female,41,"Administrative visit, transfer notes from Tafo clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0737,Female,62,"Sprained ankle at Sunyani football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0990,Female,62,"Administrative visit, transfer notes from Sunyani clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0587,Female,20,"Cough one week, no breathlessness, sleeping fine, came from Bantama for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0323,Male,77,"Suspected appendicitis, pain move to right side, vomit twice, came from Ejisu.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0361,Male,59,"Moderate head injury at Kejetia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0791,Female,29,"Administrative visit, transfer notes from Asokwa clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0936,Female,34,"Health certificate for work, need medical form, no illness, from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0734,Female,69,"Mild rash on arm after farm near Kejetia, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0346,Male,77,"Asthma attack at KATH, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0517,Female,46,"Cough one week, no breathlessness, sleeping fine, came from Tafo for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0412,Male,29,"Moderate head injury at Manhyia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0564,Female,19,"Back pain one week, no trauma, can walk, want pain advice at Sunyani clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0185,Female,23,"Stroke symptoms at KATH, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0171,Female,56,"Stroke symptoms at Manhyia, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0988,Female,34,"Immunization for baby, routine visit, child well, mother from Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0438,Male,77,"Moderate head injury at Ejisu, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0470,Male,31,"Deep cut at Bantama workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0707,Male,19,"Cough one week, no breathlessness, sleeping fine, came from Ejisu for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0591,Male,60,"Ear pain three days, child from Sunyani, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0109,Female,72,"Anaphylaxis after groundnut at Community Hospital, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,2,Orange,true
+CH-0620,Female,38,"Sore throat two days, swallow pain, fever on and off, walk from Community Hospital to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0598,Female,53,"Sore throat two days, swallow pain, fever on and off, walk from Sunyani to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0630,Female,66,"Mild rash on arm after farm near Ejisu, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0184,Female,4,"Meningococcal purpura, dark spots on skin since leaving Manhyia, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0584,Female,15,"Cough and mild fever one week, tired from Kejetia, wonder if need ED or can wait OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,true,4,Green,true
+CH-0735,Male,26,"Wound check, cut healing, small pain, farmer from Kejetia want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0669,Female,29,"Red eye since yesterday, scratchy, see fine, bought drops at Tafo pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0868,Female,67,"Suture removal request, small cut, pain small, travel from Asokwa before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0663,Male,77,"Mild burn from hot water, small blister, clean, mother from Tafo want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0792,Male,62,"Medication refill, hypertension tablets finish, stable, walk from Suame for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0862,Male,69,"Health certificate for work, need medical form, no illness, from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0897,Female,40,"Family planning visit, no emergency, contraception advice after injection last year, from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0104,Male,23,"Tension pneumothorax, rush from Asokwa, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0100,Female,24,"Stroke symptoms at Suame, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0532,Male,48,"Mild rash on arm after farm near Suame, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0222,Female,60,"Deep cut at Tafo workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0080,Female,26,"Open fracture from fall at Manhyia, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0312,Male,54,"Moderate head injury at Tafo, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0629,Female,17,"Back pain one week, no trauma, can walk, want pain advice at KATH clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0042,Male,61,"Burn from kerosene fire at Bantama, my mother scream, skin peel off arm, shock and confusion.",1,Red,Resuscitation bay,0,emergency,Bantama,false,1,Red,true
+CH-0542,Female,4,"Back pain one week, no trauma, can walk, want pain advice at Sunyani clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0807,Male,60,"Suture removal request, small cut, pain small, travel from Tafo before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0060,Female,40,"Sudden chest and back pain at Suame, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0378,Female,77,"Diarrhoea and dehydration, Sunyani child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0426,Male,26,"Sickle cell crisis from Asokwa, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0951,Male,23,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Manhyia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0863,Male,34,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0063,Male,38,"Bad headache two days at Community Hospital, worse today, vomiting once but still talking fine.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,true,2,Orange,true
+CH-0691,Male,10,"Sore throat two days, swallow pain, fever on and off, walk from Tafo to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0877,Male,67,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Suame sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0845,Female,50,"Administrative visit, transfer notes from KATH clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0780,Male,55,"Suture removal request, small cut, pain small, travel from Ejisu before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0014,Male,41,"Seizure at home in Suame, my sister convulsing, foam at mouth, cannot wake after it stop.",1,Red,Resuscitation bay,0,emergency,Suame,false,1,Red,true
+CH-0073,Male,24,"Sudden chest and back pain at Asokwa, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0621,Male,68,"Mild rash on arm after farm near Ejisu, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,3,Yellow,false
+CH-0227,Male,31,"Deep cut at Tafo workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0679,Male,46,"Sore throat two days, swallow pain, fever on and off, walk from Sunyani to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0840,Male,62,"Stitches removal only, doctor at Ejisu sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0263,Female,71,"Painful rash with shingles on side, nausea and fever, walk from Kejetia for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0605,Male,39,"Sore throat two days, swallow pain, fever on and off, walk from Manhyia to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0539,Female,75,"Mild burn from hot water, small blister, clean, mother from Suame want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0916,Female,28,"Follow-up BP check, nurse say come back, no new symptoms, live near Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,4,Green,true
+CH-0398,Male,78,"Urinary retention painful, Ejisu man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0585,Female,13,"Red eye since yesterday, scratchy, see fine, bought drops at Community Hospital pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0646,Male,5,"Mild rash on arm after farm near Sunyani, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0102,Female,60,"Worst headache of life at Manhyia market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0800,Male,39,"Health certificate for work, need medical form, no illness, from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,true,5,Green,true
+CH-0498,Male,54,"Severe abdominal pain since yesterday, Manhyia polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0720,Female,16,"Back pain one week, no trauma, can walk, want pain advice at Ejisu clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0207,Male,78,"Diarrhoea and dehydration, Ejisu child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0813,Female,26,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0183,Male,12,"Meningococcal purpura, dark spots on skin since leaving Asokwa, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0133,Male,66,"Tension pneumothorax, rush from Tafo, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0045,Male,67,"Gunshot wound at Bantama, bleeding won't stop, I pale and confused, need resuscitation.",1,Red,Resuscitation bay,0,emergency,Bantama,false,1,Red,true
+CH-0069,Male,51,"Open fracture from fall at KATH, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0918,Female,28,"Immunization for baby, routine visit, child well, mother from Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0099,Female,60,"Open fracture from fall at KATH, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0853,Male,62,"Immunization for baby, routine visit, child well, mother from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0330,Male,9,"Deep cut at Kejetia workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0420,Male,8,"Suspected appendicitis, pain move to right side, vomit twice, came from Suame.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0775,Male,36,"Stitches removal only, doctor at Bantama sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0290,Female,47,"Sickle cell crisis from Kejetia, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0870,Male,66,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0723,Female,70,"Ear pain three days, child from Kejetia, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0565,Female,58,"Red eye since yesterday, scratchy, see fine, bought drops at Community Hospital pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0510,Female,53,"Sore throat two days, swallow pain, fever on and off, walk from KATH to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0939,Female,69,"Immunization for baby, routine visit, child well, mother from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0697,Male,25,"Ankle pain after football at Bantama, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,true,4,Green,true
+CH-0397,Female,37,"Sickle cell crisis from Community Hospital, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0552,Male,75,"Red eye since yesterday, scratchy, see fine, bought drops at Suame pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0065,Female,10,"Chest discomfort and tired since Asokwa, not sure if emergency, breath a bit short when walking.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,true,2,Orange,true
+CH-0843,Male,39,"Suture removal request, small cut, pain small, travel from Ejisu before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0245,Male,14,"Severe abdominal pain since yesterday, Asokwa polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0636,Female,38,"Back pain one week, no trauma, can walk, want pain advice at Bantama clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0373,Male,44,"Diarrhoea and dehydration, Tafo child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0635,Female,44,"Mild burn from hot water, small blister, clean, mother from Tafo want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0842,Female,26,"Medication refill, hypertension tablets finish, stable, walk from Community Hospital for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0190,Female,16,"Stroke symptoms at Bantama, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0389,Female,75,"Diarrhoea and dehydration, Ejisu child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0519,Female,44,"Red eye since yesterday, scratchy, see fine, bought drops at Asokwa pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0764,Female,46,"Medication refill, hypertension tablets finish, stable, walk from Tafo for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,true,5,Green,true
+CH-0919,Male,32,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0465,Male,53,"Deep cut at Manhyia workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0376,Female,35,"Asthma attack at Bantama, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0555,Male,53,"Request malaria test, fever mild, feel tired, from KATH, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0878,Male,36,"Stitches removal only, doctor at Manhyia sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0303,Male,60,"Sickle cell crisis from Manhyia, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0461,Female,52,"Moderate head injury at Tafo, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0738,Female,70,"Wound check, cut healing, small pain, farmer from Asokwa want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0544,Female,45,"Back pain one week, no trauma, can walk, want pain advice at Suame clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0857,Male,24,"Medication refill, hypertension tablets finish, stable, walk from KATH for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0165,Male,9,"Pregnant woman from Tafo, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0568,Female,77,"Sprained ankle at KATH football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0614,Female,69,"Ear pain three days, child from Kejetia, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0282,Male,43,"Urinary retention painful, Suame man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0480,Male,49,"Fever and body pain from Ejisu, feel weak but can still walk, not sure if need emergency.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,true,3,Yellow,true
+CH-0332,Female,8,"Deep cut at Manhyia workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0357,Male,12,"Painful rash with shingles on side, nausea and fever, walk from Asokwa for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0803,Male,50,"Suture removal request, small cut, pain small, travel from Tafo before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0192,Male,64,"Meningococcal purpura, dark spots on skin since leaving Tafo, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0581,Male,20,"Sprained ankle at Ejisu football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0195,Male,34,"Meningococcal purpura, dark spots on skin since leaving Sunyani, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0502,Female,59,"Red eye since yesterday, scratchy, see fine, bought drops at Community Hospital pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0556,Female,66,"Mild burn from hot water, small blister, clean, mother from Suame want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0302,Male,60,"High fever and rigors three days from Asokwa, my child weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0573,Female,69,"Sprained ankle at Tafo football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0831,Male,35,"Medication refill, hypertension tablets finish, stable, walk from Manhyia for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0497,Male,26,"Diarrhoea and dehydration, Kejetia child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0041,Female,62,"Chest pain and collapse at church in Kejetia, my husband sweat cold, pulse weak, cannot stand.",1,Red,Resuscitation bay,0,emergency,Kejetia,true,1,Red,true
+CH-0799,Female,28,"Stitches removal only, doctor at Suame sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0138,Male,55,"Tension pneumothorax, rush from Manhyia, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0367,Male,7,"Severe abdominal pain since yesterday, Kejetia polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0387,Female,68,"Urinary retention painful, KATH man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0706,Female,42,"Sore throat two days, swallow pain, fever on and off, walk from Asokwa to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0022,Male,59,"Baby from Community Hospital, not feeding, floppy, fever very high, mother run to emergency now.",1,Red,Resuscitation bay,0,emergency,Community Hospital,false,1,Red,true
+CH-0198,Female,49,"Severe shortness of breath at Asokwa, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0450,Male,42,"Urinary retention painful, KATH man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0933,Female,55,"Immunization for baby, routine visit, child well, mother from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0724,Male,12,"Sprained ankle at KATH football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0572,Female,52,"Cough one week, no breathlessness, sleeping fine, came from Bantama for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0325,Male,53,"Diarrhoea and dehydration, Manhyia child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0828,Female,56,"Administrative visit, transfer notes from Asokwa clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0500,Female,21,"Severe abdominal pain since yesterday, KATH polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0833,Male,40,"Suture removal request, small cut, pain small, travel from Bantama before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0110,Female,32,"Meningococcal purpura, dark spots on skin since leaving Asokwa, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0550,Female,57,"Wound check, cut healing, small pain, farmer from Ejisu want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0719,Male,47,"Sprained ankle at Manhyia football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0158,Female,41,"Crushing central chest pain since Sunyani, my father sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0661,Female,78,"Back pain one week, no trauma, can walk, want pain advice at Ejisu clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0365,Female,72,"Severe abdominal pain since yesterday, KATH polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0727,Female,10,"Ear pain three days, child from Sunyani, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,3,Yellow,false
+CH-0062,Male,21,"Meningococcal purpura, dark spots on skin since leaving Bantama, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0875,Male,28,"Medication refill, hypertension tablets finish, stable, walk from Sunyani for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0347,Female,44,"Painful rash with shingles on side, nausea and fever, walk from Sunyani for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0634,Male,59,"Red eye since yesterday, scratchy, see fine, bought drops at Sunyani pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0703,Male,48,"Request malaria test, fever mild, feel tired, from Asokwa, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0094,Female,13,"Stroke symptoms at Asokwa, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0512,Female,38,"Cough one week, no breathlessness, sleeping fine, came from Ejisu for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0162,Male,43,"Open fracture from fall at Community Hospital, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,2,Orange,true
+CH-0793,Male,44,"Suture removal request, small cut, pain small, travel from Kejetia before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0928,Male,23,"Health certificate for work, need medical form, no illness, from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0817,Female,61,"Administrative visit, transfer notes from KATH clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0159,Female,62,"Worst headache of life at Sunyani market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0611,Female,25,"Ear pain three days, child from Ejisu, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0908,Male,61,"Follow-up BP check, nurse say come back, no new symptoms, live near Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0487,Female,6,"Moderate head injury at Asokwa, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0708,Male,28,"Red eye since yesterday, scratchy, see fine, bought drops at Kejetia pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0596,Female,7,"Sprained ankle at Sunyani football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0771,Female,25,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Manhyia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0903,Male,52,"Health certificate for work, need medical form, no illness, from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0249,Male,77,"Moderate head injury at Sunyani, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0406,Male,39,"Moderate head injury at Manhyia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0123,Male,43,"Open fracture from fall at Asokwa, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0599,Male,71,"Mild rash on arm after farm near Tafo, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0283,Male,51,"Painful rash with shingles on side, nausea and fever, walk from Bantama for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0172,Male,62,"Worst headache of life at Tafo market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0929,Female,34,"Follow-up BP check, nurse say come back, no new symptoms, live near Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0333,Male,46,"Painful rash with shingles on side, nausea and fever, walk from Bantama for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0445,Male,12,"Urinary retention painful, Kejetia man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0649,Female,20,"Sore throat two days, swallow pain, fever on and off, walk from Tafo to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0242,Male,56,"Diarrhoea and dehydration, Suame child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0116,Female,52,"Meningococcal purpura, dark spots on skin since leaving Asokwa, weak and confused.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0224,Female,28,"Severe abdominal pain since yesterday, Suame polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0683,Female,60,"Mild burn from hot water, small blister, clean, mother from Ejisu want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0054,Male,57,"Open fracture from fall at Community Hospital, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,3,Yellow,false
+CH-0370,Female,35,"Suspected appendicitis, pain move to right side, vomit twice, came from Manhyia.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0786,Female,58,"Health certificate for work, need medical form, no illness, from Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,4,Green,true
+CH-0306,Female,52,"Moderate head injury at KATH, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0654,Male,41,"Cough one week, no breathlessness, sleeping fine, came from Asokwa for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0493,Female,11,"High fever and rigors three days from Ejisu, my husband weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0260,Male,38,"Urinary retention painful, Asokwa man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0126,Female,51,"Worst headache of life at KATH market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0782,Female,36,"Health certificate for work, need medical form, no illness, from Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0563,Male,61,"Sprained ankle at Tafo football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0763,Female,48,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Community Hospital sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0044,Female,33,"Snake bite at farm near Suame, my mother dizzy, swelling fast, vomiting, weak pulse family say.",1,Red,Resuscitation bay,0,emergency,Suame,false,1,Red,true
+CH-0746,Female,49,"Request malaria test, fever mild, feel tired, from Manhyia, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0645,Male,16,"Cough one week, no breathlessness, sleeping fine, came from Bantama for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0163,Female,19,"Stroke symptoms at Manhyia, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0331,Female,69,"Stomach pain since yesterday, moderate, came from KATH polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,true,3,Yellow,true
+CH-0871,Male,37,"Immunization for baby, routine visit, child well, mother from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,true,4,Green,true
+CH-0698,Male,43,"Mild burn from hot water, small blister, clean, mother from Suame want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0399,Female,22,"Deep cut at Kejetia workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0997,Female,35,"Suture removal request, small cut, pain small, travel from Tafo before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0214,Female,51,"Painful rash with shingles on side, nausea and fever, walk from Community Hospital for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0682,Female,36,"Sore throat two days, swallow pain, fever on and off, walk from Kejetia to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0534,Female,43,"Ear pain three days, child from Suame, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0097,Male,70,"Stroke symptoms at Kejetia, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0753,Female,27,"Immunization for baby, routine visit, child well, mother from Ejisu.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0472,Female,40,"Suspected appendicitis, pain move to right side, vomit twice, came from Suame.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0204,Male,67,"Painful rash with shingles on side, nausea and fever, walk from Sunyani for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0035,Female,6,"Drowning rescue from KATH, my mother pulled from water, not responsive, breathing shallow.",1,Red,Resuscitation bay,0,emergency,KATH,false,1,Red,true
+CH-0976,Female,29,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Manhyia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0977,Female,49,"Administrative visit, transfer notes from Tafo clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0974,Female,38,"Family planning visit, no emergency, contraception advice after injection last year, from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0993,Female,48,"Medication refill, hypertension tablets finish, stable, walk from Ejisu for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0395,Female,64,"High fever and rigors three days from Tafo, my child weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0255,Male,76,"Suspected appendicitis, pain move to right side, vomit twice, came from Bantama.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0732,Female,7,"Mild burn from hot water, small blister, clean, mother from Kejetia want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0787,Female,29,"Stitches removal only, doctor at Asokwa sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0125,Female,19,"Open fracture from fall at Kejetia, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0013,Female,36,"Snake bite at farm near Bantama, our neighbour dizzy, swelling fast, vomiting, weak pulse family say.",1,Red,Resuscitation bay,0,emergency,Bantama,false,1,Red,true
+CH-0391,Male,46,"Urinary retention painful, KATH man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0257,Female,62,"Diarrhoea and dehydration, Ejisu child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0197,Female,7,"Crushing central chest pain since Tafo, I sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0186,Female,46,"Bad headache two days at Suame, worse today, vomiting once but still talking fine.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,true,2,Orange,true
+CH-0482,Male,13,"High fever and rigors three days from Kejetia, my sister weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0557,Male,14,"Wound check, cut healing, small pain, farmer from Kejetia want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0074,Male,46,"Pregnant woman from Sunyani, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0402,Female,11,"Asthma attack at KATH, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0795,Male,61,"Immunization for baby, routine visit, child well, mother from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0273,Male,59,"Sickle cell crisis from Asokwa, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0058,Male,13,"Anaphylaxis after groundnut at Sunyani, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,3,Yellow,false
+CH-0150,Male,55,"Stroke symptoms at Bantama, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0769,Male,57,"Family planning visit, no emergency, contraception advice after injection last year, from Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,true,4,Green,true
+CH-0083,Male,59,"Crushing central chest pain since KATH, the patient sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0339,Female,25,"Urinary retention painful, Tafo man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0033,Female,61,"Burn from kerosene fire at Suame, the patient scream, skin peel off arm, shock and confusion.",1,Red,Resuscitation bay,0,emergency,Suame,false,1,Red,true
+CH-0811,Female,59,"Health certificate for work, need medical form, no illness, from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0714,Male,17,"Wound check, cut healing, small pain, farmer from Bantama want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0475,Male,51,"Diarrhoea and dehydration, Asokwa child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0381,Female,34,"Deep cut at Community Hospital workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0511,Male,52,"Red eye since yesterday, scratchy, see fine, bought drops at Ejisu pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0805,Female,20,"Advice on skin cream, mild dryness, no rash spread, pharmacy at KATH sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0320,Female,12,"Severe abdominal pain since yesterday, Suame polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0431,Female,50,"Deep cut at Kejetia workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0351,Male,61,"Asthma attack at Suame, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0223,Female,73,"Diarrhoea and dehydration, Kejetia child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0506,Female,60,"Ear pain three days, child from Manhyia, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0016,Male,50,"Baby from Manhyia, not feeding, floppy, fever very high, mother run to emergency now.",1,Red,Resuscitation bay,0,emergency,Manhyia,false,2,Orange,false
+CH-0155,Male,16,"Tension pneumothorax, rush from Sunyani, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0093,Male,22,"Crushing central chest pain since Kejetia, my mother sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0239,Female,52,"Sickle cell crisis from KATH, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0909,Male,49,"Suture removal request, small cut, pain small, travel from Suame before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,true,4,Green,true
+CH-0745,Female,8,"Cough and mild fever one week, tired from Tafo, wonder if need ED or can wait OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,true,4,Green,true
+CH-0449,Female,71,"Asthma attack at Sunyani, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0999,Male,65,"Follow-up BP check, nurse say come back, no new symptoms, live near Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0129,Female,72,"Stroke symptoms at Suame, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Suame,false,2,Orange,true
+CH-0860,Male,66,"Medication refill, hypertension tablets finish, stable, walk from Kejetia for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,4,Green,true
+CH-0289,Male,50,"Diarrhoea and dehydration, Manhyia child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Manhyia,false,3,Yellow,true
+CH-0105,Male,12,"Pregnant woman from Asokwa, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0191,Female,5,"Sudden chest and back pain at Asokwa, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0023,Female,5,"They rush my father from KATH after road accident, blood plenty, my father almost unconscious now.",1,Red,Resuscitation bay,0,emergency,KATH,false,1,Red,true
+CH-0910,Male,60,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Kejetia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0051,Male,11,"Anaphylaxis after groundnut at Bantama, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0156,Male,24,"Tension pneumothorax, rush from Ejisu, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Ejisu,false,2,Orange,true
+CH-0020,Male,27,"Gunshot wound at Suame, bleeding won't stop, my husband pale and confused, need resuscitation.",1,Red,Resuscitation bay,0,emergency,Suame,false,1,Red,true
+CH-0329,Male,12,"Stomach pain since yesterday, moderate, came from Kejetia polyclinic, nausea but no blood.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,true,3,Yellow,true
+CH-0858,Male,59,"Stitches removal only, doctor at Sunyani sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0981,Male,65,"Health certificate for work, need medical form, no illness, from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0638,Male,61,"Cough one week, no breathlessness, sleeping fine, came from Tafo for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0718,Male,10,"Cough one week, no breathlessness, sleeping fine, came from Manhyia for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0866,Male,63,"Stitches removal only, doctor at Tafo sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0464,Female,11,"Moderate head injury at Asokwa, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0986,Male,43,"Stitches removal only, doctor at Ejisu sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0467,Male,10,"Painful rash with shingles on side, nausea and fever, walk from Asokwa for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0653,Female,39,"Ankle pain after football at Ejisu, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,true,4,Green,true
+CH-0114,Male,63,"Sudden chest and back pain at Kejetia, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0297,Female,27,"Deep cut at Tafo workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0914,Female,57,"Administrative visit, transfer notes from Kejetia clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0187,Male,34,"Open fracture from fall at Asokwa, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,3,Yellow,false
+CH-0071,Male,49,"Tension pneumothorax, rush from Sunyani, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0193,Female,14,"Severe shortness of breath at KATH, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0924,Male,68,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0276,Male,48,"Diarrhoea and dehydration, Ejisu child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0829,Female,46,"Family planning visit, no emergency, contraception advice after injection last year, from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0545,Female,66,"Request malaria test, fever mild, feel tired, from Tafo, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0761,Female,37,"Medication refill, hypertension tablets finish, stable, walk from Bantama for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0665,Male,49,"Wound check, cut healing, small pain, farmer from Community Hospital want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0292,Female,36,"Sickle cell crisis from Ejisu, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0955,Male,51,"Health certificate for work, need medical form, no illness, from Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0702,Female,76,"Mild rash on arm after farm near Ejisu, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0711,Female,74,"Ear pain three days, child from Manhyia, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0827,Female,64,"Stitches removal only, doctor at Tafo sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0628,Female,5,"Ear pain three days, child from Kejetia, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,4,Green,true
+CH-0820,Male,65,"Medication refill, hypertension tablets finish, stable, walk from Bantama for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0783,Male,29,"Family planning visit, no emergency, contraception advice after injection last year, from Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0530,Male,5,"Sore throat two days, swallow pain, fever on and off, walk from Manhyia to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0246,Female,20,"Moderate head injury at Kejetia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0641,Male,42,"Wound check, cut healing, small pain, farmer from Kejetia want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Kejetia,false,3,Yellow,false
+CH-0433,Female,19,"Painful rash with shingles on side, nausea and fever, walk from Tafo for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0082,Male,53,"Open fracture from fall at Sunyani, bone show, pain 10/10, bleeding moderate.",2,Orange,Acute / high-dependency bed,10,emergency,Sunyani,false,2,Orange,true
+CH-0270,Female,77,"Suspected appendicitis, pain move to right side, vomit twice, came from Asokwa.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0226,Male,76,"Deep cut at Bantama workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0388,Male,20,"Severe abdominal pain since yesterday, Asokwa polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0849,Female,32,"Follow-up BP check, nurse say come back, no new symptoms, live near Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0980,Male,55,"Medication refill, hypertension tablets finish, stable, walk from Community Hospital for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0662,Male,34,"Sprained ankle at KATH football, swollen but can bear weight, need X-ray maybe.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0755,Male,47,"Health certificate for work, need medical form, no illness, from Sunyani.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Sunyani,false,5,Green,true
+CH-0733,Male,32,"Back pain one week, no trauma, can walk, want pain advice at Sunyani clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0168,Female,70,"Stroke symptoms at Manhyia, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0256,Male,15,"Moderate head injury at Sunyani, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0405,Female,37,"Sickle cell crisis from Suame, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0448,Male,48,"Severe abdominal pain since yesterday, Ejisu polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0575,Female,49,"Sore throat two days, swallow pain, fever on and off, walk from KATH to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0422,Male,46,"Painful rash with shingles on side, nausea and fever, walk from Suame for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0194,Female,66,"Anaphylaxis after groundnut at Kejetia, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0383,Female,40,"Moderate head injury at Kejetia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0982,Female,42,"Follow-up BP check, nurse say come back, no new symptoms, live near Ejisu.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0008,Female,9,"Chest pain and collapse at church in KATH, my husband sweat cold, pulse weak, cannot stand.",1,Red,Resuscitation bay,0,emergency,KATH,true,1,Red,true
+CH-0816,Female,20,"Administrative visit, transfer notes from Bantama clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0237,Male,14,"Diarrhoea and dehydration, Community Hospital child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0947,Male,58,"Medication refill, hypertension tablets finish, stable, walk from Kejetia for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0300,Male,47,"Sickle cell crisis from Ejisu, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0818,Female,18,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Kejetia sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,false,5,Green,true
+CH-0441,Female,20,"Moderate head injury at Asokwa, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0785,Male,26,"Medication refill, hypertension tablets finish, stable, walk from Tafo for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0010,Female,34,"They rush my mother from Kejetia after road accident, blood plenty, my mother almost unconscious now.",1,Red,Resuscitation bay,0,emergency,Kejetia,false,1,Red,true
+CH-0307,Male,29,"Sickle cell crisis from Ejisu, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0489,Male,71,"Painful rash with shingles on side, nausea and fever, walk from Tafo for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0774,Male,44,"Stitches removal only, doctor at KATH sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0504,Female,23,"Mild burn from hot water, small blister, clean, mother from Ejisu want dressing.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0705,Female,72,"Cough one week, no breathlessness, sleeping fine, came from Community Hospital for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0009,Female,20,"Gunshot wound at Manhyia, bleeding won't stop, our neighbour pale and confused, need resuscitation.",1,Red,Resuscitation bay,0,emergency,Manhyia,false,1,Red,true
+CH-0548,Male,21,"Ear pain three days, child from Bantama, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0481,Female,27,"Moderate head injury at Kejetia, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0294,Female,20,"Sickle cell crisis from Bantama, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0353,Female,42,"Asthma attack at Ejisu, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0140,Female,74,"Severe shortness of breath at Tafo, cannot lie flat, gasping, lips tingling.",2,Orange,Acute / high-dependency bed,10,emergency,Tafo,false,2,Orange,true
+CH-0869,Male,49,"Medication refill, hypertension tablets finish, stable, walk from KATH for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,true,5,Green,true
+CH-0777,Male,40,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0835,Female,63,"Family planning visit, no emergency, contraception advice after injection last year, from Asokwa.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Asokwa,false,5,Green,true
+CH-0536,Female,44,"Sore throat two days, swallow pain, fever on and off, walk from Manhyia to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,false,4,Green,true
+CH-0001,Female,41,"my husband choke on food at chop bar near Ejisu, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Ejisu,false,1,Red,true
+CH-0011,Female,20,"my sister choke on food at chop bar near Bantama, cannot talk, clutching throat, turning blue.",1,Red,Resuscitation bay,0,emergency,Bantama,false,1,Red,true
+CH-0311,Male,61,"Diarrhoea and dehydration, Kejetia child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0985,Female,37,"Health certificate for work, need medical form, no illness, from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0267,Male,52,"Moderate head injury at Sunyani, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0423,Female,21,"Moderate head injury at Suame, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0375,Female,34,"Urinary retention painful, Bantama man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Bantama,false,3,Yellow,true
+CH-0316,Female,4,"Severe abdominal pain since yesterday, Kejetia polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0453,Female,6,"Deep cut at Sunyani workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0092,Female,15,"Tension pneumothorax, rush from Manhyia, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0825,Male,30,"Follow-up BP check, nurse say come back, no new symptoms, live near Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0233,Female,50,"Moderate head injury at Community Hospital, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0950,Female,56,"Follow-up BP check, nurse say come back, no new symptoms, live near KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0494,Female,59,"Diarrhoea and dehydration, Community Hospital child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0356,Female,63,"Moderate head injury at Ejisu, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0931,Female,44,"Immunization for baby, routine visit, child well, mother from Bantama.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0318,Female,18,"Painful rash with shingles on side, nausea and fever, walk from Sunyani for review.",3,Yellow,ED waiting / urgent stream,60,emergency,Sunyani,false,3,Yellow,true
+CH-0547,Female,62,"Wound check, cut healing, small pain, farmer from Ejisu want nurse look.",4,Green,OPD / Minors / Polyclinic,240,routine,Ejisu,false,4,Green,true
+CH-0655,Female,11,"Cough and mild fever one week, tired from Manhyia, wonder if need ED or can wait OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Manhyia,true,4,Green,true
+CH-0656,Male,57,"Back pain one week, no trauma, can walk, want pain advice at KATH clinic.",4,Green,OPD / Minors / Polyclinic,240,routine,KATH,false,4,Green,true
+CH-0991,Male,68,"Health certificate for work, need medical form, no illness, from Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0446,Female,27,"Asthma attack at Asokwa, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,2,Orange,false
+CH-0578,Male,76,"Cough one week, no breathlessness, sleeping fine, came from Tafo for review.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0899,Male,61,"Follow-up BP check, nurse say come back, no new symptoms, live near KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,true,5,Green,true
+CH-0652,Female,26,"Ear pain three days, child from Sunyani, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0767,Male,56,"Advice on skin cream, mild dryness, no rash spread, pharmacy at Ejisu sent here.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0647,Male,55,"Ear pain three days, child from Bantama, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0468,Male,13,"Deep cut at Community Hospital workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0612,Male,7,"Ankle pain after football at Asokwa, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,true,5,Green,true
+CH-0606,Male,23,"Request malaria test, fever mild, feel tired, from Tafo, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0182,Female,74,"Sudden chest and back pain at Asokwa, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0553,Male,27,"Ear pain three days, child from Suame, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0715,Female,56,"Ankle pain after football at Asokwa, swollen, can limp, not sure if urgent.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,true,4,Green,true
+CH-0139,Female,64,"Anaphylaxis after groundnut at KATH, throat tight, rash spread, wheezing bad.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0456,Male,11,"Asthma attack at KATH, inhaler finish, wheezing loud, can speak but breath tight.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0996,Female,38,"Health certificate for work, need medical form, no illness, from Manhyia.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Manhyia,false,5,Green,true
+CH-0279,Female,76,"Sickle cell crisis from Tafo, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0554,Male,49,"Mild rash on arm after farm near Suame, itch but no fever, want nurse check today.",4,Green,OPD / Minors / Polyclinic,240,routine,Suame,false,4,Green,true
+CH-0892,Female,43,"Follow-up BP check, nurse say come back, no new symptoms, live near Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0479,Female,36,"Urinary retention painful, Suame man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0488,Male,16,"Moderate head injury at Ejisu, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Ejisu,false,3,Yellow,true
+CH-0885,Female,26,"Immunization for baby, routine visit, child well, mother from Suame.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0334,Female,55,"Urinary retention painful, Asokwa man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Asokwa,false,3,Yellow,true
+CH-0938,Female,69,"Medication refill, hypertension tablets finish, stable, walk from Bantama for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0882,Female,58,"Health certificate for work, need medical form, no illness, from Community Hospital.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Community Hospital,false,5,Green,true
+CH-0366,Male,25,"Sickle cell crisis from Community Hospital, bone pain severe, fever, known SS patient.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,2,Orange,false
+CH-0680,Female,25,"Sore throat two days, swallow pain, fever on and off, walk from Tafo to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0036,Male,4,"They rush my mother from Kejetia after road accident, blood plenty, my mother almost unconscious now.",1,Red,Resuscitation bay,0,emergency,Kejetia,false,1,Red,true
+CH-0030,Male,20,"Chest pain and collapse at church in Bantama, the patient sweat cold, pulse weak, cannot stand.",1,Red,Resuscitation bay,0,emergency,Bantama,false,1,Red,true
+CH-0175,Female,67,"Stroke symptoms at Kejetia, face droop, slurred speech, weak one side since morning.",2,Orange,Acute / high-dependency bed,10,emergency,Kejetia,false,2,Orange,true
+CH-0859,Female,24,"Follow-up BP check, nurse say come back, no new symptoms, live near KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0540,Female,27,"Red eye since yesterday, scratchy, see fine, bought drops at Asokwa pharmacy.",4,Green,OPD / Minors / Polyclinic,240,routine,Asokwa,false,4,Green,true
+CH-0135,Male,70,"Tension pneumothorax, rush from Bantama, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0130,Female,45,"Tension pneumothorax, rush from Bantama, chest tight like band, vomited twice in trotro.",2,Orange,Acute / high-dependency bed,10,emergency,Bantama,false,2,Orange,true
+CH-0642,Female,22,"Sore throat two days, swallow pain, fever on and off, walk from Sunyani to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0454,Male,8,"Urinary retention painful, Community Hospital man cannot pass urine since morning, lower belly hard.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0291,Male,46,"Severe abdominal pain since yesterday, KATH polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,KATH,false,3,Yellow,true
+CH-0756,Male,50,"Stitches removal only, doctor at Ejisu sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Ejisu,false,5,Green,true
+CH-0254,Female,47,"Diarrhoea and dehydration, Kejetia child cannot keep fluids, sunken eyes, still alert.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0235,Female,62,"High fever and rigors three days from Kejetia, my brother weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0317,Male,23,"Moderate head injury at Community Hospital, brief confusion, vomit once, now awake but headache.",3,Yellow,ED waiting / urgent stream,60,emergency,Community Hospital,false,3,Yellow,true
+CH-0400,Male,28,"High fever and rigors three days from Suame, my child weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0907,Male,29,"Medication refill, hypertension tablets finish, stable, walk from Tafo for prescription.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0954,Female,29,"Chronic review diabetes, sugars stable, no hypoglycaemia, appointment from KATH.",5,Green,OPD / Minors / Polyclinic,240,follow_up,KATH,false,5,Green,true
+CH-0671,Male,18,"Request malaria test, fever mild, feel tired, from Tafo, not feeling emergency.",4,Green,OPD / Minors / Polyclinic,240,routine,Tafo,false,4,Green,true
+CH-0087,Male,28,"Pregnant woman from Asokwa, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Asokwa,false,2,Orange,true
+CH-0160,Male,58,"Worst headache of life at KATH market, thunderclap, neck stiff, vomiting, cannot bend head.",2,Orange,Acute / high-dependency bed,10,emergency,KATH,false,2,Orange,true
+CH-0633,Male,54,"Sore throat two days, swallow pain, fever on and off, walk from Community Hospital to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Community Hospital,false,4,Green,true
+CH-0269,Male,62,"Severe abdominal pain since yesterday, Tafo polyclinic refer to ED, guarding and fever.",3,Yellow,ED waiting / urgent stream,60,emergency,Tafo,false,3,Yellow,true
+CH-0107,Female,78,"Crushing central chest pain since Community Hospital, my sister sweat plenty, pain go left arm, breath short.",2,Orange,Acute / high-dependency bed,10,emergency,Community Hospital,false,2,Orange,true
+CH-0086,Female,45,"Pregnant woman from Manhyia, heavy vaginal bleeding, dizzy, cramping, soaked pad.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0784,Female,46,"Stitches removal only, doctor at Bantama sew cut last week, wound clean, no fever.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Bantama,false,5,Green,true
+CH-0537,Male,6,"Ear pain three days, child from Bantama, pulling ear, no high fever.",4,Green,OPD / Minors / Polyclinic,240,routine,Bantama,false,4,Green,true
+CH-0407,Female,40,"Deep cut at Suame workshop, bleeding controlled but need suture and tetanus today.",3,Yellow,ED waiting / urgent stream,60,emergency,Suame,false,3,Yellow,true
+CH-0790,Male,44,"Administrative visit, transfer notes from Suame clinic, no acute complaint today.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Suame,false,5,Green,true
+CH-0027,Male,57,"Seizure at home in KATH, the patient convulsing, foam at mouth, cannot wake after it stop.",1,Red,Resuscitation bay,0,emergency,KATH,false,1,Red,true
+CH-0056,Female,54,"Sudden chest and back pain at Manhyia, like knife, doctor suspect dissection, sweating in cool room.",2,Orange,Acute / high-dependency bed,10,emergency,Manhyia,false,2,Orange,true
+CH-0562,Male,58,"Sore throat two days, swallow pain, fever on and off, walk from Sunyani to OPD.",4,Green,OPD / Minors / Polyclinic,240,routine,Sunyani,false,4,Green,true
+CH-0485,Female,66,"High fever and rigors three days from Kejetia, the patient weak, malaria RDT positive, vomiting.",3,Yellow,ED waiting / urgent stream,60,emergency,Kejetia,false,3,Yellow,true
+CH-0900,Female,49,"Suture removal request, small cut, pain small, travel from Kejetia before farm work.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Kejetia,true,5,Green,true
+CH-0960,Male,62,"Follow-up BP check, nurse say come back, no new symptoms, live near Tafo.",5,Green,OPD / Minors / Polyclinic,240,follow_up,Tafo,false,5,Green,true
+CH-0066,Male,4,"Bad headache two days at Ejisu, worse today, vomiting once but still talking fine.",2,Orange,Acute / high-dependency bed,10,emergency,Ejisu,true,1,Red,false

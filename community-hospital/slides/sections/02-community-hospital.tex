@@ -1,0 +1,90 @@
+% =============================================================================
+\section{Community Hospital case study}
+% =============================================================================
+
+\begin{frame}{Case study setting}
+  \small
+  \textbf{Community Hospital} is a fictional Ghanaian LMIC facility (Kumasi-region style) \citep{Rominski2014, Gyedu2016}.
+
+  \vspace{0.15cm}
+  \begin{itemize}
+    \item Synthetic cohort: \textbf{N = 1000} patients with \textbf{skewed ED arrival mix} (5\% / 15\% / 30\% / 25\% / 25\%) \citep{Mitchell2023, thisstudy2026}.
+    \item Ghanaian patient-voice chief complaints (Kejetia, Bantama, Ejisu, Sunyani, KATH).
+    \item Ground-truth nurse labels $c \in \{1,\ldots,5\}$ $\to$ $C = f_{\mathrm{SATS}}(c)$ $\to$ pathway $P(C)$ \citep{SATS2012, Rominski2014}.
+    \item $\sim$7\% borderline complaints flagged for adjacent-level ambiguity \citep{thisstudy2026}.
+    \item Chatbot eval: \textbf{97.5\%} colour-routing accuracy (975/1000); 8k holdout reference 99.92\% \citep{thisstudy2026, Lee2020}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Dataset schema}
+  \footnotesize
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Field & Example \\
+    \midrule
+    patient\_id & CH-0042 \\
+    sex / age & Female, 34 \\
+    chief\_complaint & ``Crushing chest pain since Kejetia\ldots'' \\
+    acuity\_level & 2 \\
+    sats\_colour & Orange \\
+    pathway\_destination & Acute / high-dependency bed \\
+    t\_max\_minutes & 10 \\
+    ambiguity\_flag & true / false \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.2cm}
+  Data: \texttt{community-hospital/data/community\_hospital\_patients.csv} \citep{thisstudy2026}
+\end{frame}
+
+\begin{frame}{Acuity distribution}
+  \begin{center}
+    \includegraphics[width=0.82\textwidth]{acuity_distribution.png}
+  \end{center}
+  \footnotesize
+  Skewed mix mirrors real ED arrivals: few Red, many Yellow and Green \citep{Mitchell2023, Rominski2014}. L4 and L5 use distinct bar colours; both map to SATS Green \citep{SATS2012, thisstudy2026}.
+\end{frame}
+
+\begin{frame}{Pathway destinations}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{pathway_flow.png}
+  \end{center}
+  \plain{Each row carries destination and $T_{\max}$. Colour is bound to a protocol, not a label alone \citep{Sundstrom2014, SATS2012}.}
+\end{frame}
+
+\begin{frame}{Green-pathway diversion}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \includegraphics[width=\textwidth]{green_diversion.png}
+    \column{0.48\textwidth}
+    \small
+    \textbf{50\%} of cohort (levels 4--5, $n=500$) routed to OPD / Minors / Polyclinic \citep{thisstudy2026}.
+
+    \vspace{0.2cm}
+    Without early diversion, many Green patients queue in acute zones and worsen overcrowding \citep{Yilmaz2021, Mitchell2023}.
+
+    \vspace{0.2cm}
+    Chatbot assigns Green at intake, before the physical desk \citep{Sundstrom2014, thisstudy2026}.
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Chatbot colour-routing accuracy}
+  \begin{center}
+    \includegraphics[width=0.82\textwidth]{chatbot_accuracy_by_level.png}
+  \end{center}
+  \small
+  \textbf{97.5\%} overall (975/1000). Level 1 recall \textbf{94.0\%} (47/50). Errors concentrate on adjacent levels and borderline cases \citep{thisstudy2026, Stewart2023, Berkowitz2019}.
+\end{frame}
+
+\begin{frame}{Case study conclusion}
+  \small
+  \begin{block}{Findings}
+    \begin{itemize}
+      \item NLP maps Ghanaian free text to SATS colour before vitals are available \citep{Stewart2023, Gligorijevic2018, thisstudy2026}.
+      \item Every case includes pathway destination and $T_{\max}$ \citep{Sundstrom2014, thisstudy2026}.
+      \item 500/1000 patients are Green diversion candidates: operational lever on crowding \citep{Yilmaz2021, thisstudy2026}.
+    \end{itemize}
+  \end{block}
+
+  \plain{Next: transshipment LP model for ED patient flow \citep{thisstudy2026}.}
+\end{frame}

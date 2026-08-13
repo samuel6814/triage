@@ -25,7 +25,187 @@ router.post('/predict', async (req, res) => {
       return res.status(400).json({ detail: 'text is required' });
     }
 
-    const response = await fetch(`${ML_SERVICE_URL}/predict`, {
+    const url = new URL(`${ML_SERVICE_URL}/predict`);
+    // OpenMed enrichment is on by default; pass openmed=false to disable.
+    const openmedOff =
+      req.query.openmed === 'false' ||
+      req.query.openmed === '0' ||
+      req.query.enrich === 'false';
+    const openmedOn =
+      req.query.openmed === 'true' ||
+      req.query.openmed === '1' ||
+      req.query.enrich === 'true';
+    if (openmedOff) {
+      url.searchParams.set('openmed', 'false');
+    } else if (openmedOn || req.query.openmed == null) {
+      // Default on when query omitted (matches ML default).
+      url.searchParams.set('openmed', 'true');
+    }
+
+    // Medical gate is on by default; pass gate=false to disable for demos.
+    const gateOff =
+      req.query.gate === 'false' || req.query.gate === '0';
+    url.searchParams.set('gate', gateOff ? 'false' : 'true');
+
+    const useGate = url.searchParams.get('gate') === 'true';
+    const useOpenMed = url.searchParams.get('openmed') === 'true';
+    console.log(
+      `[api] predict proxy text_len=${text.trim().length} gate=${useGate} openmed=${useOpenMed}`,
+    );
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.trim() }),
+    });
+
+    const data = await response.json();
+    if (response.ok && data.predicted_acuity_level != null) {
+      console.log(
+        `[api] predict result level=${data.predicted_acuity_level} confidence=${data.confidence}`,
+      );
+    }
+    res.status(response.status).json(data);
+  } catch (err) {
+    console.error(`[api] predict proxy error: ${err.message}`);
+    res.status(503).json({
+      detail: 'ML service unavailable',
+      message: err.message,
+    });
+  }
+});
+
+router.post('/fuse', async (req, res) => {
+  try {
+    const { text, vitals } = req.body;
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ detail: 'text is required' });
+    }
+
+    const url = new URL(`${ML_SERVICE_URL}/fuse`);
+    const openmedOff =
+      req.query.openmed === 'false' ||
+      req.query.openmed === '0';
+    url.searchParams.set('openmed', openmedOff ? 'false' : 'true');
+
+    const gateOff = req.query.gate === 'false' || req.query.gate === '0';
+    url.searchParams.set('gate', gateOff ? 'false' : 'true');
+
+    const forceBayes =
+      req.query.force_bayes === 'true' || req.query.force_bayes === '1';
+    url.searchParams.set('force_bayes', forceBayes ? 'true' : 'false');
+
+    const payload = { text: text.trim() };
+    if (vitals && typeof vitals === 'object') {
+      payload.vitals = vitals;
+    }
+
+    console.log(
+      `[api] fuse proxy text_len=${text.trim().length} vitals=${Boolean(payload.vitals)} gate=${url.searchParams.get('gate')} openmed=${url.searchParams.get('openmed')}`,
+    );
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (response.ok && data.fused_colour) {
+      console.log(
+        `[api] fuse result fused=${data.fused_colour} nlp=${data.layers?.c_nlp} tews=${data.layers?.c_tews}`,
+      );
+    }
+    res.status(response.status).json(data);
+  } catch (err) {
+    console.error(`[api] fuse proxy error: ${err.message}`);
+    res.status(503).json({
+      detail: 'ML service unavailable',
+      message: err.message,
+    });
+  }
+});
+
+router.post('/analyze', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ detail: 'text is required' });
+    }
+
+    const response = await fetch(`${ML_SERVICE_URL}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.trim() }),
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(503).json({
+      detail: 'ML service unavailable',
+      message: err.message,
+    });
+  }
+});
+
+router.post('/deidentify', async (req, res) => {
+  try {
+    const { text, method = 'mask' } = req.body;
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ detail: 'text is required' });
+    }
+
+    const response = await fetch(`${ML_SERVICE_URL}/deidentify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.trim(), method }),
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(503).json({
+      detail: 'ML service unavailable',
+      message: err.message,
+    });
+  }
+});
+
+router.post('/translate', async (req, res) => {
+  try {
+    const { text, source_lang = 'tw' } = req.body;
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ detail: 'text is required' });
+    }
+
+    const response = await fetch(`${ML_SERVICE_URL}/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: text.trim(),
+        source_lang: source_lang === 'en' ? 'en' : 'tw',
+      }),
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(503).json({
+      detail: 'ML service unavailable',
+      message: err.message,
+    });
+  }
+});
+
+router.post('/explain', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ detail: 'text is required' });
+    }
+
+    const response = await fetch(`${ML_SERVICE_URL}/explain`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text.trim() }),

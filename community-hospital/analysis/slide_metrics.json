@@ -1,0 +1,15 @@
+{
+  "n": 1000,
+  "colour_accuracy_pct": 97.5,
+  "colour_correct": 975,
+  "l1_recall_pct": 94.0,
+  "green_n": 500,
+  "green_pct": 50,
+  "acute_n": 500,
+  "transship_cost_without": 7150.0,
+  "transship_cost_with": 2700.0,
+  "transship_cost_reduction_pct": 62.2,
+  "transship_acute_reduction_pct": 44.4,
+  "acute_load_without": 900,
+  "acute_load_with": 500
+}

@@ -68,11 +68,11 @@ export const TokenizationPipeline = () => (
   </Wrap>
 );
 
-export const ClsTokenDiagram = () => (
-  <Wrap>
+export const ClsTokenDiagram = ({ className }) => (
+  <Wrap className={className}>
     <Svg viewBox="0 0 520 130" preserveAspectRatio="xMidYMid meet">
       {['[CLS]', 'i', 'have', 'head', 'feel', 'fever', '[SEP]'].map((tok, i) => (
-        <g key={tok}>
+        <g key={tok} className="viz-cls-token">
           <rect
             x={8 + i * 70}
             y="10"

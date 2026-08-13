@@ -1,0 +1,96 @@
+\chapter{METHODOLOGY}
+\label{ch:method}
+
+\section{Overview}
+
+The methodology has three layers:
+
+\begin{enumerate}
+  \item \textbf{Digital Acuity Engine (Part~1):} text \(\to\) acuity \(\hat{c}\) \(\to\) \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\).
+  \item \textbf{Fusion controller:} optional TEWS, discriminators \(\mathbf{D}\), and tabular Bayes combine with \(C_{\mathrm{NLP}}\) via max-urgency \(f_{\mathrm{fusion}}\).
+  \item \textbf{Pathway protocols:} fused \(C\mapsto P(C)=(T_{\max},\mathrm{dest},\mathrm{actions},\mathrm{escalation})\).
+\end{enumerate}
+
+Text-only \texttt{/predict} remains NLP-only; multi-signal intake uses \texttt{/fuse}.
+
+\section{Data and fine-tuning}
+
+Chief-complaint text paired with acuity labels was used to fine-tune BioBERT for sequence classification over five classes. Training artefacts and notebooks live under \texttt{fine-tuned-biobert/}. A stratified \(10\%\) holdout (\(n=8{,}000\)) was reserved for evaluation. An optional SMOTE-augmented training variant was compared for minority-class (Red) recall.
+
+\section{Medical gate}
+
+Before acuity prediction, a clinical relevance gate scores whether the input is a medical chief complaint. Non-clinical text (greetings, shopping, sports, etc.) is rejected with a dynamic message and category (e.g.\ \texttt{non\_clinical\_topic}). Default threshold: \(0.35\). This protects the triage model from nonsense inputs and answers RQ5.
+
+\section{OpenMed enrichment}
+
+When enabled, OpenMed NER extracts disease/condition and medication spans, with simple negation heuristics. Optional entity prefixes of the form \texttt{[DISEASE: \ldots]} / \texttt{[DRUG: \ldots]} may be prepended before BioBERT tokenisation. OpenMed does \textbf{not} predict acuity; BioBERT remains the classifier (RQ6).
+
+\section{BioBERT inference}
+
+Let \(X\) be the (possibly enriched) complaint. BioBERT produces logits \(\mathbf{z}\in\mathbb{R}^{5}\). Softmax yields
+\[
+\hat{y}_c=\frac{e^{z_c}}{\sum_{j=1}^{5}e^{z_j}},\qquad
+\hat{c}=\arg\max_c\hat{y}_c,\qquad
+\mathrm{confidence}=\max_c\hat{y}_c.
+\]
+Training minimises cross-entropy against nurse acuity labels.
+
+\section{Colour mapping}
+
+\[
+C=f_{\mathrm{SATS}}(\hat{c})=
+\begin{cases}
+\mathrm{Red} & \hat{c}=1\\
+\mathrm{Orange} & \hat{c}=2\\
+\mathrm{Yellow} & \hat{c}=3\\
+\mathrm{Green} & \hat{c}\in\{4,5\}
+\end{cases}
+\]
+Implemented in the ML service as a constant lookup. Under this fixed map, colour-routing accuracy equals acuity accuracy (RQ2).
+
+\section{Pathway protocols \(P(C)\)}
+
+\begin{table}[h]
+\centering
+\caption{Protocol-mapped colour pathways (chatbot Part~2).}
+\label{tab:pathways}
+\begin{tabular}{p{1.6cm}p{1.8cm}p{3.2cm}p{5cm}}
+\hline
+Colour & \(T_{\max}\) & Destination & Actions (summary) \\
+\hline
+Red & 0~min & Resuscitation & Code Red; bypass registration \\
+Orange & 10~min & Acute bed & Countdown; escalate if unclaimed \\
+Yellow & 60~min & Urgent ED stream & Standing orders in parallel \\
+Green & Routine & OPD / Minors / Polyclinic & Divert from acute ED \\
+Blue & Dignity & Mortuary pathway & Silent social-work protocol \\
+\hline
+\end{tabular}
+\end{table}
+
+Blue is a dignity protocol outside the five-class acuity head. Pathways attach to \textbf{fused} colour from \texttt{/fuse} (or to \(C_{\mathrm{NLP}}\) for text-only \texttt{/predict} demos).
+
+\section{TEWS, discriminators, and tabular Bayes}
+
+When vitals are present, TEWS scores \(f_1\)--\(f_6\) yield \(T\) and \(C_{\mathrm{TEWS}}\). Rule/OpenMed discriminators yield \(C_{\mathrm{disc}}\). Tabular Bayes yields \(C_{\mathrm{Bayes}}\) when incomplete TEWS, low NLP confidence, layer conflict, or \texttt{force\_bayes} applies. Fusion:
+\[
+\mathrm{ord}(C)\ge\max\bigl\{\mathrm{ord}(C_{\mathrm{disc}}),\,\mathrm{ord}(C_{\mathrm{TEWS}}),\,\mathrm{ord}(C_{\mathrm{Bayes}}),\,\mathrm{ord}(C_{\mathrm{NLP}})\bigr\}.
+\]
+Incomplete TEWS Green is suppressed so missing vitals cannot downgrade a higher NLP/discriminator signal.
+
+\section{Evaluation protocol}
+
+On the holdout set we report accuracy, precision, recall, F1, macro-F1, per-class support, confusion matrices, mean confidence, and calibration plots. Level-1 recall is emphasised as a safety metric (RQ7). Softmax overconfidence informs nurse-in-the-loop guidance (RQ8). Fusion scenarios (chest pain, critical vitals, Green diversion) are tabulated for RQ10--RQ11.
+
+\section{System prototype (Curatio)}
+
+\begin{itemize}
+  \item \textbf{ML service:} FastAPI --- \texttt{/predict}, \texttt{/fuse}, \texttt{/analyze}, \texttt{/deidentify}, voice intake.
+  \item \textbf{API gateway:} Express proxies to the ML service.
+  \item \textbf{Client:} React triage test page (vitals + layer audit) and presentation dashboard.
+\end{itemize}
+
+Default predict path enables the medical gate and OpenMed enrichment; both can be disabled for ablation demos. OpenMed NER is timeout-bounded so model downloads cannot block acuity forever.
+
+\section{What is not in the methodology}
+
+Full Bayesian network structure learning (pgmpy), EMR-calibrated priors, and a learned multi-label discriminator head are excluded. Prospective clinical trials remain future work.

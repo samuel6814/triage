@@ -16,7 +16,6 @@ const Block = styled.div`
   border: 2px solid #166534;
   font-weight: 700;
   color: #166534;
-  opacity: 0;
   transform: translateY(20px);
 `;
 
@@ -24,7 +23,6 @@ const Plus = styled.span`
   font-size: 1.5rem;
   font-weight: 800;
   color: #94a3b8;
-  opacity: 0;
 `;
 
 const Result = styled.div`
@@ -33,7 +31,6 @@ const Result = styled.div`
   background: #166534;
   color: #fff;
   font-weight: 800;
-  opacity: 0;
   transform: scale(0.8);
   margin-top: 0.5rem;
   width: 100%;

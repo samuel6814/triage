@@ -1,0 +1,130 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{amsmath,amssymb}
+
+\title{Project Framing\\[0.4em]\large Hospital Chatbot for Color-Coded Clinical Pathways}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose}
+This pack states what the project is doing: Part~1 (NLP acuity) is built; Part~2 is protocol-mapped colour pathways; Bayesian fusion is out of scope.
+
+\section{Project map}
+
+\subsection*{One-sentence summary}
+A hospital chatbot that maps a patient's chief complaint to a SATS acuity level and colour, then attaches a concrete clinical pathway (destination, time target, actions)---without requiring a TEWS+Bayesian fusion stack at intake.
+
+\subsection*{Architecture (implemented)}
+\begin{verbatim}
+Chief complaint
+  -> Medical gate
+  -> OpenMed NER (optional)
+  -> BioBERT (5-class acuity)
+  -> Softmax -> acuity c-hat in {1..5}
+  -> C = f_SATS(c-hat)   % 1 Red, 2 Orange, 3 Yellow, 4/5 Green
+  -> Pathway protocol P(C)
+\end{verbatim}
+
+\subsection*{Part 1 --- done}
+\begin{tabular}{@{}p{6cm}p{8cm}@{}}
+\toprule
+\textbf{Component} & \textbf{Location} \\
+\midrule
+Fine-tuned BioBERT (baseline + SMOTE) & \texttt{fine-tuned-biobert/} \\
+ML API (predict, gate, OpenMed, \ldots) & \texttt{curatio/server/ml/} \\
+Express gateway & \texttt{curatio/server/} \\
+React demo + presentation UI & \texttt{curatio/client/} \\
+Holdout eval ($\sim$99.92\% colour accuracy) & \texttt{results/eval\_outputs/} \\
+Results slides & \texttt{results/slides/} \\
+\bottomrule
+\end{tabular}
+
+Colour mapping in code: \texttt{curatio/server/ml/predict.py} (\texttt{SATS\_BY\_ACUITY}).
+
+\subsection*{Part 2 --- implemented}
+Pathways \(P(C)\) attach to \textbf{fused} colour from \texttt{/fuse}. TEWS, rule discriminators, and tabular Bayes vote under max-urgency \(f_{\mathrm{fusion}}\) (full BN learning remains out of scope). Spec: \texttt{triage-fusion/}.
+
+\subsection*{Explicit non-goals}
+\begin{itemize}
+  \item No full Bayesian network (pgmpy / structure learning)
+  \item No claim that BioBERT itself performs TEWS--Bayes fusion
+  \item No prospective clinical trial in this draft
+\end{itemize}
+
+\section{Research gaps}
+\begin{enumerate}
+  \item \textbf{Acuity discontinuity} --- colour does not drive care after the desk; answer with pathway object $P(C)$.
+  \item \textbf{LMIC / Ghanaian chief-complaint NLP} --- local text$\to$SATS colour via BioBERT + Curatio.
+  \item \textbf{Green Tag Burden} --- Green pathway diversion to OPD / Minors / Polyclinic.
+  \item \textbf{Constrained classifier vs open LLM} --- fixed 5-class head + deterministic maps.
+  \item \textbf{Text-only pre-triage} --- NLP acuity before vitals; optional TEWS when supplied via \texttt{/fuse}.
+  \item \textbf{Minority Red safety} --- baseline vs SMOTE; report L1 recall.
+  \item \textbf{Colour must mean a pathway} --- not only a badge.
+\end{enumerate}
+
+\section{Ten research questions}
+\begin{enumerate}
+  \item[\textbf{RQ1}] Can unstructured chief complaints map to SATS acuity $1$--$5$ with usable accuracy?
+  \item[\textbf{RQ2}] Does correct acuity imply correct colour under fixed $f_{\mathrm{SATS}}$?
+  \item[\textbf{RQ3}] How should colours become pathways (destination, $T_{\max}$, actions)?
+  \item[\textbf{RQ4}] Can a chatbot deliver pre-triage acuity and pathway guidance?
+  \item[\textbf{RQ5}] How well does the system reject non-clinical input?
+  \item[\textbf{RQ6}] Does OpenMed NER improve interpretability without replacing acuity?
+  \item[\textbf{RQ7}] How does imbalance affect Level-1 (Red) recall?
+  \item[\textbf{RQ8}] How overconfident is softmax, and what about nurse oversight?
+  \item[\textbf{RQ9}] Can Green diversion be specified to reduce ED congestion?
+  \item[\textbf{RQ10}] Does $f_{\mathrm{fusion}}$ assign a safer colour than $C_{\mathrm{NLP}}$ when TEWS and language disagree?
+  \item[\textbf{RQ11}] Are pathway cards $P(C)$ correctly attached to fused colours in API tests?
+\end{enumerate}
+
+Formal Part~1: $\text{Input } X \to \hat{c}\in\{1,\ldots,5\} \to C=f_{\mathrm{SATS}}(\hat{c})$.
+
+Formal Part~2: $C \mapsto P(C)=(T_{\max},\,\mathrm{dest},\,\mathrm{actions},\,\mathrm{escalation})$.
+
+\section{Pathways design (no Bayesian)}
+\begin{tabular}{@{}p{1.8cm}p{2cm}p{3.5cm}p{5.5cm}@{}}
+\toprule
+Colour & $T_{\max}$ & Destination & Actions (summary) \\
+\midrule
+Red & 0 min & Resuscitation & Code Red; bypass registration \\
+Orange & 10 min & Acute bed & Countdown; escalate if unclaimed \\
+Yellow & 60 min & Urgent ED stream & Standing orders in parallel \\
+Green & Routine & OPD / Minors / Polyclinic & Divert from acute ED \\
+Blue & Dignity & Mortuary pathway & Silent social-work protocol \\
+\bottomrule
+\end{tabular}
+
+\section{Mathematics scope}
+\textbf{In scope:} softmax acuity; $f_{\mathrm{SATS}}$; pathway $P(C)$; evaluation metrics; medical gate.
+
+\textbf{Out of scope:} TEWS sum engine; Bayesian $P(C_k\mid E)$; fusion $\max$-urgency controller.
+
+\section{Thesis outline}
+\begin{itemize}
+  \item Ch.1 Introduction --- problem, 10 RQs, scope (no Bayes)
+  \item Ch.2 Literature --- SATS, Green Tag, triage NLP
+  \item Ch.3 Methodology --- BioBERT, colour map, pathways
+  \item Ch.4 Results --- holdout metrics, calibration, scenarios
+  \item Ch.5 Conclusion --- RQ answers, future TEWS overlay (optional)
+\end{itemize}
+Location: \texttt{thesis/first-draft/}.
+
+\section{Roadmap}
+\begin{itemize}
+  \item Done: Part~1 software/eval; framing; findings; thesis first draft; no-Bayes decision
+  \item Write: deepen Ch.2 from reading notes; expand bib
+  \item Optional build: pathway card fields in API/UI
+  \item Do not schedule: Bayesian networks / fusion controller
+\end{itemize}
+
+\end{document}

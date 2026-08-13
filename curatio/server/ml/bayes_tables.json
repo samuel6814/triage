@@ -1,0 +1,32 @@
+{
+  "scenarios": {
+    "chest_pain_partial_vitals": {
+      "priors": {"Red": 0.05, "Orange": 0.15, "Yellow": 0.30, "Green": 0.50},
+      "likelihoods": {"Red": 0.10, "Orange": 0.95, "Yellow": 0.03, "Green": 0.007}
+    },
+    "chest_pain_full_vitals": {
+      "priors": {"Red": 0.08, "Orange": 0.22, "Yellow": 0.30, "Green": 0.40},
+      "likelihoods": {"Red": 0.20, "Orange": 0.85, "Yellow": 0.20, "Green": 0.05}
+    },
+    "respiratory_distress": {
+      "priors": {"Red": 0.10, "Orange": 0.25, "Yellow": 0.35, "Green": 0.30},
+      "likelihoods": {"Red": 0.25, "Orange": 0.80, "Yellow": 0.25, "Green": 0.08}
+    },
+    "low_confidence_general": {
+      "priors": {"Red": 0.05, "Orange": 0.15, "Yellow": 0.35, "Green": 0.45},
+      "likelihoods": {"Red": 0.15, "Orange": 0.35, "Yellow": 0.40, "Green": 0.35}
+    },
+    "default_ed": {
+      "priors": {"Red": 0.05, "Orange": 0.15, "Yellow": 0.35, "Green": 0.45},
+      "likelihoods": {"Red": 0.10, "Orange": 0.25, "Yellow": 0.40, "Green": 0.50}
+    }
+  },
+  "mi_phrases": [
+    "crushing central chest",
+    "crushing chest",
+    "radiating to arm",
+    "arm radiation",
+    "radiates to left arm",
+    "central chest pain"
+  ]
+}

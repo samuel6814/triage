@@ -1,0 +1,90 @@
+% =============================================================================
+\section{Transshipment optimization}
+% =============================================================================
+
+\begin{frame}{ED overcrowding as a network problem}
+  \small
+  \textbf{Problem:} long waits and acute-zone congestion when non-urgent patients enter the wrong queue \citep{Yilmaz2021, Mitchell2023}.
+
+  \vspace{0.15cm}
+  \textbf{OR tool:} transshipment LP
+  \[
+    \min Z = \sum_{(i,j)} c_{ij}\, x_{ij}
+  \]
+  subject to supply, balance, and demand constraints.
+
+  \plain{Patients are flow; arcs are routing paths; cost $c_{ij}$ is expected wait plus wrong-queue penalty \citep{thisstudy2026}.}
+\end{frame}
+
+\begin{frame}{Hospital transshipment network}
+  \begin{center}
+    \resizebox{0.92\linewidth}{!}{%
+    \begin{tikzpicture}[x=1cm, y=1cm, font=\tiny]
+      % Layer labels (left of diagram, clear of node boxes)
+      \node[anchor=east, font=\scriptsize\itshape] at (-2.2, 2.2) {Sources};
+      \node[anchor=east, font=\scriptsize\itshape] at (-2.2, 0.8) {Transshipment};
+      \node[anchor=east, font=\scriptsize\itshape] at (-2.2, -0.8) {Destinations};
+
+      % Row y=2.2: sources
+      \node[flowbox, minimum width=2.1cm] (s1) at (0, 2.2) {Critical\\(50)};
+      \node[flowbox, minimum width=2.1cm] (s2) at (3.2, 2.2) {Very urg.\\(150)};
+      \node[flowbox, minimum width=2.1cm] (s3) at (6.4, 2.2) {Urgent\\(300)};
+      \node[flowbox, minimum width=2.1cm] (s4) at (9.6, 2.2) {Non-urg.\\(500)};
+
+      % Row y=0.8: transshipment
+      \node[flowbox, minimum width=2.1cm] (bot) at (1.6, 0.8) {Chatbot\\pre-triage};
+      \node[flowbox, minimum width=2.1cm] (desk) at (7.2, 0.8) {Triage\\desk};
+
+      % Row y=-0.8: destinations
+      \node[flowbox, minimum width=2.1cm] (d1) at (0, -0.8) {Resus\\(50)};
+      \node[flowbox, minimum width=2.1cm] (d2) at (4.8, -0.8) {Majors\\(450)};
+      \node[flowbox, minimum width=2.1cm] (d3) at (9.6, -0.8) {OPD\\(500)};
+
+      \draw[flowarr] (s1) -- (bot);
+      \draw[flowarr] (s2) -- (bot);
+      \draw[flowarr] (s4) -- (bot);
+      \draw[flowarr] (s3) to[bend left=15] (desk);
+      \draw[flowarr] (bot) -- (d1);
+      \draw[flowarr] (bot) to[bend right=12] (d2);
+      \draw[flowarr] (bot) to[bend left=12] (d3);
+      \draw[flowarr] (desk) -- (d2);
+      \draw[flowarr] (desk) -- (d3);
+    \end{tikzpicture}%
+    }
+  \end{center}
+  \footnotesize Sources (1--4) $\to$ transshipment nodes (chatbot, desk) $\to$ destinations \citep{thisstudy2026, Yilmaz2021}.
+\end{frame}
+
+\begin{frame}{LP structure}
+  \footnotesize
+  \textbf{Decision variables:} $x_{ij}$ = patients routed on arc $(i,j)$.
+
+  \vspace{0.08cm}
+  \textbf{Supply:} arrivals (50, 150, 300, 500) \citep{thisstudy2026}.
+
+  \textbf{Balance:} inflow $=$ outflow at chatbot and desk.
+
+  \textbf{Demand:} resuscitation 50, majors 450, OPD 500 \citep{thisstudy2026}.
+
+  \vspace{0.1cm}
+  \begin{block}{Community Hospital instance}
+    \begin{tabular}{@{}lrr@{}}
+      \toprule
+      Scenario & Total cost $Z$ & Acute-zone load \\
+      \midrule
+      Without chatbot & 7150 & 900 \\
+      With chatbot & 2700 & 500 \\
+      \textbf{Reduction} & \textbf{62\%} & \textbf{44\%} \\
+      \bottomrule
+    \end{tabular}
+  \end{block}
+  \vspace{-0.05cm}
+  {\tiny Results from synthetic cohort routing \citep{thisstudy2026}.}
+\end{frame}
+
+\begin{frame}{Acute-zone load reduction}
+  \begin{center}
+    \includegraphics[width=0.75\textwidth]{wait_time_scenario.png}
+  \end{center}
+  \plain{Without digital pre-triage, 500 Green patients can mis-route to majors; chatbot diverts them to OPD early \citep{Yilmaz2021, thisstudy2026}.}
+\end{frame}

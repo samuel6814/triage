@@ -214,6 +214,7 @@
 \begin{frame}{Worked Example: Full ID Assignment}
 	\scriptsize
 	\textbf{Input:} ``I have a headache and feel feverish.'' \quad Each ID $\to$ row in $E_{\mathrm{word}}$.
+	Real tokens: $M \approx 12$; batches pad to length 128 with filler tokens.
 	\vspace{0.05cm}
 	\begin{columns}[T]
 		\begin{column}{0.48\textwidth}
@@ -238,14 +239,29 @@
 				6 & feel & feel & 2514 \\
 				7 & feverish & fever+\#\#ish & 9643, 6804 \\
 				8 & . & . & 1012 \\
+				9 & --- & \texttt{[SEP]} & 102 \\
+				10 & --- & \texttt{[PAD]} & 0 \\
+				11 & --- & \texttt{[PAD]} & 0 \\
 				$\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
-				$M$ & --- & \texttt{[SEP]} & 102 \\
+				127 & --- & \texttt{[PAD]} & 0 \\
 				\bottomrule
 			\end{tabular}
 		\end{column}
 	\end{columns}
-	\vspace{0.08cm}
-	\footnotesize Reserved: \texttt{[CLS]}=101 (classification summary), \texttt{[SEP]}=102 (sentence end).
+	\vspace{0.06cm}
+	\textbf{Vocabulary range:} token IDs $0 \ldots 28{,}995$ ($|\mathcal{V}| = 28{,}996$); sequence positions $i = 0 \ldots 127$ ($M \leq 128$).
+	\vspace{0.04cm}
+	\begin{tabular}{@{}l c p{7.4cm}@{}}
+		\toprule
+		\textbf{Special token} & \textbf{ID} & \textbf{Role} \\
+		\midrule
+		\texttt{[PAD]} & 0 & Padding filler after \texttt{[SEP]}; attention mask = 0 (ignored) \\
+		\texttt{[UNK]} & 100 & Unknown WordPiece piece \\
+		\texttt{[CLS]} & 101 & Classification summary (always $i=0$) \\
+		\texttt{[SEP]} & 102 & Sentence boundary \\
+		\texttt{[MASK]} & 103 & MLM pre-training only --- not used at triage inference \\
+		\bottomrule
+	\end{tabular}
 \end{frame}
 
 \begin{frame}{What is \texttt{[CLS]}?}

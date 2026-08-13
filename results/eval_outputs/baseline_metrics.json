@@ -1,0 +1,40 @@
+{
+  "accuracy": 0.99925,
+  "macro_f1": 0.9976736879586123,
+  "recall_L1_Red": 0.9813664596273292,
+  "precision_L1_Red": 1.0,
+  "f1_L1_Red": 0.9905956112852664,
+  "support_L1_Red": 322,
+  "precision_L1 Red": 1.0,
+  "recall_L1 Red": 0.9813664596273292,
+  "f1_L1 Red": 0.9905956112852664,
+  "support_L1 Red": 322,
+  "precision_L2 Orange": 0.9955555555555555,
+  "recall_L2 Orange": 1.0,
+  "f1_L2 Orange": 0.9977728285077951,
+  "support_L2 Orange": 1344,
+  "precision_L3 Yellow": 1.0,
+  "recall_L3 Yellow": 1.0,
+  "f1_L3 Yellow": 1.0,
+  "support_L3 Yellow": 2892,
+  "precision_L4 Green": 1.0,
+  "recall_L4 Green": 1.0,
+  "f1_L4 Green": 1.0,
+  "support_L4 Green": 2302,
+  "precision_L5 Green": 1.0,
+  "recall_L5 Green": 1.0,
+  "f1_L5 Green": 1.0,
+  "support_L5 Green": 1140,
+  "calibration": {
+    "mean_confidence": 0.9996618413627147,
+    "pct_confidence_eq_1": 0.7905,
+    "pct_confidence_below_0_85": 0.0
+  },
+  "latency_ms": {
+    "p50": 100.30444160929619,
+    "p95": 139.10841579538553,
+    "mean_per_sample": 102.13309951849988
+  },
+  "n_eval": 8000,
+  "model_path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_biobert_triage"
+}

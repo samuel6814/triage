@@ -1,0 +1,177 @@
+% =============================================================================
+\section{Methodology}
+% =============================================================================
+
+\begin{frame}{How input flows through the model}
+  \begin{center}
+    \resizebox{0.98\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=0.5cm and 0.4cm]
+      \node[flowbox] (x) {Chief\\complaint $X$};
+      \node[flowbox, right=of x] (tok) {Tokenize};
+      \node[flowbox, right=of tok] (emb) {Embed\\768-d};
+      \node[flowbox, right=of emb] (bb) {BioBERT\\12 layers};
+      \node[flowbox, right=of bb] (cls) {\texttt{[CLS]}\\summary};
+      \node[flowbox, right=of cls] (sm) {Softmax\\5 classes};
+      \node[flowbox, right=of sm] (lvl) {Acuity\\level};
+      \node[flowbox, right=of lvl, fill=triageYellow!25] (col) {SATS\\colour};
+      \foreach \a/\b in {x/tok, tok/emb, emb/bb, bb/cls, cls/sm, sm/lvl, lvl/col}
+        \draw[flowarr] (\a) -- (\b);
+    \end{tikzpicture}}
+  \end{center}
+
+  \vspace{0.35cm}
+  \centering
+  \small
+  Input text passes through these stages to produce a \textbf{colour-coded triage decision}.
+\end{frame}
+
+\begin{frame}{Stage 1: Tokenization}
+  \small
+  Computers read numbers, not words. Tokenization maps text to integer IDs:
+  \[
+    X \xrightarrow{\tau} (t_1, t_2, \ldots, t_M), \qquad M \leq 128
+  \]
+
+  \begin{itemize}
+    \item \textbf{WordPiece:} common words stay whole; rare words split (``headache'' $\to$ \texttt{head}+\texttt{\#\#ache})
+    \item Vocabulary $\mathcal{V}$: $|\mathcal{V}| = 28{,}996$ token IDs
+    \item Special tokens: \texttt{[CLS]} (101), \texttt{[SEP]} (102), \texttt{<redacted\_PAD>} (0)
+  \end{itemize}
+
+  \vspace{0.1cm}
+  \footnotesize
+  \begin{tabular}{@{}c l c@{}}
+    \toprule
+    $i$ & Token & ID \\
+    \midrule
+    0 & \texttt{[CLS]} & 101 \\
+    1 & i & 1045 \\
+    2 & have & 2031 \\
+    4 & head+\#\#ache & 7994 \\
+    7 & fever+\#\#ish & 9643 \\
+    9 & \texttt{[SEP]} & 102 \\
+    10--127 & \texttt{<redacted\_PAD>} & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Stage 2: Embedding}
+  \small
+  Each token ID is converted to a dense vector by table lookup:
+  \[
+    \mathbf{e}_i = E_{\mathrm{word}}[\mathrm{id}(t_i)] \in \mathbb{R}^{768}
+  \]
+
+  Three learned vectors are summed for each position:
+  \[
+    E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(t_i)
+  \]
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \begin{itemize}
+      \item $E_{\mathrm{word}}$: what word is this?
+      \item $E_{\mathrm{pos}}(i)$: where is it in the sentence?
+      \item $E_{\mathrm{seg}}$: which sentence segment
+    \end{itemize}
+    All token vectors form:
+    \[
+      H^{(0)} \in \mathbb{R}^{M \times 768}
+    \]
+
+    \column{0.48\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=0.45cm,
+      box/.style={draw=green!60!black, rounded corners, fill=green!8,
+        minimum height=0.55cm, minimum width=1.4cm, align=center, font=\tiny}]
+      \node[box] (ids) {Token IDs};
+      \node[box, right=0.6cm of ids, fill=green!15] (lookup) {$E_{\mathrm{word}}$\\lookup};
+      \node[box, right=0.6cm of lookup, fill=triageYellow!20, minimum width=1.6cm] (mat) {$H^{(0)}$\\$M \times 768$};
+      \draw[flowarr] (ids) -- (lookup);
+      \draw[flowarr] (lookup) -- (mat);
+    \end{tikzpicture}}
+  \end{columns}
+
+  \plain{Row 0 of $H^{(0)}$ is \texttt{[CLS]} --- this row becomes the triage summary after BioBERT.}
+\end{frame}
+
+\begin{frame}{Stage 3: BioBERT processing}
+  \begin{columns}[T]
+    \column{0.44\textwidth}
+    \centering
+    \resizebox{!}{0.72\textheight}{%
+    \begin{tikzpicture}[node distance=0.4cm, auto, thick,
+      box/.style={draw=green!60!black, rectangle, fill=green!10, text width=2.8cm,
+        align=center, minimum height=0.65cm, rounded corners, font=\scriptsize},
+      arrow/.style={->, >=latex, thick, draw=green!60!black}]
+      \node[box] (input) {``Headache, feverish,\\body aches, weak''};
+      \node[box, fill=blue!10, below=of input] (layer1) {Layers 1--4:\\recognise words};
+      \node[box, fill=blue!15, below=of layer1] (layer2) {Layers 5--8:\\combine symptoms};
+      \node[box, fill=blue!20, below=of layer2] (layer3) {Layers 9--12:\\clinical urgency};
+      \node[box, fill=triageYellow!30, below=of layer3] (cls) {\texttt{[CLS]} summary\\768 numbers};
+      \draw[arrow] (input) -- (layer1);
+      \draw[arrow] (layer1) -- (layer2);
+      \draw[arrow] (layer2) -- (layer3);
+      \draw[arrow] (layer3) -- (cls);
+    \end{tikzpicture}}
+
+    \column{0.52\textwidth}
+    \small
+    \textbf{What BioBERT does (in words):}
+    \begin{itemize}
+      \item Reads the complaint \textbf{in both directions} at once
+      \item Each of 12 layers lets every word ``look at'' every other word
+      \item Clinical words like \textit{headache} and \textit{feverish} receive more weight
+      \item After 12 layers, the \texttt{[CLS]} token holds a compressed summary of the whole complaint
+      \item This summary is passed to a classifier that picks the acuity level
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Stage 4: Acuity level to SATS colour}
+  \small
+  \begin{columns}[T]
+    \column{0.46\textwidth}
+    \textbf{Level $\to$ colour mapping}
+    \vspace{0.15cm}
+    \begin{tabular}{@{}clc@{}}
+      \toprule
+      \textbf{Level} & \textbf{Colour} & \textbf{Target time} \\
+      \midrule
+      1 & \textcolor{triageRed}{\textbf{Red}} & Immediate \\
+      2 & \textcolor{triageOrange}{\textbf{Orange}} & $< 10$ min \\
+      3 & \textcolor{triageYellow}{\textbf{Yellow}} & $< 60$ min \\
+      4--5 & \textcolor{triageGreen}{\textbf{Green}} & $< 4$ hr \\
+      \bottomrule
+    \end{tabular}
+
+    \vspace{0.2cm}
+    Each colour triggers a \textbf{clinical pathway} --- the ED routes the patient to the right department.
+
+    \column{0.50\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=0.55cm and 0.5cm]
+      \node[flowbox, minimum width=1.6cm] (pred) {Predicted\\level};
+      \node[flowbox, right=of pred, fill=triageOrange!20] (colour) {SATS\\colour $C$};
+      \node[flowbox, right=of colour] (path) {Clinical\\pathway};
+      \draw[flowarr] (pred) -- node[edgelabel, above] {$f_{\mathrm{SATS}}$} (colour);
+      \draw[flowarr] (colour) -- (path);
+    \end{tikzpicture}}
+
+    \vspace{0.25cm}
+    \begin{tikzpicture}[x=0.9cm]
+      \fill[triageRed!80] (0,0) rectangle ++(0.7,0.3);
+      \fill[triageOrange!80] (0.85,0) rectangle ++(0.7,0.3);
+      \fill[triageYellow!80] (1.7,0) rectangle ++(0.7,0.3);
+      \fill[triageGreen!80] (2.55,0) rectangle ++(0.7,0.3);
+      \node[font=\tiny] at (0.35,-0.2) {Red};
+      \node[font=\tiny] at (1.2,-0.2) {Orange};
+      \node[font=\tiny] at (2.05,-0.2) {Yellow};
+      \node[font=\tiny] at (2.9,-0.2) {Green};
+    \end{tikzpicture}
+  \end{columns}
+
+  \plain{The model predicts a number (1--5); the hospital system converts it to a colour and routes the patient.}
+\end{frame}

@@ -1,0 +1,59 @@
+% Curatio math-first results deck — Ann Arbor / green spruce style
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows.meta,positioning,calc}
+\usepackage{hyperref}
+
+\usetheme{AnnArbor}
+\usecolortheme{spruce}
+\setbeamercolor{title}{bg=green!60!black,fg=white}
+\setbeamercolor{frametitle}{bg=green!60!black,fg=white}
+\setbeamercolor{structure}{fg=green!60!black}
+\setbeamercolor{palette primary}{bg=green!60!black,fg=white}
+\setbeamercolor{palette secondary}{bg=green!70!black,fg=white}
+\setbeamercolor{palette tertiary}{bg=green!80!black,fg=white}
+\setbeamercolor{palette quaternary}{bg=black,fg=white}
+\setbeamercolor{item}{fg=green!60!black}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{%
+  \hfill\small \insertframenumber{} / \inserttotalframenumber\hspace{1.5em}%
+}
+
+\definecolor{curatioGreen}{RGB}{22,101,52}
+\definecolor{triageRed}{RGB}{220,20,60}
+\definecolor{triageOrange}{RGB}{255,140,0}
+\definecolor{triageYellow}{RGB}{255,200,0}
+\definecolor{triageGreen}{RGB}{34,139,34}
+
+\setbeamercolor{block title}{bg=green!60!black, fg=white}
+\setbeamercolor{block body}{bg=green!4}
+
+\newcommand{\plain}[1]{\begin{block}{Simple meaning}\footnotesize #1\end{block}}
+\newcommand{\examplebox}[1]{\begin{exampleblock}{Worked example}\footnotesize #1\end{exampleblock}}
+
+\newcommand{\vartable}[1]{%
+  \vspace{0.08cm}
+  \footnotesize
+  \begin{tabular}{@{}p{1.4cm} p{3.8cm} p{4.8cm}@{}}
+    \toprule
+    \textbf{Symbol} & \textbf{Meaning} & \textbf{Role in triage} \\
+    \midrule
+    #1
+    \bottomrule
+  \end{tabular}
+}
+
+\tikzset{
+  flowbox/.style={rectangle, draw=green!60!black, rounded corners=3pt,
+    fill=green!6, minimum height=0.72cm, minimum width=1.55cm,
+    align=center, font=\scriptsize, inner sep=3pt},
+  flowarr/.style={-{Stealth[length=2mm]}, thick, draw=green!70!black},
+  edgelabel/.style={font=\tiny, fill=white, inner sep=1pt}
+}

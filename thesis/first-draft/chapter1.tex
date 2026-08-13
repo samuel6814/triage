@@ -1,0 +1,80 @@
+\chapter{INTRODUCTION}
+\label{ch:intro}
+
+\section{Background of the study}
+
+In high-functioning emergency care, \textbf{triage} prioritises patients by urgency so that the right patient receives the right care at the right time. The \textbf{South African Triage Scale (SATS)}---widely used in LMIC settings including Ghana---assigns colour codes: Red (immediate), Orange (very urgent, typically within 10~minutes), Yellow (urgent, typically within 60~minutes), Green (non-urgent), and Blue (deceased / dignity pathway).
+
+These colours are meant to trigger \textbf{clinical pathways}: standardised roadmaps of destination, diagnostics, and time targets. In practice, however, colour often becomes a label that ends at the triage desk. Once a patient moves to imaging, a ward, or a generic queue, the hospital ecosystem may ``forget'' their acuity. We call this failure \textbf{acuity discontinuity}.
+
+Compounding the problem is the \textbf{Green Tag Burden}: non-urgent patients occupy acute emergency capacity. Pre-triage queues may also delay first assessment for hours. Patients arriving via digital channels can describe symptoms in free text long before six TEWS vitals are available.
+
+This project develops a \textbf{hospital chatbot for color-coded clinical pathways}. The chatbot collects a chief complaint, predicts SATS acuity and colour with clinical NLP, optionally fuses TEWS vitals with discriminators and a tabular Bayesian fallback, and attaches an operational pathway card to the fused colour.
+
+\section{Problem statement}
+
+Resource-constrained hospitals face:
+
+\begin{enumerate}
+  \item \textbf{Pre-triage bottleneck} --- delay before any colour is assigned.
+  \item \textbf{Cognitive load} --- manual TEWS calculation under pressure risks under- and over-triage.
+  \item \textbf{Static triage} --- one-shot colour without digital timers or re-assessment prompts.
+  \item \textbf{Lost urgency} --- Orange/Yellow protections are not tracked after the ED desk.
+  \item \textbf{Text-only intake} --- vitals are often missing at home or in the queue, so a language-based acuity signal is needed at the door.
+\end{enumerate}
+
+Generic consumer symptom checkers are not aligned to SATS hospital pathways or local operational routing (e.g.\ Polyclinic vs acute ED).
+
+\section{Aim and objectives}
+
+\subsection{General objective}
+
+To design and prototype a chatbot-mediated Digital Acuity Engine that maps unstructured chief complaints to SATS colour-coded clinical pathways for LMIC hospital intake.
+
+\subsection{Specific objectives}
+
+\begin{enumerate}
+  \item Fine-tune and evaluate a BioBERT classifier that maps chief complaints to acuity levels \(1\)--\(5\).
+  \item Map acuity to SATS colour via a fixed function \(f_{\mathrm{SATS}}\) and report colour-routing performance.
+  \item Define protocol-mapped pathways \(P(C)\) for Red, Orange, Yellow, Green, and Blue.
+  \item Implement a chatbot/API prototype (Curatio) with medical gating and optional clinical NER enrichment.
+  \item Document and implement a fusion architecture \(f_{\mathrm{fusion}}\) with pathways \(P(C)\) on fused colour (TEWS + discriminators + tabular Bayes), keeping full BN learning out of scope.
+\end{enumerate}
+
+\section{Research questions}
+\label{sec:rqs}
+
+\begin{enumerate}
+  \item[\textbf{RQ1}] Can unstructured chief complaints be mapped to SATS acuity levels \(1\)--\(5\) with clinically usable accuracy?
+  \item[\textbf{RQ2}] Does correct acuity prediction imply correct colour assignment under fixed \(f_{\mathrm{SATS}}\)?
+  \item[\textbf{RQ3}] How should colours translate into pathways (destination, \(T_{\max}\), actions)?
+  \item[\textbf{RQ4}] Can a chatbot deliver pre-triage acuity and pathway guidance before the nurse desk?
+  \item[\textbf{RQ5}] How well does the system reject non-clinical input?
+  \item[\textbf{RQ6}] Does OpenMed NER enrichment improve interpretability without replacing the acuity model?
+  \item[\textbf{RQ7}] How does class imbalance affect Level-1 (Red) recall, and what mitigation is appropriate?
+  \item[\textbf{RQ8}] How overconfident is softmax output, and what does that imply for nurse oversight?
+  \item[\textbf{RQ9}] Can Green-pathway diversion be specified to reduce acute ED congestion?
+  \item[\textbf{RQ10}] Does \(f_{\mathrm{fusion}}\) assign a safer SATS colour than \(C_{\mathrm{NLP}}\) alone when TEWS and language disagree?
+  \item[\textbf{RQ11}] Are pathway cards \(P(C)\) correctly attached to fused colours in end-to-end API tests?
+\end{enumerate}
+
+\section{Scope and limitations}
+
+\textbf{In scope:} text \(\to\) BioBERT \(\to\) \(C_{\mathrm{NLP}}\); optional TEWS, discriminators, tabular Bayes; max-urgency fusion; pathway protocols \(P(C)\); medical gate; OpenMed enrichment; holdout + fusion scenario evaluation; Curatio prototype (\texttt{/predict}, \texttt{/fuse}).
+
+\textbf{Out of scope:} full Bayesian networks (pgmpy); learned discriminator neural heads; prospective KATH clinical trial; full HIS integration; EMR-calibrated Bayes priors.
+
+TEWS algebra, rule discriminators, and tabular \(P(C_k\mid E)\) are \textbf{implemented} in Part~2 (\texttt{triage-fusion/}); full BN structure learning remains future work.
+
+\section{Contributions}
+
+\begin{itemize}
+  \item An implemented NLP Digital Acuity Engine with measured holdout performance.
+  \item A protocol table linking SATS colours to hospital pathways (including Green diversion).
+  \item A fusion controller \(f_{\mathrm{fusion}}\) (max-urgency) with TEWS, discriminators, and tabular Bayes, exposed as \texttt{POST /fuse}.
+  \item Open framing documents and a first-draft thesis structure for continued writing.
+\end{itemize}
+
+\section{Organisation of the thesis}
+
+Chapter~\ref{ch:lit} reviews SATS, overcrowding, and triage NLP. Chapter~\ref{ch:method} presents methodology. Chapter~\ref{ch:results} reports results and discusses pathways. Chapter~\ref{ch:conclusion} concludes and states future work.

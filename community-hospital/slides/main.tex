@@ -1,0 +1,40 @@
+% Hospital Chatbot presentation (KNUST Beamer)
+% Compile: pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+
+\documentclass[aspectratio=169,12pt]{beamer}
+
+\input{preamble.tex}
+
+\title[Hospital Chatbot]{Hospital Chatbot for Color Coded Clinical Pathways}
+\author[Quaigraine \& Twum Samuel]%
+{{\scriptsize by}\\
+  \bcol[green!40!black]{Quaigraine Samuel \quad Twum Samuel}}
+\institute[KNUST]%
+{Department of Mathematics\\
+  Kwame Nkrumah University of Science and Technology}
+% \logo{\includegraphics[scale=0.1]{KNUSTlogo}}  % add KNUSTlogo.png when available
+\date{August 2026}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline of Presentation}
+  \tableofcontents
+\end{frame}
+
+\input{sections/01-research-gap}
+\input{sections/02-community-hospital}
+\input{sections/03-transshipment}
+\input{sections/04-nlp-vs-generative}
+\input{sections/05-conclusion}
+
+\begin{frame}[allowframebreaks]{References}
+  \tiny
+  \bibliographystyle{plainnat}
+  \bibliography{references}
+\end{frame}
+
+\end{document}
