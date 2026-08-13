@@ -4,9 +4,9 @@ Emergency departments in low- and middle-income countries (LMICs) face overcrowd
 
 \textbf{Part~1} implements a Digital Acuity Engine: a medical gate filters non-clinical text; optional OpenMed named-entity enrichment surfaces diseases and drugs; a fine-tuned BioBERT classifier predicts acuity levels \(1\)--\(5\); a fixed map \(f_{\mathrm{SATS}}\) yields Red, Orange, Yellow, or Green. On an \(8{,}000\)-sample stratified holdout, baseline BioBERT achieved \(99.92\%\) colour-routing accuracy and \(98.14\%\) Level-1 (Red) recall.
 
-\textbf{Part~2} defines protocol-mapped pathways \(P(C)\) for each colour (including Green diversion from the acute ED and a Blue dignity protocol). The architecture deliberately omits Bayesian fusion with Triage Early Warning Score (TEWS) vitals at chatbot intake: BioBERT already performs end-to-end text-to-acuity inference; pathways attach deterministically to colour. TEWS remains nurse-side or future work.
+\textbf{Part~2} defines protocol-mapped pathways \(P(C)\) for each colour (including Green diversion from the acute ED and a Blue dignity protocol), and implements a multi-signal fusion controller \(f_{\mathrm{fusion}}\) over NLP colour, optional TEWS vitals, rule-based discriminators, and a \emph{tabular} Bayesian fallback (not a full Bayesian network). Pathways attach to the \textbf{fused} colour via \texttt{/fuse}; text-only \texttt{/predict} remains NLP-only for compatibility.
 
-The contribution is a defensible LMIC chatbot design and prototype (Curatio) that answers whether NLP can drive colour-coded clinical pathways without requiring a full TEWS--Bayesian stack before the triage desk.
+The contribution is a defensible LMIC chatbot design and prototype (Curatio) that shows NLP can drive colour-coded pathways while optional vitals and safety layers prevent under-triage when language and physiology disagree.
 
 \vspace{0.5cm}
 \noindent\textbf{Keywords:} SATS; clinical pathways; BioBERT; triage chatbot; LMIC; acuity discontinuity.

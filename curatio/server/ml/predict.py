@@ -126,17 +126,6 @@ def _class_index_to_acuity(class_index: int) -> int:
     return class_index + 1
 
 
-def _fetch_entities(text: str, *, enabled: bool) -> dict | None:
-    from openmed_enrich import analyze_entities, is_enabled
-
-    if not enabled or not is_enabled():
-        return None
-    try:
-        return analyze_entities(text)
-    except Exception:
-        return None
-
-
 def predict(text: str, *, openmed: bool = True, gate: bool = True) -> dict:
     """Run medical gate + OpenMed enrichment (both default on), then BioBERT inference."""
     text = (text or "").strip()
@@ -144,17 +133,29 @@ def predict(text: str, *, openmed: bool = True, gate: bool = True) -> dict:
         raise ValueError("text must not be empty")
 
     from medical_gate import evaluate as gate_evaluate, rejection_payload
-    from openmed_enrich import build_entity_prefix, entity_prefix_enabled
+    from openmed_enrich import build_entity_prefix, entity_prefix_enabled, fetch_entities
 
-    entities = _fetch_entities(text, enabled=openmed)
+    entities = fetch_entities(text, enabled=openmed)
+    entities_for_gate = (
+        entities if entities.get("entities_status") == "ok" else None
+    )
     gate_result = None
     if gate:
-        gate_result = gate_evaluate(text, entities)
+        gate_result = gate_evaluate(text, entities_for_gate)
         if not gate_result.is_medical:
-            return rejection_payload(text, gate_result, entities)
+            rejected = rejection_payload(text, gate_result, entities_for_gate)
+            rejected["entities"] = entities
+            rejected["entities_status"] = entities.get("entities_status")
+            if entities.get("entities_error"):
+                rejected["entities_error"] = entities["entities_error"]
+            return rejected
 
     model_input = text
-    if openmed and entity_prefix_enabled() and entities:
+    if (
+        openmed
+        and entity_prefix_enabled()
+        and entities.get("entities_status") == "ok"
+    ):
         prefix = build_entity_prefix(entities)
         if prefix:
             model_input = f"{prefix} {text}".strip()
@@ -198,12 +199,14 @@ def predict(text: str, *, openmed: bool = True, gate: bool = True) -> dict:
         "sats_colour": sats,
         "bayesian_candidate": confidence < CONFIDENCE_THRESHOLD,
         "calibration_warning": confidence >= 0.999,
+        "entities": entities,
+        "entities_status": entities.get("entities_status"),
     }
+    if entities.get("entities_error"):
+        response["entities_error"] = entities["entities_error"]
     if gate_result is not None:
         response["clinical_relevance_score"] = gate_result.clinical_relevance_score
         response["gate_signals"] = gate_result.signals
-    if entities is not None:
-        response["entities"] = entities
     return response
 
 

@@ -1,0 +1,160 @@
+{
+  "threshold_env": "DISCRIMINATOR_THRESHOLD",
+  "default_threshold": 0.85,
+  "rules": [
+    {
+      "id": "unresponsive",
+      "label": "Unresponsive / loss of consciousness",
+      "colour_floor": "Red",
+      "phrases": [
+        "unresponsive",
+        "not waking",
+        "collapsed unconscious",
+        "loss of consciousness",
+        "unconscious"
+      ]
+    },
+    {
+      "id": "airway_obstruction",
+      "label": "Airway obstruction",
+      "colour_floor": "Red",
+      "phrases": [
+        "choking",
+        "cannot breathe at all",
+        "stridor",
+        "airway obstruction"
+      ]
+    },
+    {
+      "id": "uncontrolled_haemorrhage",
+      "label": "Uncontrolled haemorrhage",
+      "colour_floor": "Red",
+      "phrases": [
+        "bleeding heavily",
+        "blood won't stop",
+        "blood wont stop",
+        "uncontrolled bleeding",
+        "haemorrhage",
+        "hemorrhage"
+      ]
+    },
+    {
+      "id": "seizure_active",
+      "label": "Active seizure",
+      "colour_floor": "Red",
+      "phrases": [
+        "seizing now",
+        "seizure now",
+        "convulsing",
+        "active seizure",
+        "fitting now"
+      ]
+    },
+    {
+      "id": "anaphylaxis",
+      "label": "Anaphylaxis",
+      "colour_floor": "Red",
+      "phrases": [
+        "throat closing",
+        "anaphylaxis",
+        "swelling tongue",
+        "tongue swelling"
+      ]
+    },
+    {
+      "id": "central_chest_pain",
+      "label": "Central chest pain",
+      "colour_floor": "Orange",
+      "phrases": [
+        "crushing chest",
+        "central chest pain",
+        "crushing central chest",
+        "chest pain",
+        "tight chest",
+        "chest tightness"
+      ]
+    },
+    {
+      "id": "stroke_symptoms",
+      "label": "Stroke symptoms",
+      "colour_floor": "Orange",
+      "phrases": [
+        "face droop",
+        "slurred speech",
+        "sudden weakness one side",
+        "weakness on one side",
+        "facial droop"
+      ]
+    },
+    {
+      "id": "severe_shortness_breath",
+      "label": "Severe shortness of breath",
+      "colour_floor": "Orange",
+      "phrases": [
+        "cannot catch breath",
+        "can't catch breath",
+        "gasping",
+        "severe dyspnoea",
+        "severe dyspnea",
+        "severe shortness of breath"
+      ]
+    },
+    {
+      "id": "severe_pain",
+      "label": "Severe pain",
+      "colour_floor": "Orange",
+      "phrases": [
+        "worst pain ever",
+        "10/10 pain",
+        "10 out of 10 pain",
+        "excruciating pain"
+      ]
+    },
+    {
+      "id": "moderate_pain",
+      "label": "Moderate pain",
+      "colour_floor": "Yellow",
+      "phrases": [
+        "moderate pain",
+        "hurting for days",
+        "pain for days"
+      ]
+    },
+    {
+      "id": "persistent_vomiting",
+      "label": "Persistent vomiting",
+      "colour_floor": "Yellow",
+      "phrases": [
+        "cannot keep fluids down",
+        "can't keep fluids down",
+        "persistent vomiting",
+        "vomiting blood"
+      ]
+    }
+  ],
+  "compound_rules": [
+    {
+      "id": "haemodynamic_compromise",
+      "label": "Haemodynamic compromise",
+      "colour_floor": "Orange",
+      "confidence": 0.88,
+      "any_of": ["sweaty", "clammy", "clamy", "dizzy", "lightheaded"],
+      "and_any_of": ["pale", "grey", "gray", "chest pain", "chest"]
+    }
+  ],
+  "entity_map": {
+    "chest pain": "central_chest_pain",
+    "myocardial infarction": "central_chest_pain",
+    "acute coronary syndrome": "central_chest_pain",
+    "dyspnea": "severe_shortness_breath",
+    "dyspnoea": "severe_shortness_breath",
+    "shortness of breath": "severe_shortness_breath",
+    "hemorrhage": "uncontrolled_haemorrhage",
+    "haemorrhage": "uncontrolled_haemorrhage",
+    "loss of consciousness": "unresponsive",
+    "unconscious": "unresponsive",
+    "stroke": "stroke_symptoms",
+    "seizure": "seizure_active",
+    "anaphylaxis": "anaphylaxis"
+  }
+}

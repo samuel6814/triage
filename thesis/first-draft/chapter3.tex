@@ -3,14 +3,15 @@
 
 \section{Overview}
 
-The methodology has two layers:
+The methodology has three layers:
 
 \begin{enumerate}
-  \item \textbf{Digital Acuity Engine (Part~1):} text \(\to\) acuity \(\hat{c}\) \(\to\) colour \(C=f_{\mathrm{SATS}}(\hat{c})\).
-  \item \textbf{Pathway protocols (Part~2):} \(C\mapsto P(C)=(T_{\max},\mathrm{dest},\mathrm{actions},\mathrm{escalation})\).
+  \item \textbf{Digital Acuity Engine (Part~1):} text \(\to\) acuity \(\hat{c}\) \(\to\) \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\).
+  \item \textbf{Fusion controller:} optional TEWS, discriminators \(\mathbf{D}\), and tabular Bayes combine with \(C_{\mathrm{NLP}}\) via max-urgency \(f_{\mathrm{fusion}}\).
+  \item \textbf{Pathway protocols:} fused \(C\mapsto P(C)=(T_{\max},\mathrm{dest},\mathrm{actions},\mathrm{escalation})\).
 \end{enumerate}
 
-No Bayesian fusion or live TEWS calculator is included in the chatbot inference path.
+Text-only \texttt{/predict} remains NLP-only; multi-signal intake uses \texttt{/fuse}.
 
 \section{Data and fine-tuning}
 
@@ -66,22 +67,30 @@ Blue & Dignity & Mortuary pathway & Silent social-work protocol \\
 \end{tabular}
 \end{table}
 
-Blue is a dignity protocol outside the five-class acuity head. The chatbot should emit a pathway card alongside colour and confidence.
+Blue is a dignity protocol outside the five-class acuity head. Pathways attach to \textbf{fused} colour from \texttt{/fuse} (or to \(C_{\mathrm{NLP}}\) for text-only \texttt{/predict} demos).
+
+\section{TEWS, discriminators, and tabular Bayes}
+
+When vitals are present, TEWS scores \(f_1\)--\(f_6\) yield \(T\) and \(C_{\mathrm{TEWS}}\). Rule/OpenMed discriminators yield \(C_{\mathrm{disc}}\). Tabular Bayes yields \(C_{\mathrm{Bayes}}\) when incomplete TEWS, low NLP confidence, layer conflict, or \texttt{force\_bayes} applies. Fusion:
+\[
+\mathrm{ord}(C)\ge\max\bigl\{\mathrm{ord}(C_{\mathrm{disc}}),\,\mathrm{ord}(C_{\mathrm{TEWS}}),\,\mathrm{ord}(C_{\mathrm{Bayes}}),\,\mathrm{ord}(C_{\mathrm{NLP}})\bigr\}.
+\]
+Incomplete TEWS Green is suppressed so missing vitals cannot downgrade a higher NLP/discriminator signal.
 
 \section{Evaluation protocol}
 
-On the holdout set we report accuracy, precision, recall, F1, macro-F1, per-class support, confusion matrices, mean confidence, and calibration plots. Level-1 recall is emphasised as a safety metric (RQ7). Softmax overconfidence informs nurse-in-the-loop guidance (RQ8).
+On the holdout set we report accuracy, precision, recall, F1, macro-F1, per-class support, confusion matrices, mean confidence, and calibration plots. Level-1 recall is emphasised as a safety metric (RQ7). Softmax overconfidence informs nurse-in-the-loop guidance (RQ8). Fusion scenarios (chest pain, critical vitals, Green diversion) are tabulated for RQ10--RQ11.
 
 \section{System prototype (Curatio)}
 
 \begin{itemize}
-  \item \textbf{ML service:} FastAPI --- \texttt{/predict}, \texttt{/analyze}, \texttt{/deidentify}, voice intake.
+  \item \textbf{ML service:} FastAPI --- \texttt{/predict}, \texttt{/fuse}, \texttt{/analyze}, \texttt{/deidentify}, voice intake.
   \item \textbf{API gateway:} Express proxies to the ML service.
-  \item \textbf{Client:} React triage test page and presentation dashboard.
+  \item \textbf{Client:} React triage test page (vitals + layer audit) and presentation dashboard.
 \end{itemize}
 
-Default predict path enables the medical gate and OpenMed enrichment; both can be disabled for ablation demos.
+Default predict path enables the medical gate and OpenMed enrichment; both can be disabled for ablation demos. OpenMed NER is timeout-bounded so model downloads cannot block acuity forever.
 
 \section{What is not in the methodology}
 
-TEWS piecewise scoring, Bayesian posteriors \(P(C_k\mid E)\), and fusion \(\max\)-urgency controllers are excluded from the implemented method. They may appear in future work after vitals capture at the desk.
+Full Bayesian network structure learning (pgmpy), EMR-calibrated priors, and a learned multi-label discriminator head are excluded. Prospective clinical trials remain future work.

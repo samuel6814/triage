@@ -2,19 +2,23 @@
 
 ## One-sentence summary
 
-A hospital chatbot that maps a patient’s chief complaint to a SATS acuity level and colour, then attaches a concrete clinical pathway (destination, time target, actions)—without requiring a TEWS+Bayesian fusion stack at intake.
+A hospital chatbot that maps a patient’s chief complaint to a SATS acuity level and colour, optionally fuses TEWS / discriminators / tabular Bayes, then attaches a concrete clinical pathway (destination, time target, actions) to the fused colour.
 
 ## Architecture (implemented)
 
 ```
-Chief complaint text
+Chief complaint text (+ optional vitals)
   → Medical gate (reject non-clinical input)
-  → OpenMed NER enrichment (optional entity tags)
-  → Fine-tuned BioBERT (5-class acuity)
-  → Softmax → acuity ĉ ∈ {1…5}
-  → C = f_SATS(ĉ)   // 1→Red, 2→Orange, 3→Yellow, 4/5→Green
-  → Pathway protocol P(C)  // Part 2 design: destination, T_max, actions
+  → OpenMed NER enrichment (timeout-hardened)
+  → Fine-tuned BioBERT → C_NLP = f_SATS(ĉ)
+  → TEWS → C_TEWS (if vitals)
+  → Discriminators → C_disc
+  → Tabular Bayes → C_Bayes (when triggered)
+  → C = f_fusion(...)   // max-urgency
+  → Pathway protocol P(C)
 ```
+
+`POST /predict` = NLP-only. `POST /fuse` = full fusion + pathway.
 
 ## Part 1 — done (software + evaluation)
 
@@ -27,32 +31,29 @@ Chief complaint text
 | Holdout eval (~99.92% colour accuracy) | `results/eval_outputs/` |
 | Results slides | `results/slides/` |
 
-Colour mapping in code: `curatio/server/ml/predict.py` (`SATS_BY_ACUITY`).
-
-## Part 2 — designed here, partially UI-only
+## Part 2 — fusion + pathways (done)
 
 | Concept | Status |
 |---------|--------|
 | SATS colour label from NLP | Implemented |
-| Five-path protocols (Red→Blue) | Specified in synopsis + `project-framing/03-pathways-design.md` |
-| Pathway card in chatbot (destination + timer + actions) | To implement / document in thesis |
-| TEWS calculator from vitals | Deferred (nurse-side / future) |
-| Bayesian fusion | **Out of scope** |
+| Five-path protocols (Red→Blue) | Implemented (`pathways.py`) |
+| Pathway card on fused colour | Implemented (`/fuse` + TriageTestPage) |
+| TEWS calculator from vitals | Implemented (`tews.py`) |
+| Discriminators + tabular Bayes | Implemented |
+| Spec pack | `triage-fusion/` |
 
-## Explicit non-goals
+## Explicit non-goals (still)
 
-- No Bayesian network implementation
-- No three-layer fusion controller (NLP + TEWS + Bayes)
-- No claim that BioBERT “already does Bayesian fusion” — it does **text→acuity classification**; pathways attach **deterministically** to colour
+- No full Bayesian network (pgmpy / structure learning)
+- No claim that BioBERT “is” Bayesian TEWS fusion — it provides \(C_{\mathrm{NLP}}\); fusion is a separate controller
+- No prospective KATH trial in this draft
 
 ## Related folders
 
 | Folder | Role |
 |--------|------|
-| `project-framing/` | What we are doing (this pack) |
-| `research-findings/` | Reading notes and discoveries |
-| `systematic-review-prisma/` | PRISMA checklist + flow diagram templates |
-| `thesis/first-draft/` | KNUST thesis first draft |
-| `papers/`, `biobert/papers/` | Literature PDFs |
-| `latex/synopsis-article/` | Original synopsis |
-| `slides_saturday/` | Clinical + fusion math decks (historical; Bayes = future work) |
+| `triage-fusion/` | Implementation spec + scenario results |
+| `project-framing/` | RQs, math scope, pathways framing |
+| `thesis/first-draft/` | Thesis chapters |
+| `slides_saturday/` | Clinical + fusion math decks |
+| `research-findings/` | Reading notes |

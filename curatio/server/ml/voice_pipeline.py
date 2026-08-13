@@ -53,9 +53,17 @@ def _load_whisper():
     return _whisper_model
 
 
+def whisper_language_arg(hint: str | None) -> str | None:
+    """Map app language hint to a Whisper-supported code (or None = auto-detect).
+
+    Whisper has no Twi/Akan code; only force English when the client asks for en.
+    """
+    return "en" if (hint or "").lower() == "en" else None
+
+
 def _transcribe_file(audio_path: Path, language_hint: str | None) -> tuple[str, str | None, float]:
     model = _load_whisper()
-    lang = language_hint if language_hint in {"tw", "en"} else None
+    lang = whisper_language_arg(language_hint)
     segments, info = model.transcribe(
         str(audio_path),
         language=lang,
@@ -68,6 +76,10 @@ def _transcribe_file(audio_path: Path, language_hint: str | None) -> tuple[str, 
     return text, detected, duration
 
 
+# deep-translator / Google: Twi is listed as Akan (`ak`); `tw` is not accepted.
+_GOOGLE_SOURCE = {"tw": "ak", "ak": "ak", "en": "en"}
+
+
 def translate_twi_to_english(text: str, source_lang: str = "tw") -> str:
     if not text.strip():
         return ""
@@ -78,7 +90,8 @@ def translate_twi_to_english(text: str, source_lang: str = "tw") -> str:
 
     from deep_translator import GoogleTranslator
 
-    return GoogleTranslator(source=source_lang, target="en").translate(text)
+    google_src = _GOOGLE_SOURCE.get((source_lang or "tw").lower(), "ak")
+    return GoogleTranslator(source=google_src, target="en").translate(text)
 
 
 def process_voice_intake(
@@ -89,6 +102,7 @@ def process_voice_intake(
     if not audio_bytes:
         raise ValueError("audio file is empty")
 
+    hint = (language_hint or "tw").lower()
     suffix = Path(filename or "audio.webm").suffix or ".webm"
     start = time.perf_counter()
 
@@ -97,17 +111,18 @@ def process_voice_intake(
         tmp_path = Path(tmp.name)
 
     try:
-        transcript, detected_lang, audio_duration = _transcribe_file(
+        transcript, _whisper_lang, audio_duration = _transcribe_file(
             tmp_path,
-            language_hint=(language_hint or "tw").lower(),
+            language_hint=hint,
         )
     finally:
         tmp_path.unlink(missing_ok=True)
 
-    source_lang = (detected_lang or language_hint or "tw").lower()
+    # Prefer client hint for translation / UI: Twi is not a Whisper language.
+    source_lang = "en" if hint == "en" else "tw"
     needs_translation = source_lang != "en" and translation_enabled()
     english = (
-        translate_twi_to_english(transcript, source_lang=source_lang)
+        translate_twi_to_english(transcript, source_lang="tw")
         if needs_translation
         else transcript
     )

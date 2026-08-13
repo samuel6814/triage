@@ -16,9 +16,15 @@ OpenMed does **not** predict triage acuity. BioBERT remains the acuity classifie
 ```bash
 # curatio/server/ml
 export OPENMED_ENABLED=true
-# optional: prepend entity tags before BioBERT tokenization
+# Keep prefix OFF for production baseline BioBERT (not trained with entity tags)
 export OPENMED_ENTITY_PREFIX=false
+# Optional NER confidence cutoff
+export OPENMED_CONFIDENCE_THRESHOLD=0.5
+# Fail NER after N seconds so BioBERT acuity still returns
+export OPENMED_TIMEOUT_SECONDS=20
 ```
+
+Entity responses include `entities_status` (`ok` | `disabled` | `error`) and `entities_error` when NER fails — failures are no longer silently empty. First-run Hugging Face downloads that exceed the timeout yield `entities_status=error` while acuity continues.
 
 Keep `OPENMED_ENABLED=false` on Hugging Face Spaces only if the Space OOMs — baseline BioBERT + two NER models need substantial RAM.
 

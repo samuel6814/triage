@@ -51,14 +51,14 @@ Results slides & \texttt{results/slides/} \\
 
 Colour mapping in code: \texttt{curatio/server/ml/predict.py} (\texttt{SATS\_BY\_ACUITY}).
 
-\subsection*{Part 2 --- designed}
-Colour today is a label; pathways add destination, $T_{\max}$, and actions. TEWS calculator and Bayesian fusion are deferred / out of scope.
+\subsection*{Part 2 --- implemented}
+Pathways \(P(C)\) attach to \textbf{fused} colour from \texttt{/fuse}. TEWS, rule discriminators, and tabular Bayes vote under max-urgency \(f_{\mathrm{fusion}}\) (full BN learning remains out of scope). Spec: \texttt{triage-fusion/}.
 
 \subsection*{Explicit non-goals}
 \begin{itemize}
-  \item No Bayesian network implementation
-  \item No three-layer fusion controller (NLP + TEWS + Bayes)
-  \item No claim that BioBERT ``already does Bayesian fusion'' --- it does text$\to$acuity classification; pathways attach deterministically to colour
+  \item No full Bayesian network (pgmpy / structure learning)
+  \item No claim that BioBERT itself performs TEWS--Bayes fusion
+  \item No prospective clinical trial in this draft
 \end{itemize}
 
 \section{Research gaps}
@@ -67,7 +67,7 @@ Colour today is a label; pathways add destination, $T_{\max}$, and actions. TEWS
   \item \textbf{LMIC / Ghanaian chief-complaint NLP} --- local text$\to$SATS colour via BioBERT + Curatio.
   \item \textbf{Green Tag Burden} --- Green pathway diversion to OPD / Minors / Polyclinic.
   \item \textbf{Constrained classifier vs open LLM} --- fixed 5-class head + deterministic maps.
-  \item \textbf{Text-only pre-triage} --- NLP acuity before vitals; TEWS nurse-side later.
+  \item \textbf{Text-only pre-triage} --- NLP acuity before vitals; optional TEWS when supplied via \texttt{/fuse}.
   \item \textbf{Minority Red safety} --- baseline vs SMOTE; report L1 recall.
   \item \textbf{Colour must mean a pathway} --- not only a badge.
 \end{enumerate}
@@ -83,7 +83,8 @@ Colour today is a label; pathways add destination, $T_{\max}$, and actions. TEWS
   \item[\textbf{RQ7}] How does imbalance affect Level-1 (Red) recall?
   \item[\textbf{RQ8}] How overconfident is softmax, and what about nurse oversight?
   \item[\textbf{RQ9}] Can Green diversion be specified to reduce ED congestion?
-  \item[\textbf{RQ10}] What LMIC architecture uses NLP acuity without TEWS+Bayes at intake?
+  \item[\textbf{RQ10}] Does $f_{\mathrm{fusion}}$ assign a safer colour than $C_{\mathrm{NLP}}$ when TEWS and language disagree?
+  \item[\textbf{RQ11}] Are pathway cards $P(C)$ correctly attached to fused colours in API tests?
 \end{enumerate}
 
 Formal Part~1: $\text{Input } X \to \hat{c}\in\{1,\ldots,5\} \to C=f_{\mathrm{SATS}}(\hat{c})$.

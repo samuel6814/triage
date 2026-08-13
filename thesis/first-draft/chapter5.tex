@@ -3,19 +3,20 @@
 
 \section{Conclusion}
 
-This thesis addressed \textbf{Hospital Chatbot for Color-Coded Clinical Pathways} in two parts. Part~1 delivered a working Digital Acuity Engine: medical gating, optional clinical NER, fine-tuned BioBERT acuity prediction, and deterministic SATS colour mapping, with strong holdout colour-routing performance. Part~2 specified protocol-mapped pathways so each colour carries destination, time target, and actions---including Green diversion and Blue dignity---thereby attacking acuity discontinuity without pretending that a badge alone is a pathway.
+This thesis addressed \textbf{Hospital Chatbot for Color-Coded Clinical Pathways} in two parts. Part~1 delivered a working Digital Acuity Engine: medical gating, optional clinical NER, fine-tuned BioBERT acuity prediction, and deterministic SATS colour mapping, with strong holdout colour-routing performance. Part~2 specified protocol-mapped pathways and implemented multi-signal fusion \(f_{\mathrm{fusion}}\) (TEWS, discriminators, tabular Bayes, max-urgency) so each fused colour carries destination, time target, and actions---including Green diversion and Blue dignity---thereby attacking acuity discontinuity.
 
-We explicitly \textbf{did not} implement Bayesian fusion. Softmax already yields an acuity distribution from text; pathways attach by \(f_{\mathrm{SATS}}\) and \(P(C)\). That answers RQ10 with a lean LMIC intake architecture.
+Softmax still yields the primary language distribution \(C_{\mathrm{NLP}}\); pathways on \texttt{/fuse} attach to the \textbf{fused} colour. That answers RQ10--RQ11 with a practical LMIC intake stack that can escalate when vitals or discriminators demand it, without claiming a full EMR-trained Bayesian network.
 
 \section{Answers to research questions (summary)}
 
 \begin{itemize}
   \item \textbf{RQ1--RQ2:} Yes---high holdout acuity/colour accuracy under fixed \(f_{\mathrm{SATS}}\).
   \item \textbf{RQ3, RQ9:} Pathways defined as protocol table including Green diversion.
-  \item \textbf{RQ4:} Curatio chatbot/API demonstrates pre-desk delivery of acuity and colour (pathway card as design completion).
-  \item \textbf{RQ5--RQ6:} Gate and OpenMed behave as intended in system tests.
+  \item \textbf{RQ4:} Curatio chatbot/API demonstrates pre-desk delivery of acuity, fusion audit, and pathway cards.
+  \item \textbf{RQ5--RQ6:} Gate and OpenMed behave as intended in system tests (NER timeout-hardened).
   \item \textbf{RQ7--RQ8:} Red recall and calibration overconfidence require safety-aware deployment.
-  \item \textbf{RQ10:} NLP\(\to\)colour\(\to\)\(P(C)\) is a defensible intake stack without TEWS--Bayes.
+  \item \textbf{RQ10:} Fusion max-urgency is at least as urgent as NLP when TEWS/discriminators/Bayes escalate.
+  \item \textbf{RQ11:} \texttt{/fuse} attaches \(P(C)\) to fused colour in API/unit tests.
 \end{itemize}
 
 \section{Contributions restated}
@@ -23,15 +24,15 @@ We explicitly \textbf{did not} implement Bayesian fusion. Softmax already yields
 \begin{enumerate}
   \item Implemented and evaluated text-to-SATS-colour triage NLP.
   \item Formalised colour-coded clinical pathway protocols for chatbot output.
-  \item Scoped mathematics honestly: softmax + deterministic maps in; Bayesian fusion out.
+  \item Implemented TEWS + discriminators + tabular Bayes + max-urgency fusion (\texttt{/fuse}).
 \end{enumerate}
 
 \section{Future work}
 
 \begin{itemize}
-  \item Instrument pathway cards and timers in the live API/UI.
-  \item Optional nurse-desk TEWS calculator after vitals capture (not Bayesian-by-default).
-  \item Prospective evaluation with KATH clinicians; measure under-triage and time-to-provider.
+  \item Instrument pathway timers and HIS escalation in live hospital middleware.
+  \item Calibrate tabular Bayes priors on local EMR / prospective KATH data.
+  \item Prospective evaluation with clinicians; measure under-triage and time-to-provider.
   \item Domain adaptation to Ghanaian informal English / Twi-translated complaints.
-  \item Only if justified: compare Bayesian multimodal fusion as a \emph{post-vitals} research extension---not a rewrite of Part~1.
+  \item Optional: full BN structure learning or a learned discriminator head---only if justified against the tabular baseline.
 \end{itemize}

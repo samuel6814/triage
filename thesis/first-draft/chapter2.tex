@@ -17,21 +17,13 @@ SATS combines physiological early warning (TEWS) with clinical discriminators th
 
 \textbf{Implication for this thesis:} Colour codes already exist in hospital policy. The research gap is not inventing colours, but (i)~assigning them from free-text complaints before full vitals, and (ii)~binding colours to pathway protocols so acuity does not disappear after the desk.
 
-\section{Triage Early Warning Score (TEWS) --- context only}
+\section{Triage Early Warning Score (TEWS) --- parallel vitals layer}
 
-TEWS aggregates mobility, respiratory rate, heart rate, temperature, AVPU, and trauma into a sum that maps to colour bands. It is central to bedside SATS. However, chatbot intake often lacks complete vitals. This thesis therefore does \textbf{not} implement TEWS algebra in the chatbot. TEWS remains the nurse-side gold-standard overlay after arrival.
+TEWS aggregates mobility, respiratory rate, heart rate, temperature, AVPU, and trauma into a sum that maps to colour bands. It is central to bedside SATS. Chatbot intake may lack complete vitals, so TEWS is an \textbf{optional parallel layer}: when vitals are supplied, \(C_{\mathrm{TEWS}}\) votes in \(f_{\mathrm{fusion}}\); when missing, partial TEWS is flagged and cannot silently downgrade urgency.
 
-\section{Why Bayesian fusion is deferred}
+\section{Tabular Bayesian fallback (not a full BN)}
 
-Multimodal Bayesian triage models appear in the literature as ways to combine uncertain evidence. Older project materials sketched \(P(C\mid E)\) fusion with TEWS and NLP. For this thesis we defer Bayesian fusion because:
-
-\begin{itemize}
-  \item BioBERT already maps text to a full acuity distribution via softmax;
-  \item duplicating a second probabilistic layer at intake expands scope without matching the deployed prototype;
-  \item deterministic \(f_{\mathrm{SATS}}\) and \(P(C)\) already produce actionable colour pathways.
-\end{itemize}
-
-Bayesian papers are retained as related work (skim) and future research, not methodology requirements.
+Multimodal Bayesian triage models appear in the literature as ways to combine uncertain evidence. This thesis implements a \textbf{tabular} fallback \(P(C_k\mid E)\) with scenario-keyed priors and likelihoods (e.g.\ chest pain + partial vitals), not structure learning or pgmpy. Full Bayesian networks remain related work / future calibration research. Softmax \(C_{\mathrm{NLP}}\) remains the primary language signal; tabular Bayes is invoked when TEWS is incomplete, NLP confidence is low, or layers conflict.
 
 \section{Clinical NLP and BioBERT}
 
@@ -49,4 +41,4 @@ Clinical pathways are step-by-step care roadmaps. Synopsis and clinical protocol
 
 \section{Summary of the gap}
 
-Prior art provides SATS colours, TEWS bedside scoring, and growing NLP triage evidence. Missing for LMIC chatbot intake is an integrated story: accurate text\(\to\)acuity\(\to\)colour \textbf{plus} explicit pathway protocols, without mandating Bayesian TEWS fusion before the nurse has vitals. Chapters~\ref{ch:method}--\ref{ch:results} address that gap.
+Prior art provides SATS colours, TEWS bedside scoring, and growing NLP triage evidence. Missing for LMIC chatbot intake is an integrated story: accurate text\(\to\)acuity\(\to\)colour \textbf{plus} optional vitals/discriminator/Bayes fusion \textbf{plus} explicit pathway protocols on the fused colour. Chapters~\ref{ch:method}--\ref{ch:results} address that gap.

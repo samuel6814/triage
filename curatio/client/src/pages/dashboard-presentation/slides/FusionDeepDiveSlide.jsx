@@ -52,7 +52,8 @@ const FusionDeepDiveSlide = () => {
     <SlideContainer>
       <LeadText>
         Fusion is a priority checklist — flip each formula to see how a real chest-pain case
-        moves through the rules.
+        moves through the rules. Implemented in Curatio as <code>POST /fuse</code> (max-urgency
+        over NLP, TEWS, discriminators, and tabular Bayes).
       </LeadText>
 
       <FusionDiagram />

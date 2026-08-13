@@ -42,16 +42,16 @@ Plain language: **fuse parallel triage signals into one SATS colour, then assign
 | Layer | Status | Location |
 |-------|--------|----------|
 | Medical gate | Implemented | [`curatio/server/ml/medical_gate.py`](../curatio/server/ml/medical_gate.py) |
-| OpenMed NER | Implemented | [`curatio/server/ml/openmed_enrich.py`](../curatio/server/ml/openmed_enrich.py) |
+| OpenMed NER | Implemented (timeout-hardened) | [`curatio/server/ml/openmed_enrich.py`](../curatio/server/ml/openmed_enrich.py) |
 | BioBERT → \(C_{\mathrm{NLP}}\) | Implemented | [`curatio/server/ml/predict.py`](../curatio/server/ml/predict.py) |
-| TEWS calculator | **Not implemented** | Spec: [02-tews-calculator.md](02-tews-calculator.md) |
-| Discriminators \(\mathbf{D}\) | **Not implemented** | Spec: [03-discriminators.md](03-discriminators.md) |
-| Tabular Bayes | **Not implemented** | Spec: [04-bayesian-fallback.md](04-bayesian-fallback.md) |
-| \(f_{\mathrm{fusion}}\) | **Not implemented** | Spec: [05-fusion-engine.md](05-fusion-engine.md) |
-| \(P(C)\) pathway cards | UI copy only | Spec: [06-pathways.md](06-pathways.md) |
-| `POST /fuse` | **Not implemented** | Spec: [07-api-contract.md](07-api-contract.md) |
+| TEWS calculator | **Done** | [`curatio/server/ml/tews.py`](../curatio/server/ml/tews.py) |
+| Discriminators \(\mathbf{D}\) | **Done** | [`curatio/server/ml/discriminators.py`](../curatio/server/ml/discriminators.py) |
+| Tabular Bayes | **Done** | [`curatio/server/ml/bayes_fallback.py`](../curatio/server/ml/bayes_fallback.py) |
+| \(f_{\mathrm{fusion}}\) | **Done** (NLP+TEWS+disc+Bayes) | [`curatio/server/ml/fusion.py`](../curatio/server/ml/fusion.py) |
+| \(P(C)\) pathway cards | **Done** | [`curatio/server/ml/pathways.py`](../curatio/server/ml/pathways.py) |
+| `POST /fuse` | **Done** | [`curatio/server/ml/app.py`](../curatio/server/ml/app.py) |
 
-`POST /predict` remains NLP-only for backward compatibility. `bayesian_candidate` today is only `confidence < 0.85`.
+`POST /predict` remains NLP-only for backward compatibility. Scenario export: [fusion-scenario-results.md](fusion-scenario-results.md).
 
 ---
 

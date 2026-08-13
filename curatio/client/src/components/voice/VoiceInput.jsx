@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Loader2, Mic, Square, Upload } from 'lucide-react';
-import { useBrowserSpeech } from '../../hooks/useBrowserSpeech';
 import { useAudioRecorder } from '../../hooks/useAudioRecorder';
 
 const API_BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
@@ -93,27 +92,29 @@ const PreviewText = styled.textarea`
   box-sizing: border-box;
 `;
 
-export default function VoiceInput({ onEnglishText, onTwiResult }) {
-  const [mode, setMode] = useState('en');
+export default function VoiceInput({ onEnglishText, onTwiResult, languageHint }) {
+  const preferred = languageHint === 'tw' ? 'tw' : 'en';
+  const [mode, setMode] = useState(preferred);
   const [uploading, setUploading] = useState(false);
   const [twiPreview, setTwiPreview] = useState(null);
   const [englishDraft, setEnglishDraft] = useState('');
+  const [error, setError] = useState(null);
 
-  const speech = useBrowserSpeech({
-    language: 'en-GH',
-    onFinal: (transcript) => onEnglishText?.(transcript),
-  });
+  useEffect(() => {
+    setMode(preferred);
+  }, [preferred]);
 
   const recorder = useAudioRecorder();
 
-  const handleTwiStop = async () => {
+  const handleRecordStop = async () => {
     try {
       setUploading(true);
-      const { blob, mimeType, durationMs } = await recorder.stop();
+      setError(null);
+      const { blob, mimeType } = await recorder.stop();
       const ext = mimeType.includes('mp4') ? 'm4a' : mimeType.includes('ogg') ? 'ogg' : 'webm';
       const form = new FormData();
       form.append('audio', blob, `recording.${ext}`);
-      form.append('language', 'tw');
+      form.append('language', mode);
 
       const res = await fetch(`${API_BASE}/api/voice/intake`, {
         method: 'POST',
@@ -124,10 +125,27 @@ export default function VoiceInput({ onEnglishText, onTwiResult }) {
         throw new Error(data.detail ?? data.message ?? 'Voice intake failed');
       }
 
+      if (mode === 'en') {
+        const eng = (data.transcript_english || data.transcript_original || '').trim();
+        setEnglishDraft(eng);
+        setTwiPreview(null);
+        if (!eng) {
+          setError('No speech detected — speak closer to the mic and try again.');
+          return;
+        }
+        onEnglishText?.(eng);
+        return;
+      }
+
       setTwiPreview(data);
       setEnglishDraft(data.transcript_english || '');
+      if (!(data.transcript_original || '').trim()) {
+        setError('No speech detected — speak closer to the mic and try again.');
+        return;
+      }
       onTwiResult?.(data);
     } catch (err) {
+      setError(err.message);
       setTwiPreview({ error: err.message });
     } finally {
       setUploading(false);
@@ -135,85 +153,97 @@ export default function VoiceInput({ onEnglishText, onTwiResult }) {
   };
 
   const applyEnglish = () => {
-    if (englishDraft.trim()) {
-      onEnglishText?.(englishDraft.trim());
+    const eng = englishDraft.trim();
+    if (!eng && !(twiPreview?.transcript_original || '').trim()) return;
+    if (onTwiResult && twiPreview && !twiPreview.error) {
+      onTwiResult({
+        ...twiPreview,
+        transcript_english: eng || twiPreview.transcript_english || '',
+      });
+      return;
     }
+    if (eng) onEnglishText?.(eng);
   };
 
   return (
     <Panel>
       <Row>
-        <ModeBtn type="button" $active={mode === 'en'} onClick={() => setMode('en')}>
-          English (browser)
+        <ModeBtn
+          type="button"
+          $active={mode === 'en'}
+          onClick={() => {
+            setMode('en');
+            setTwiPreview(null);
+            setError(null);
+          }}
+        >
+          English
         </ModeBtn>
-        <ModeBtn type="button" $active={mode === 'tw'} onClick={() => setMode('tw')}>
+        <ModeBtn
+          type="button"
+          $active={mode === 'tw'}
+          onClick={() => {
+            setMode('tw');
+            setTwiPreview(null);
+            setError(null);
+          }}
+        >
           Twi (record + translate)
         </ModeBtn>
       </Row>
 
-      {mode === 'en' && (
-        <>
-          <Row style={{ marginTop: '0.75rem' }}>
-            <ActionBtn
-              type="button"
-              onClick={speech.listening ? speech.stop : speech.start}
-              disabled={!speech.supported}
-            >
-              {speech.listening ? <Square size={16} /> : <Mic size={16} />}
-              {speech.listening ? 'Stop listening' : 'Speak in English'}
+      <Status style={{ marginTop: '0.75rem' }}>
+        Uses free local Whisper on the ML server (no Google). First run may take a minute while the model loads.
+      </Status>
+
+      <Row style={{ marginTop: '0.75rem' }}>
+        {!recorder.recording ? (
+          <ActionBtn type="button" onClick={recorder.start} disabled={uploading}>
+            <Mic size={16} /> {mode === 'en' ? 'Record English' : 'Record Twi'}
+          </ActionBtn>
+        ) : (
+          <>
+            <ActionBtn type="button" $danger onClick={handleRecordStop} disabled={uploading}>
+              {uploading ? <Loader2 size={16} className="spin" /> : <Square size={16} />}
+              {uploading ? 'Processing…' : 'Stop & transcribe'}
             </ActionBtn>
-          </Row>
-          {!speech.supported && (
-            <ErrorText>Web Speech API unavailable — use Chrome/Edge or switch to Twi recording.</ErrorText>
-          )}
-          {speech.interim && <Status>Listening: {speech.interim}</Status>}
-          {speech.error && <ErrorText>{speech.error}</ErrorText>}
-          <Status>English speech fills the chief complaint field directly.</Status>
-        </>
+            <ActionBtn type="button" onClick={recorder.cancel} disabled={uploading}>
+              Cancel
+            </ActionBtn>
+          </>
+        )}
+      </Row>
+
+      {recorder.recording && (
+        <Status>
+          Recording… speak your chief complaint in {mode === 'en' ? 'English' : 'Twi'}.
+        </Status>
+      )}
+      {recorder.error && <ErrorText>{recorder.error}</ErrorText>}
+      {error && <ErrorText>{error}</ErrorText>}
+
+      {mode === 'en' && englishDraft && !error && (
+        <Status>Transcribed: {englishDraft}</Status>
       )}
 
-      {mode === 'tw' && (
+      {mode === 'tw' && twiPreview && !twiPreview.error && (
         <>
+          <PreviewCard>
+            <PreviewLabel>Twi transcript</PreviewLabel>
+            <PreviewText readOnly value={twiPreview.transcript_original || ''} />
+          </PreviewCard>
+          <PreviewCard>
+            <PreviewLabel>English (edit before triage)</PreviewLabel>
+            <PreviewText
+              value={englishDraft}
+              onChange={(e) => setEnglishDraft(e.target.value)}
+            />
+          </PreviewCard>
           <Row style={{ marginTop: '0.75rem' }}>
-            {!recorder.recording ? (
-              <ActionBtn type="button" onClick={recorder.start} disabled={uploading}>
-                <Mic size={16} /> Record Twi
-              </ActionBtn>
-            ) : (
-              <>
-                <ActionBtn type="button" $danger onClick={handleTwiStop} disabled={uploading}>
-                  {uploading ? <Loader2 size={16} className="spin" /> : <Square size={16} />}
-                  {uploading ? 'Processing…' : 'Stop & transcribe'}
-                </ActionBtn>
-                <ActionBtn type="button" onClick={recorder.cancel} disabled={uploading}>
-                  Cancel
-                </ActionBtn>
-              </>
-            )}
+            <ActionBtn type="button" onClick={applyEnglish}>
+              <Upload size={16} /> Use for triage
+            </ActionBtn>
           </Row>
-          {recorder.recording && <Status>Recording… speak your chief complaint in Twi.</Status>}
-          {recorder.error && <ErrorText>{recorder.error}</ErrorText>}
-          {twiPreview?.error && <ErrorText>{twiPreview.error}</ErrorText>}
-          {twiPreview && !twiPreview.error && (
-            <>
-              <PreviewCard>
-                <PreviewLabel>Twi transcript</PreviewLabel>
-                <PreviewText readOnly value={twiPreview.transcript_original || ''} />
-              </PreviewCard>
-              <PreviewCard>
-                <PreviewLabel>English (edit before triage)</PreviewLabel>
-                <PreviewText
-                  value={englishDraft}
-                  onChange={(e) => setEnglishDraft(e.target.value)}
-                />
-              </PreviewCard>
-              <Row style={{ marginTop: '0.75rem' }}>
-                <ActionBtn type="button" onClick={applyEnglish}>
-                  <Upload size={16} /> Use for triage
-                </ActionBtn>
-              </Row>
-            </>
-          )}
         </>
       )}
     </Panel>

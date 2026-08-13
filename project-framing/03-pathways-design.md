@@ -1,26 +1,28 @@
-# Pathways design — protocol-mapped colour pathways (no Bayesian)
+# Pathways design — protocol-mapped colour pathways on fused \(C\)
 
 ## Design choice
 
 **Method:** Protocol-mapped colour pathways (SATS-aligned).
 
-After Part 1 assigns colour \(C\) from NLP acuity, the chatbot emits a **pathway card** \(P(C)\). No TEWS sum and no Bayesian posterior are required at intake.
+After fusion assigns colour \(C = f_{\mathrm{fusion}}(\ldots)\), the chatbot emits a **pathway card** \(P(C)\). Text-only `/predict` still maps \(C_{\mathrm{NLP}} = f_{\mathrm{SATS}}(\hat{c})\) for backward compatibility; pathway cards for multi-signal intake use **fused** colour from `POST /fuse`.
 
 \[
 P(C) = \bigl(T_{\max},\; \text{destination},\; \text{actions},\; \text{escalation}\bigr)
 \]
 
-## Colour from acuity (implemented)
+Full protocol + JSON shape: [`../triage-fusion/06-pathways.md`](../triage-fusion/06-pathways.md).
 
-| Acuity \(\hat{c}\) | Colour \(C\) |
-|--------------------|--------------|
+## Colour from acuity (NLP layer)
+
+| Acuity \(\hat{c}\) | \(C_{\mathrm{NLP}}\) |
+|--------------------|----------------------|
 | 1 | Red |
 | 2 | Orange |
 | 3 | Yellow |
 | 4 | Green |
 | 5 | Green |
 
-Blue is a separate dignity protocol (not produced by the 5-class acuity model).
+Blue is a separate dignity protocol (not produced by the 5-class acuity model or fusion).
 
 ## Five-path protocol table
 
@@ -32,30 +34,25 @@ Blue is a separate dignity protocol (not produced by the 5-class acuity model).
 | **Green** | &lt; 4 h (routine) | OPD / Minors / Polyclinic | **Divert** away from acute ED; digital ticket to non-acute stream | Return to ED only if deterioration / re-triage |
 | **Blue** | Dignity protocol | Mortuary / private space | Silent notification to mortuary + social work/chaplaincy; no emergency alarm | N/A |
 
-Sources: `latex/synopsis-article/syn-no-math.tex`, `slides_saturday/sections/01-clinical.tex`, `slides_saturday/sections/07-protocols-demo.tex`.
-
 ## Chatbot output (Part 2 product shape)
 
-For each accepted medical complaint the system should return:
+For each accepted medical complaint via `/fuse` the system returns:
 
-1. Predicted acuity level and SATS colour  
-2. Confidence (softmax)  
-3. Pathway card: destination, \(T_{\max}\), next actions, escalation rule  
-4. Optional OpenMed entities (interpretability)  
-5. Calibration / low-confidence warning when appropriate (nurse review)—**not** Bayesian inference  
+1. NLP acuity + confidence (audit)  
+2. Layer colours \(C_{\mathrm{NLP}}\), \(C_{\mathrm{TEWS}}\), \(C_{\mathrm{disc}}\), \(C_{\mathrm{Bayes}}\)  
+3. Fused colour \(C\) and pathway card \(P(C)\)  
+4. Optional OpenMed entities  
+5. Flags (incomplete TEWS, layer conflict, Bayes invoked, calibration warning)
 
-## What we are not building in Part 2
+## What remains out of scope
 
-- Live TEWS calculator from vitals  
-- Bayesian \(P(C\mid E)\) fusion  
-- Master fusion checklist that takes \(\max\) over NLP/TEWS/Bayes  
-
-Those remain future work / related literature only.
+- Full Bayesian network (pgmpy)  
+- Learned multi-label discriminator head  
+- Prospective clinical trial / HIS integration  
 
 ## Worked scenario (chest pain)
 
 1. Patient texts: “crushing central chest pain, sweaty, cannot catch breath.”  
-2. Medical gate: pass. OpenMed: disease spans (chest pain, dyspnoea).  
-3. BioBERT → e.g. Level 2 → **Orange**.  
-4. Pathway card: acute bed, 10-minute countdown, escalate if unclaimed.  
-5. Nurse may later add TEWS vitals at the desk; chatbot already routed urgency from language.
+2. Optional vitals: HR 125, RR 26 → \(T=4\), \(C_{\mathrm{TEWS}}=\) Yellow.  
+3. Discriminator `central_chest_pain` → Orange floor; tabular Bayes → Orange (~0.89).  
+4. Fusion max-urgency → **Orange**; pathway: acute bed, 10-minute countdown.

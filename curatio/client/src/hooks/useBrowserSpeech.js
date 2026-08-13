@@ -41,11 +41,16 @@ export function useBrowserSpeech({ language = 'en-GH', onFinal } = {}) {
     recognition.onend = () => setListening(false);
     recognition.onerror = (event) => {
       setListening(false);
-      if (event.error !== 'aborted') {
-        setError(event.error === 'not-allowed'
-          ? 'Microphone permission denied.'
-          : `Speech recognition error: ${event.error}`);
-      }
+      if (event.error === 'aborted') return;
+      const messages = {
+        'not-allowed': 'Microphone permission denied.',
+        network:
+          'Browser speech needs Google’s online service (network error). Use Record + server Whisper instead.',
+        'no-speech': 'No speech detected — try again.',
+        'audio-capture': 'No microphone found.',
+        'service-not-allowed': 'Browser blocked speech recognition on this page.',
+      };
+      setError(messages[event.error] || `Speech recognition error: ${event.error}`);
     };
     recognition.onresult = (event) => {
       let interimText = '';
