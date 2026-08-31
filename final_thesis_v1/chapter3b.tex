@@ -1,0 +1,935 @@
+\section{Tokenisation}
+\label{sec:tokenisation}
+
+Neural networks require fixed-size numerical input. Tokenisation is the first transformation: it maps raw complaint text \(X\) into a bounded sequence of subword tokens. The maximum length \(M \leq 128\) matches the BioBERT configuration used at inference and allows batching of complaints of different lengths by padding shorter sequences.
+
+\begin{equation}
+  X \xrightarrow{\tau} (t_1, \ldots, t_M), \quad M \leq 128.
+\end{equation}
+
+\textbf{WordPiece} is the subword algorithm used by BERT and BioBERT. Common clinical words (``fever'', ``pain'') remain whole; rare or misspelled forms split into pieces (e.g.\ ``headache'' \(\to\) \texttt{head}+\texttt{\#\#ache}). This keeps the vocabulary finite while still representing novel spellings. Vocabulary \(\mathcal{V}\) has \(|\mathcal{V}| \approx 28{,}996\) entries; each token ID indexes a row in the embedding table. When a word splits into two subwords, it occupies \textbf{two positions} in the sequence (see rows 4 and 7 in Table~\ref{tab:token-ids}), so \(M\) counts subword tokens, not raw words.
+
+\begin{remark}
+The fixed length \(M=128\) is a practical choice: BioBERT was trained with this cap, and padding shorter complaints to 128 lets the hospital batch many requests through the same matrix operations at intake.
+\end{remark}
+
+Three special tokens structure every input sequence:
+\begin{itemize}
+\item \texttt{[CLS]} (ID 101) is inserted at position \(i=0\) as the classification summary token; its final hidden state feeds the acuity head (Section~\ref{sec:cls}).
+\item \texttt{[SEP]} (ID 102) is the \textbf{separator} token marking the end of the complaint sentence. It tells the model where clinical text stops, so subsequent \texttt{<PAD>} fillers are not interpreted as symptoms.
+\item \texttt{<PAD>} (ID 0) fills unused positions up to length \(M=128\); the attention mask sets these positions to zero so they do not affect encoding.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|l|p{7.5cm}|}
+\hline
+\textbf{Token} & \textbf{ID} & \textbf{Purpose} \\
+\hline
+\texttt{[CLS]} & 101 & Classification summary; always first \\
+\texttt{[SEP]} & 102 & End-of-sentence boundary before padding \\
+\texttt{<PAD>} & 0 & Batch padding to fixed length 128 \\
+\hline
+\end{tabular}
+\caption{Special tokens in the BioBERT tokenizer.}
+\label{tab:special-tokens}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{|c|l|l|c|}
+\hline
+\(i\) & Raw & Token & ID \\
+\hline
+0 & n/a & \texttt{[CLS]} & 101 \\
+1 & I & i & 1045 \\
+2 & have & have & 2031 \\
+3 & a & a & 1037 \\
+4 & headache & head+\#\#ache & 7994, 8772 \\
+5 & and & and & 1998 \\
+6 & feel & feel & 2514 \\
+7 & feverish & fever+\#\#ish & 9643, 6804 \\
+8 & . & . & 1012 \\
+9 & n/a & \texttt{[SEP]} & 102 \\
+10--127 & n/a & \texttt{<PAD>} & 0 \\
+\hline
+\end{tabular}
+\caption{Token IDs for the illustrative complaint (padding to length 128 omitted).}
+\label{tab:token-ids}
+\end{table}
+
+\section{The \texttt{[CLS]} and \texttt{[SEP]} tokens}
+\label{sec:cls}
+
+Sequence classification requires one fixed-length vector summarising the entire complaint. Rather than averaging all token rows (which would weight filler words equally with symptoms), BERT introduces an artificial summary token \texttt{[CLS]} at position \(i=0\). The \texttt{[SEP]} token at the end of the real text marks the sentence boundary: encoding stops treating tokens after \texttt{[SEP]} as part of the clinical complaint, which matters once \texttt{<PAD>} fillers occupy the remaining positions. Only the \texttt{[CLS]} row is passed to the classification head; \texttt{[SEP]} itself is not used for acuity prediction.
+
+After \(L=12\) encoder layers:
+\begin{equation}
+  h_{\mathrm{[CLS]}} = H^{(L)}_{0,:} \in \mathbb{R}^{768}.
+\end{equation}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.85\textwidth}{!}{%
+\begin{tikzpicture}[node distance=0.35cm,
+  tok/.style={draw, rounded corners, minimum width=0.85cm, minimum height=0.5cm, font=\footnotesize, align=center},
+  cls/.style={tok, fill=triageYellow!40, draw=green!60!black, thick}]
+  \node[cls] (c) {\texttt{[CLS]}};
+  \node[tok, right=0.15cm of c] (i) {i};
+  \node[tok, right=0.15cm of i] (h) {have};
+  \node[tok, right=0.15cm of h] (hd) {head};
+  \node[tok, right=0.15cm of hd] (fe) {feel};
+  \node[tok, right=0.15cm of fe] (fv) {fever};
+  \node[tok, right=0.15cm of fv] (sep) {\texttt{[SEP]}};
+  \node[draw, rounded corners, fill=green!10, minimum width=3.5cm, minimum height=0.8cm,
+    below=0.8cm of hd, font=\small, align=center] (vec) {768-dim summary\\$h_{\mathrm{[CLS]}}$};
+  \draw[->, thick, green!60!black] (c.south) -- (vec.north);
+  \node[font=\footnotesize, right=0.05cm of vec] {$\to$ acuity prediction};
+\end{tikzpicture}}
+\caption{\texttt{[CLS]} aggregates context into one summary vector for classification.}
+\label{fig:cls-diagram}
+\end{figure}
+
+Self-attention updates the \texttt{[CLS]} row at every layer so that it encodes information from all symptom tokens; the classification head therefore reads a single vector that represents the full clinical wording of \(X\).
+
+\section{Embedding lookup}
+\label{sec:embeddings}
+
+A token ID is an index, not a meaning. The embedding layer maps each ID to a dense vector in \(\mathbb{R}^{768}\) via the learned matrix \(E_{\mathrm{word}} \in \mathbb{R}^{V \times 768}\):
+\begin{equation}
+  \mathbf{e}_i = E_{\mathrm{word}}[\mathrm{id}(t_i)] \in \mathbb{R}^{768}.
+\end{equation}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Symbol} & \textbf{Definition} \\
+\hline
+\(V\) & Vocabulary size (\(\approx 30{,}000\)) \\
+\(D=768\) & Hidden dimension (BioBERT base configuration) \\
+\(\mathbf{e}_i\) & Word embedding vector for token at position \(i\) \\
+\hline
+\end{tabular}
+\caption{Embedding lookup notation.}
+\label{tab:embed-symbols}
+\end{table}
+
+The lookup \(\mathbf{e}_i\) is one term in the full input representation \(E(t_i) = E_{\mathrm{word}} + E_{\mathrm{pos}} + E_{\mathrm{seg}}\) from Equation~\eqref{eq:embedding-sum-preview}. After PubMed pre-training, BioBERT places clinically related terms nearer in this space than general-purpose embeddings would.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.0]
+  \draw[->, gray] (0,0) -- (8.2,0) node[right, font=\footnotesize] {dim 1};
+  \draw[->, gray] (0,0) -- (0,4.8) node[above, font=\footnotesize] {dim 2};
+  % Headache cluster
+  \draw[dashed, gray!50] (1.3,1.0) ellipse (1.2 and 0.75);
+  \node[font=\footnotesize] at (1.3, 2.0) {headache cluster};
+  \node[font=\scriptsize] at (0.95, 1.05) {headache};
+  \node[font=\scriptsize] at (1.65, 0.95) {pain};
+  % Fever cluster
+  \draw[dashed, gray!50] (4.5,1.35) ellipse (1.2 and 0.75);
+  \node[font=\footnotesize] at (4.5, 2.35) {fever cluster};
+  \node[font=\scriptsize] at (4.05, 1.35) {fever};
+  \node[font=\scriptsize] at (5.0, 1.25) {feverish};
+  % Body / weakness cluster (matches running complaint)
+  \draw[dashed, gray!50] (7.0,3.2) ellipse (1.2 and 0.75);
+  \node[font=\footnotesize] at (7.0, 4.1) {weakness cluster};
+  \node[font=\scriptsize] at (6.6, 3.15) {weak};
+  \node[font=\scriptsize] at (7.5, 3.05) {body ache};
+\end{tikzpicture}
+\caption{Schematic of BioBERT embedding space: familiar symptom words group together after biomedical pre-training (two examples per cluster).}
+\label{fig:word-embed}
+\end{figure}
+
+When a patient writes ``feverish'' instead of ``fever'', or ``head ache'' as two tokens, the model can still map the wording into regions of this space associated with similar presentations. That generalisation across varied patient language is central to text-first triage.
+
+Contextual mapping sums three embeddings (Equation~\eqref{eq:embedding-sum-preview}). The positional embedding depends only on index \(i\), and the segment embedding depends on segment id \(s\) (always \(s=0\) for a single complaint):
+\begin{equation}
+  E_{\mathrm{pos}}(i) \in \mathbb{R}^{768}, \qquad E_{\mathrm{seg}}(s) \in \mathbb{R}^{768}, \quad s = 0.
+\end{equation}
+The final input vector for token \(t_i\) at position \(i\) is the element-wise sum across all \(D=768\) dimensions:
+\begin{equation}
+  E(t_i)_d = E_{\mathrm{word}}(t_i)_d + E_{\mathrm{pos}}(i)_d + E_{\mathrm{seg}}(s)_d, \quad d = 1, \ldots, 768.
+  \label{eq:embedding-sum-full}
+\end{equation}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Symbol} & \textbf{Definition} \\
+\hline
+\(E_{\mathrm{word}}(t_i)\) & Row of \(E_{\mathrm{word}}\) looked up by token ID \\
+\(E_{\mathrm{pos}}(i)\) & Learned vector for position \(i\) in the sequence \\
+\(E_{\mathrm{seg}}(s)\) & Learned vector for segment \(s\) (here \(s=0\)) \\
+\(E(t_i)_d\) & Component \(d\) of the summed embedding \\
+\hline
+\end{tabular}
+\caption{Symbols in the full input embedding (Equation~\eqref{eq:embedding-sum-full}).}
+\label{tab:embed-full-symbols}
+\end{table}
+
+\begin{example}
+For token ``head'' at position \(i=4\), suppose the first three dimensions (illustrative only) are
+\begin{align*}
+  E_{\mathrm{word}} &= [0.31,\,-0.18,\,0.52], \\
+  E_{\mathrm{pos}}(4) &= [0.05,\,0.02,\,-0.01], \\
+  E_{\mathrm{seg}}(0) &= [0.00,\,0.00,\,0.00], \\
+  E(t_4) &= E_{\mathrm{word}} + E_{\mathrm{pos}}(4) + E_{\mathrm{seg}}(0) \\
+         &= [0.36,\,-0.16,\,0.51] \quad \text{(first three dimensions)}.
+\end{align*}
+The same element-wise addition repeats for all remaining dimensions \(d=4,\ldots,768\). The result is row 4 of \(H^{(0)}\).
+\end{example}
+
+\begin{remark}
+The embedding table is like a dictionary: each token ID points to a list of 768 numbers encoding meaning. Adding position tells the model where the word appears; adding segment (zero here) reserves the mechanism for two-sentence inputs in other BERT tasks.
+\end{remark}
+
+Figure~\ref{fig:three-embed} shows the flow for one token position. The 768 dimensions are a fixed width chosen in the original BERT architecture: wide enough to encode rich semantics, yet small enough to train twelve layers on large corpora.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.88\textwidth}{!}{%
+\begin{tikzpicture}[node distance=0.6cm and 1.2cm,
+  emb/.style={draw=green!60!black, rounded corners, fill=green!8,
+    minimum width=2.4cm, minimum height=0.65cm, align=center, font=\small}]
+  \node[emb] (ew) {$E_{\mathrm{word}}$\\(token identity)};
+  \node[emb, below=of ew] (ep) {$E_{\mathrm{pos}}(i)$\\(position $i$)};
+  \node[emb, below=of ep] (es) {$E_{\mathrm{seg}}(0)$\\(segment 0)};
+  \node[circle, draw, thick, minimum size=0.7cm, right=2.2cm of ep] (plus) {$+$};
+  \node[emb, right=1.2cm of plus] (ef) {$E(t_i)$\\final embedding};
+  \node[emb, right=1.2cm of ef, fill=triageYellow!20] (row) {Row $i$ of $H^{(0)}$};
+  \draw[flowarr] (ew.east) -| (plus.west);
+  \draw[flowarr] (ep) -- (plus);
+  \draw[flowarr] (es.east) -| (plus.west);
+  \draw[flowarr] (plus) -- (ef);
+  \draw[flowarr] (ef) -- (row);
+\end{tikzpicture}}
+\caption{Three embeddings summed element-wise for one token position.}
+\label{fig:three-embed}
+\end{figure}
+
+\section{Input matrix \(H^{(0)}\)}
+\label{sec:h0}
+
+Stacking the embedding vector for each of the \(M\) tokens forms the initial hidden-state matrix
+\begin{equation}
+  H^{(0)} \in \mathbb{R}^{M \times 768}.
+\end{equation}
+Row \(i\) is built by applying Equation~\eqref{eq:embedding-sum-full} at position \(i\): look up the word vector, add the positional vector \(E_{\mathrm{pos}}(i)\), add the segment vector \(E_{\mathrm{seg}}(0)\), and stack the result. Each row is one token; each column is one learned feature dimension. Viewed this way, a chief complaint is a table of numbers that the encoder layers progressively transform.
+
+\begin{remark}
+Rows are tokens and columns are features. The matrix shape \(M \times 768\) is preserved through all twelve encoder layers; only the entries change as self-attention distributes context across rows.
+\end{remark}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|c|l|c|c|c|c|c|}
+\hline
+\textbf{\(i\)} & \textbf{Token} & \(D_1\) & \(D_2\) & \(D_3\) & \(D_4\) & \(\cdots\) \\
+\hline
+0 & \texttt{[CLS]} & \(0.02\) & \(0.11\) & \(-0.05\) & \(0.33\) & \(\cdots\) \\
+1 & i & \(-0.08\) & \(0.04\) & \(0.19\) & \(0.01\) & \(\cdots\) \\
+2 & have & \(0.15\) & \(-0.22\) & \(0.07\) & \(0.44\) & \(\cdots\) \\
+4 & head & \(0.31\) & \(-0.18\) & \(0.52\) & \(0.09\) & \(\cdots\) \\
+7 & fever & \(0.44\) & \(0.27\) & \(-0.11\) & \(0.61\) & \(\cdots\) \\
+\(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) & \(\vdots\) \\
+\hline
+\end{tabular}
+\caption{Example submatrix of \(H^{(0)}\) (first four of 768 dimensions; illustrative values).}
+\label{tab:submatrix}
+\end{table}
+
+After encoding, row 0 (\texttt{[CLS]}) holds the summary passed to the softmax classifier; the remaining rows are not used directly for the final colour decision.
+
+\section{Encoder layers}
+\label{sec:encoder}
+
+BioBERT applies the same encoder block \(L=12\) times. Each block first lets tokens attend to one another (mixing symptom phrases), then applies a feed-forward network (FFN) to each row independently. \textbf{Residual connections} add the block input back to its output so that gradients can flow through depth during training. \textbf{Layer normalisation} rescales activations after each sub-step for numerical stability. The update equations are
+\begin{align}
+  Z^{(\ell)} &= \mathrm{LayerNorm}\!\bigl(H^{(\ell-1)} + \mathrm{MultiHeadAttention}(H^{(\ell-1)})\bigr), \\
+  H^{(\ell)} &= \mathrm{LayerNorm}\!\bigl(Z^{(\ell)} + \mathrm{FFN}(Z^{(\ell)})\bigr), \\
+  \mathrm{FFN}(x) &= W_2\,\mathrm{ReLU}(W_1 x + b_1) + b_2,
+\end{align}
+with \(W_1 \in \mathbb{R}^{768 \times 3072}\), \(W_2 \in \mathbb{R}^{3072 \times 768}\), and bias vectors \(b_1 \in \mathbb{R}^{3072}\), \(b_2 \in \mathbb{R}^{768}\) in the standard BERT-base configuration. The inner dimension 3072 is four times the hidden width 768, giving the FFN enough capacity to transform each token row nonlinearly.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{3.2cm}|p{8.8cm}|}
+\hline
+\textbf{Component} & \textbf{What it does} \\
+\hline
+MultiHeadAttention & Twelve parallel self-attention heads; each learns different word relationships \\
+FFN & Two linear layers with ReLU: expands each row to 3072 dims, then projects back to 768 \\
+LayerNorm & Rescales activations for stable training across depth \\
+Residual (\(+\)) & Adds sub-layer input to output so earlier information is not lost \\
+\hline
+\end{tabular}
+\caption{Components inside one BioBERT encoder layer.}
+\label{tab:encoder-components}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.45\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=0.35cm and 0.4cm,
+  block/.style={draw=green!60!black, rounded corners, fill=green!8,
+    minimum width=2.8cm, minimum height=0.55cm, align=center, font=\scriptsize}
+]
+  \node[block] (in) {Input $H^{(\ell-1)}$};
+  \node[block, below=of in] (attn) {Multi-head self-attention};
+  \node[block, below=of attn] (add1) {Residual + layer norm $\to Z^{(\ell)}$};
+  \node[block, below=of add1] (ffn) {Feed-forward network (FFN)};
+  \node[block, below=of ffn] (add2) {Residual + layer norm $\to H^{(\ell)}$};
+  \draw[flowarr] (in) -- (attn);
+  \draw[flowarr] (attn) -- (add1);
+  \draw[flowarr] (add1) -- (ffn);
+  \draw[flowarr] (ffn) -- (add2);
+  \draw[flowarr, dashed] (in.east) -| ++(1.2,0) |- (add1.east);
+  \draw[flowarr, dashed] (add1.east) -| ++(1.2,0) |- (add2.east);
+\end{tikzpicture}}
+\caption{One BioBERT encoder layer (dashed arrows: residual connections). The block is stacked $L=12$ times.}
+\label{fig:encoder-layer}
+\end{figure}
+
+In the attention sub-step, each token row is updated using information from every other row in the complaint, which is how ``headache'' and ``feverish'' influence one another before acuity is estimated. The FFN sub-step then applies the same nonlinear transformation to each row separately, increasing representational capacity. Repeating this block twelve times transforms \(H^{(0)}\) into \(H^{(12)}\):
+\[
+  H^{(0)} \xrightarrow{\text{Layer 1}} H^{(1)} \xrightarrow{\text{Layer 2}} \cdots \xrightarrow{\text{Layer 12}} H^{(12)} = H^{(L)}.
+\]
+Shallow layers (1--4) tend to encode individual words and short phrases; middle layers (5--8) combine symptoms such as ``headache'' with ``feverish'' and ``weak''; deep layers (9--12) encode broader urgency patterns. All \(M\) token rows are processed in parallel at each layer, not left-to-right as in older language models.
+
+\begin{remark}
+Stacking layers is like reading a complaint once for words, once for symptom combinations, and once for overall urgency. The \texttt{[CLS]} row at layer 12 becomes \(h_{\mathrm{[CLS]}}\) for classification.
+\end{remark}
+
+\section{Self-attention}
+\label{sec:attention}
+
+Self-attention computes a weighted combination of token representations for each position. The computation proceeds in four steps, matching Figure~\ref{fig:self-attention}:
+
+\begin{enumerate}
+\item \textbf{Project} hidden rows into query, key, and value matrices.
+\item \textbf{Score} pairwise compatibility between tokens.
+\item \textbf{Normalise} scores into attention weights.
+\item \textbf{Combine} value rows into context-aware outputs.
+\end{enumerate}
+\begin{align*}
+  Q &= H W_Q, \quad K = H W_K, \quad V = H W_V, \\
+  S &= QK^\top / \sqrt{d_k}, \\
+  A &= \mathrm{softmax}(S), \\
+  \text{output} &= AV.
+\end{align*}
+
+Following \citet{vaswani2017attention}, one attention head uses:
+\begin{equation}
+  \mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V,
+  \label{eq:attention}
+\end{equation}
+with key dimension \(d_k = 64\) per head. For one query row, the softmax over keys assigns weight \(\alpha_j\) to token \(j\):
+\begin{equation}
+  \alpha_j = \frac{\exp(e_j)}{\sum_{k=1}^{m}\exp(e_k)}, \quad \sum_{j=1}^{m}\alpha_j = 1,
+  \label{eq:attn-softmax}
+\end{equation}
+where \(e_j\) is the scaled score in row \(j\) of \(QK^\top/\sqrt{d_k}\) and \(m\) is the sequence length. BioBERT runs twelve such heads in parallel; their outputs are concatenated and projected back to 768 dimensions so each head can specialise (e.g.\ symptom co-occurrence vs negation).
+
+\begin{figure}[H]
+\centering
+\resizebox{0.75\textwidth}{!}{%
+\begin{tikzpicture}[node distance=0.7cm, thick,
+  box/.style={draw=green!60!black, rectangle, fill=green!5, text width=3.2cm, align=center, minimum height=0.75cm, rounded corners, font=\small},
+  highlightbox/.style={draw=green!80!black, rectangle, fill=green!20, text width=4.2cm, align=center, minimum height=0.7cm, rounded corners, font=\small\bfseries},
+  arrow/.style={->, >=latex, thick, draw=black!70},
+  label/.style={font=\tiny\itshape, text=black!70, align=center}]
+  \node[highlightbox] (input) {1.\ Input Embeddings\\ \mdseries \footnotesize (token rows of $H^{(\ell-1)}$)};
+  \node[box, below=0.7cm of input, xshift=-3.8cm] (query) {\textbf{Query ($Q$)}\\ \footnotesize ``What am I looking for?''};
+  \node[box, below=0.7cm of input] (key) {\textbf{Key ($K$)}\\ \footnotesize ``What do I represent?''};
+  \node[box, below=0.7cm of input, xshift=3.8cm] (value) {\textbf{Value ($V$)}\\ \footnotesize ``What is my content?''};
+  \node[box, fill=yellow!20, draw=yellow!80!black, below=0.7cm of key, text width=4cm] (matmul) {\textbf{2.\ Alignment Scores}\\ $Q \cdot K^T$};
+  \node[box, fill=orange!20, draw=orange!80!black, below=0.7cm of matmul, text width=4cm] (softmax) {\textbf{3.\ Softmax Normalization}};
+  \node[highlightbox, fill=red!15, draw=red!80!black, below=0.7cm of softmax, text width=4.2cm] (output) {\textbf{4.\ Context-Aware Output}\\ \mdseries \footnotesize Weighted sum ($Attention \times V$)};
+  \draw[arrow] (input) -- node[label, left] {Linear\\Transform} (query);
+  \draw[arrow] (input) -- node[label, right] {Linear\\Transform} (key);
+  \draw[arrow] (input) -- node[label, right] {Linear\\Transform} (value);
+  \draw[arrow] (query) |- (matmul);
+  \draw[arrow] (key) -- (matmul);
+  \draw[arrow] (matmul) -- node[label, right] {Scale by $\frac{1}{\sqrt{d_k}}$} (softmax);
+  \draw[arrow] (softmax) -- (output);
+  \draw[arrow] (value) |- (output);
+\end{tikzpicture}}
+\caption{Self-attention data flow within one encoder layer.}
+\label{fig:self-attention}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Symbol} & \textbf{Definition} \\
+\hline
+\(Q, K, V\) & Query, key, and value matrices derived from hidden states \(H\) \\
+\(QK^\top\) & Matrix of pairwise compatibility scores between tokens \\
+\(\sqrt{d_k}\) & Scaling constant (\(d_k=64\)) that prevents dot products from growing too large \\
+\(e_j\) & Raw attention score for token \(j\) before normalisation \\
+\(\alpha_j\) & Normalised attention weight for token \(j\) (a probability) \\
+\(m\) & Sequence length (number of tokens, at most 128) \\
+\hline
+\end{tabular}
+\caption{Self-attention notation.}
+\label{tab:attention-symbols}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+Query token & \texttt{[CLS]} & headache & feverish & filler \\
+\hline
+Attention to & 0.09 & 0.32 & 0.41 & 0.18 \\
+\hline
+\end{tabular}
+\caption{Schematic attention weights when the query is \texttt{[CLS]} (illustrative, not measured from the model). Symptom tokens receive higher weight than filler words.}
+\label{tab:attn-toy}
+\end{table}
+
+The product \(QK^\top\) measures how strongly each token should attend to every other token. Dividing by \(\sqrt{d_k}\) keeps those scores in a range where the softmax in Equation~\eqref{eq:attn-softmax} does not saturate. In a complaint mentioning both ``headache'' and ``feverish'', attention typically assigns higher weight to symptom tokens than to function words such as ``I'' or ``and'', so the updated representation emphasises clinically informative wording (Table~\ref{tab:attn-toy}).
+
+\section{Classification softmax}
+\label{sec:classification}
+
+The classification head maps the summary vector \(h_{\mathrm{[CLS]}}\) to five acuity logits, then applies softmax to obtain a probability distribution. Logits are unconstrained real scores; softmax converts them into non-negative probabilities that sum to one, which is the standard output format for multi-class clinical classifiers:
+\begin{equation}
+\begin{aligned}
+  \mathbf{z} &= W h_{\mathrm{[CLS]}} + \mathbf{b}, \\
+  \hat{\mathbf{y}} &= \mathrm{softmax}(\mathbf{z}), \\
+  \hat{y}_c &= \frac{\exp(z_c)}{\sum_{j=1}^{5}\exp(z_j)},
+\end{aligned}
+  \label{eq:softmax-class}
+\end{equation}
+with \(W \in \mathbb{R}^{5 \times 768}\), \(\mathbf{b} \in \mathbb{R}^{5}\), logits \(z_c\), and \(\sum_{c=1}^{5} \hat{y}_c = 1\). The predicted level is \(\hat{c} = \arg\max_c \hat{y}_c\). Expressing output as probabilities allows downstream routing logic to consider confidence (e.g.\ a dominant Yellow at 72\% versus a near tie between Yellow and Green).
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Symbol} & \textbf{Definition} \\
+\hline
+\(h_{\mathrm{[CLS]}}\) & 768-dimensional summary vector from final encoder layer \\
+\(W, \mathbf{b}\) & Learned classification weight matrix and bias \\
+\(z_c\) & Logit (pre-softmax score) for acuity level \(c\) \\
+\(\hat{y}_c\) & Probability of level \(c \in \{1,\ldots,5\}\) \\
+\(\hat{c}\) & Predicted level: index of largest \(\hat{y}_c\) \\
+\hline
+\end{tabular}
+\caption{Classification head notation.}
+\label{tab:class-symbols}
+\end{table}
+
+\begin{example}
+Suppose illustrative logits for levels 1--5 are
+\begin{align*}
+  \mathbf{z} &= [-1.2,\,-0.5,\,1.8,\,0.3,\,-0.9], \\
+  \exp(\mathbf{z}) &\propto [0.30,\,0.61,\,6.05,\,1.35,\,0.41], \\
+  \sum_{c=1}^{5} \exp(z_c) &= 8.72, \\
+  \hat{\mathbf{y}} &\approx [0.03,\,0.07,\,0.69,\,0.15,\,0.05], \\
+  \hat{c} &= 3, \\
+  f_{\mathrm{SATS}}(3) &= \text{Yellow}.
+\end{align*}
+Level 3 has the largest probability (\(\hat{y}_3 \approx 0.69\), rounded to 72\% in deployment logs; Section~\ref{sec:fsats}).
+\end{example}
+
+\section{Model training pipeline}
+\label{sec:training-pipeline}
+
+The deployed triage classifier is not trained from random initialisation. It is the product of three sequential stages: biomedical pre-training (Stage 1), encoder transfer from a prior triage checkpoint (Stage 2), and project fine-tuning on nurse-labeled chief complaints (Stage 3). Stages 1 and 2 supply medical language and partial triage adaptation; Stage 3 is the comprehensive retraining that maps free-text complaints to five acuity levels for this chatbot.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.92\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=0.45cm and 0.35cm,
+  stage/.style={draw=green!60!black, rounded corners, fill=green!8,
+    minimum width=2.6cm, minimum height=0.85cm, align=center, font=\scriptsize},
+  arrow/.style={->, >=latex, thick, draw=black!60}]
+  \node[stage] (s1) {Stage 1\\BioBERT MLM\\PubMed + PMC};
+  \node[stage, right=of s1] (s2) {Stage 2\\Encoder transfer\\2-class checkpoint};
+  \node[stage, right=of s2] (s3) {Stage 3\\Project fine-tuning\\80k complaints, 5 classes};
+  \node[stage, right=of s3, fill=triageYellow!25] (out) {Deployed\\triage model};
+  \foreach \a/\b in {s1/s2, s2/s3, s3/out} \draw[arrow] (\a) -- (\b);
+\end{tikzpicture}}
+\caption{Three-stage training stack for the BioBERT triage classifier.}
+\label{fig:training-stages}
+\end{figure}
+
+\subsection{Stage 1: BioBERT pre-training (masked language modelling)}
+\label{sec:mlm}
+
+Before any triage labels are used, BioBERT is trained on biomedical text with masked language modelling (MLM). Random tokens are hidden and the model must predict them from surrounding context in both directions:
+\begin{equation}
+  \mathcal{L}_{\mathrm{LM}} = -\sum_{i \in \mathcal{M}} \log P(t_i \mid H^{(L)};\, \theta),
+\end{equation}
+where \(\mathcal{M}\) is the set of masked positions, \(t_i\) is the true token at position \(i\), \(H^{(L)}\) is the final hidden-state matrix from all twelve layers, \(\theta\) denotes all model parameters, and \(P(t_i \mid \cdot)\) is the softmax probability assigned to the correct word. PubMed abstracts and PubMed Central full text (\(\approx 18\) billion words) teach medical vocabulary and syntax. Stage 1 does \textbf{not} teach triage urgency, SATS colours, or informal chief-complaint phrasing.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Symbol} & \textbf{Definition} \\
+\hline
+\(\mathcal{M}\) & Set of masked token positions in the sentence \\
+\(t_i\) & True (correct) word at masked position \(i\) \\
+\(\theta\) & All model weights and biases \\
+\(P(t_i \mid H^{(L)};\,\theta)\) & Model probability for the correct token \\
+\(\mathcal{L}_{\mathrm{LM}}\) & Total MLM penalty; lower means better predictions \\
+\hline
+\end{tabular}
+\caption{Masked language modelling notation (Stage 1).}
+\label{tab:mlm-symbols}
+\end{table}
+
+\begin{example}
+If the masked token should be ``headache'', the MLM contribution is
+\begin{align*}
+  \shortintertext{Good prediction (\(P = 0.92\)):}
+  -\log(0.92) &\approx 0.08 && \text{(small penalty)}, \\
+  \shortintertext{Poor prediction (\(P = 0.01\)):}
+  -\log(0.01) &\approx 4.6 && \text{(large penalty)}.
+\end{align*}
+\end{example}
+
+\subsection{Stage 2: Encoder transfer from a triage checkpoint}
+
+A publicly available BioBERT triage checkpoint partially adapted the encoder to urgency-related text using a \textbf{two-class} classification head (\(W \in \mathbb{R}^{2 \times 768}\)). For this project, that 2-class head is \textbf{discarded} on load because our labels require five acuity levels. The loader uses \texttt{ignore\_mismatched\_sizes=True}: only encoder weights carry forward; the output layer is randomly reinitialised for five classes. Stage 2 therefore contributes triage-oriented encoder features without constraining the final colour mapping.
+
+\subsection{Stage 3: Fine-tuning on nurse-labeled chief complaints}
+\label{sec:training}
+
+Stage 3 is the comprehensive retraining performed for this thesis. Nurse-assigned acuity labels from the Triagegeist benchmark (Section~\ref{sec:data-provenance}) are inner-joined with chief-complaint text on patient identifier, yielding \(N = 80{,}000\) English text-label pairs \((X_i, y_i)\). Only \texttt{chief\_complaint\_raw} and \texttt{triage\_acuity} are used; vitals and demographics in the source records are excluded so the NLP path matches the single-shot text input at intake.
+
+The data are split 90/10 into training and validation sets (\(\approx 72{,}000\) / \(\approx 8{,}000\) rows, \texttt{test\_size=0.1}, random seed 42). A new classification head \(W \in \mathbb{R}^{5 \times 768}\), \(\mathbf{b} \in \mathbb{R}^{5}\) is trained from scratch while encoder weights are updated with a small learning rate.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|r|r|l|}
+\hline
+\textbf{Level} & \textbf{Count} & \textbf{Proportion} & \textbf{SATS colour} \\
+\hline
+1 (most urgent) & 3,222 & 0.0403 & Red \\
+2 & 13,439 & 0.1680 & Orange \\
+3 & 28,921 & 0.3615 & Yellow \\
+4 & 23,020 & 0.2878 & Green \\
+5 (least urgent) & 11,398 & 0.1425 & Green \\
+\hline
+\textbf{Total} & \textbf{80,000} & \textbf{1.000} & \\
+\hline
+\end{tabular}
+\caption{Class distribution in the 80{,}000 labeled chief-complaint training pairs.}
+\label{tab:class-distribution}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+Epochs & 3 \\
+Batch size (train and eval) & 16 \\
+Learning rate \(\alpha\) & \(2 \times 10^{-5}\) \\
+Weight decay & 0.01 \\
+Max sequence length & 128 tokens \\
+Mixed precision (FP16) & Enabled \\
+Total optimizer steps & 13,500 (3 epochs \(\times\) 4,500 steps) \\
+Best validation loss & 0.001812 (epoch 3) \\
+\hline
+\end{tabular}
+\caption{Fine-tuning hyperparameters (Stage 3).}
+\label{tab:hyperparams}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{8.5cm}|}
+\hline
+\textbf{Component} & \textbf{Updated during Stage 3?} \\
+\hline
+Embedding layers & Yes (small learning-rate updates) \\
+12 transformer encoder layers & Yes \\
+Classification head \(W, \mathbf{b}\) & Yes (trained from scratch) \\
+\hline
+\end{tabular}
+\caption{Which model components change during project fine-tuning.}
+\label{tab:trainable-components}
+\end{table}
+
+The objective is \textbf{cross-entropy loss}: for each training example, the model is penalised when it assigns low probability to the nurse's true acuity label. For a single example with true class \(y\),
+\begin{equation}
+  \mathcal{L}_{\mathrm{CE}} = -\log \hat{y}_{y},
+\end{equation}
+where \(\hat{y}_{y}\) is the probability the model assigns to the correct level. Over the full training set:
+\begin{equation}
+  \mathcal{L}_{\mathrm{triage}} = -\sum_{i=1}^{N} \log P(y_i \mid X_i;\, \theta), \quad N = 80{,}000.
+\end{equation}
+
+\begin{example}
+If the nurse labeled a complaint Yellow (level 3), the cross-entropy penalty is
+\begin{align*}
+  \shortintertext{Low confidence on the true class (\(\hat{y}_3 = 0.05\)):}
+  \mathcal{L}_{\mathrm{CE}} = -\log(0.05) &\approx 3.0 && \text{(large penalty)}, \\
+  \shortintertext{High confidence on the true class (\(\hat{y}_3 = 0.95\)):}
+  \mathcal{L}_{\mathrm{CE}} = -\log(0.95) &\approx 0.05 && \text{(small penalty)}.
+\end{align*}
+Fine-tuning adjusts weights so correct classes receive higher probability on similar complaints.
+\end{example}
+
+\textbf{Backpropagation} computes how each weight contributed to \(\mathcal{L}_{\mathrm{triage}}\) by applying the chain rule backward from the loss through the softmax head and all twelve encoder layers. For classification weights \(W\), with logits \(\mathbf{z} = W h_{\mathrm{[CLS]}} + \mathbf{b}\),
+\begin{equation}
+  \frac{\partial \mathcal{L}}{\partial W} = \frac{\partial \mathcal{L}}{\partial \hat{\mathbf{y}}} \cdot \frac{\partial \hat{\mathbf{y}}}{\partial \mathbf{z}} \cdot \frac{\partial \mathbf{z}}{\partial W}.
+\end{equation}
+In words: (i) \(\partial \mathcal{L}/\partial \hat{\mathbf{y}}\) measures how wrong the predicted probabilities are; (ii) \(\partial \hat{\mathbf{y}}/\partial \mathbf{z}\) propagates through softmax; (iii) \(\partial \mathbf{z}/\partial W\) links logits to the weight matrix. The same logic applies layer by layer through BioBERT.
+
+\textbf{Gradient descent} then adjusts weights in the direction that reduces the loss:
+\begin{equation}
+  W_{\mathrm{new}} = W_{\mathrm{old}} - \alpha \frac{\partial \mathcal{L}}{\partial W},
+\end{equation}
+with \(\alpha = 2 \times 10^{-5}\). When the model confidently predicts the wrong colour, backpropagation increases the loss sharply and the subsequent weight update pushes similar complaints toward the nurse-labeled class on the next training pass.
+
+\begin{remark}
+Pre-training (Stage 1) gives the model medical language; comprehensive fine-tuning (Stage 3) teaches triage decisions on short, informal chief-complaint phrasing. The learning rate is kept small so PubMed knowledge is preserved while the head and encoder adapt to urgency labels.
+\end{remark}
+
+\section{Mapping acuity to colour: \(f_{\mathrm{SATS}}\)}
+\label{sec:fsats}
+
+The softmax head predicts acuity levels \(1\)--\(5\) learned from training data. Hospital routing uses SATS colours, so a fixed deterministic map converts level to colour:
+\begin{equation}
+  f_{\mathrm{SATS}}(\hat{c}) = C_{\mathrm{NLP}} = \begin{cases}
+    \text{Red} & \hat{c} = 1 \\
+    \text{Orange} & \hat{c} = 2 \\
+    \text{Yellow} & \hat{c} = 3 \\
+    \text{Green} & \hat{c} \in \{4, 5\}
+  \end{cases}
+\end{equation}
+Levels 4 and 5 both correspond to non-urgent presentations in the training schema and therefore map to Green. Blue is reserved for dignity protocol on arrival and is not produced by this five-class head.
+
+\section{Clinical pathways \(P(C_{\mathrm{NLP}})\)}
+\label{sec:pathways}
+
+Once \(C_{\mathrm{NLP}}\) is known, the chatbot attaches a pathway card that specifies waiting time, destination, and escalation rules drawn from SATS-aligned hospital protocol at \examplehospital{}:
+\begin{equation}
+  P(C) = \bigl(T_{\max},\; \text{destination},\; \text{actions},\; \text{escalation}\bigr).
+\end{equation}
+The four tuple components correspond directly to the columns in Table~\ref{tab:pathways}: \(T_{\max}\) is the maximum waiting time, destination is the primary clinical department, actions list support steps (nursing, pharmacy, diagnostics), and escalation defines what happens if the timer expires or the patient worsens.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|p{3.2cm}|p{3.5cm}|}
+\hline
+\textbf{Colour} & \(T_{\max}\) & \textbf{Destination} & \textbf{Escalation} \\
+\hline
+Red & 0 min & Resuscitation / Surgery & Immediate senior alert \\
+Orange & 10 min & Internal Medicine / Surgery / Obs.\ \& Gynae & Head nurse if unclaimed \\
+Yellow & 60 min & Outpatient urgent / Pediatrics & Re-assess if timer expires \\
+Green & \(<\) 4 h & Outpatient / Dental / Eye / Public \& Preventive Health & Return only if worse \\
+\hline
+\end{tabular}
+\caption{SATS pathway protocol at \examplehospital{} (clinical destinations).}
+\label{tab:pathways}
+\end{table}
+
+Table~\ref{tab:pathway-scenarios} is the authoritative full map: one row per NLP outcome (including gate rejection), with primary clinical departments, support actions, escalation rules, and an example complaint phrase.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{|p{1.5cm}|p{1.6cm}|p{0.9cm}|p{2.4cm}|p{3.1cm}|p{2.2cm}|}
+\hline
+\textbf{Scenario} & \textbf{Trigger} & \(T_{\max}\) & \textbf{Primary clinical departments} & \textbf{Support actions} & \textbf{Escalation} \\
+\hline
+Gate reject & \(g(X)<0.35\) & n/a & Hold at intake & Nursing: request complaint; HIT: no colour stored & Re-submit with clinical text \\
+Red & \(\hat{c}=1\) & 0 min & Surgery, Internal Medicine & Nursing (vitals, TEWS), Pharmacy (emergency), Health Info (Red flag), Admin (bed bypass), HIT (Code Red) & Immediate senior clinician \\
+Orange & \(\hat{c}=2\) & 10 min & Internal Medicine, Surgery, Obs.\ \& Gynae & Nursing (monitor, timer), Diagnostics (stat labs), Pharmacy, Health Info, Admin, HIT & Head nurse if unclaimed \\
+Yellow & \(\hat{c}=3\) & 60 min & Outpatient urgent, Pediatrics, Diagnostics & Nursing (vitals, TEWS, timer), Pharmacy, Health Info, HIT, Accounts (defer billing) & Re-assess at 60 min \\
+Green & \(\hat{c}\in\{4,5\}\) & \(<\)4 h & Outpatient, Dental, Eye, Public \& Preventive Health & Nursing (brief triage), Diagnostics (routine), Health Info, HIT, Accounts & Return if worse \\
+\hline
+\end{tabular}
+\caption{Complete NLP pathway scenarios at \examplehospital{} (gate reject plus four SATS colours).}
+\label{tab:pathway-scenarios}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Scenario} & \textbf{Example complaint phrase} \\
+\hline
+Gate reject & ``Hello, how are you?'' (no clinical content) \\
+Red & ``Crushing chest pain, cannot breathe, sweating heavily'' \\
+Orange & ``Severe abdominal pain in pregnancy, bleeding'' \\
+Yellow & \runningcomplaint{} \\
+Green & ``Routine dental pain for two weeks, no fever'' \\
+\hline
+\end{tabular}
+\caption{Example chief complaints triggering each pathway scenario.}
+\label{tab:pathway-examples}
+\end{table}
+
+Table~\ref{tab:knust-dept-routing} maps all hospital departments to their role in the pathway system. Clinical departments receive patients by colour; support departments execute actions attached to each pathway card.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{|p{3.4cm}|c|p{4.8cm}|}
+\hline
+\textbf{Department} & \textbf{Role} & \textbf{Colours / function} \\
+\hline
+Internal Medicine & Clinical & Red, Orange (acute medical) \\
+Surgery & Clinical & Red, Orange (trauma, acute surgical) \\
+Obstetrics and Gynaecology & Clinical & Orange (obstetric urgency) \\
+Pediatrics & Clinical & Yellow (child urgent stream) \\
+Outpatient & Clinical & Yellow (urgent), Green (routine) \\
+Diagnostics Services & Clinical & Yellow, Green (parallel labs/imaging) \\
+Dental & Clinical & Green \\
+Eye & Clinical & Green \\
+Public Health & Clinical & Green (community referrals) \\
+Preventive Health & Clinical & Green (screening, wellness) \\
+Nursing & Support & All colours (triage, vitals, reassessment) \\
+Pharmacy & Support & All colours (medication on protocol) \\
+Health Information & Support & All colours (record colour and timer) \\
+Hospital Information Technology & Support & All colours (digital routing, API) \\
+Administration & Support & All colours (bed and queue management) \\
+Accounts & Support & Green, Yellow (billing after stabilisation) \\
+\hline
+\end{tabular}
+\caption{Department routing map at \examplehospital{}.}
+\label{tab:knust-dept-routing}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  box/.style={draw=green!60!black, rectangle, fill=green!10, text width=1.6cm, align=center,
+    minimum height=0.65cm, rounded corners, font=\scriptsize, inner sep=2pt},
+  colred/.style={box, fill=triageRed!35, draw=red!70!black, text width=1.4cm},
+  colorange/.style={box, fill=triageOrange!35, draw=orange!70!black, text width=1.4cm},
+  colyellow/.style={box, fill=triageYellow!40, draw=orange!60!black, text width=1.4cm},
+  colgreen/.style={box, fill=triageGreen!25, draw=green!50!black, text width=1.4cm},
+  dept/.style={box, text width=2.1cm, minimum height=1.15cm, font=\scriptsize, inner sep=2pt},
+  support/.style={box, fill=gray!12, text width=12.8cm, minimum height=0.6cm, font=\scriptsize, inner sep=3pt},
+  arrow/.style={->, >=latex, thick, draw=black!60},
+  bus/.style={thick, draw=black!45}]
+  % Row 1 (elevated): intake with wide horizontal spacing
+  \node[box] (in) at (0.5, 2.8) {Complaint};
+  \node[box] (gate) at (5.5, 2.8) {Gate};
+  \node[box] (nlp) at (10.5, 2.8) {BioBERT};
+  % Reject branch: own row below Gate, slightly left (clear of intake and fan lines)
+  \node[box, fill=gray!15] (reject) at (4.5, 0.6) {Re-prompt\\no colour};
+  % Row 2: four colours
+  \node[colred] (red) at (0, -4.0) {Red};
+  \node[colorange] (orange) at (4.2, -4.0) {Orange};
+  \node[colyellow] (yellow) at (8.4, -4.0) {Yellow};
+  \node[colgreen] (green) at (12.6, -4.0) {Green};
+  % Row 3: clinical departments
+  \node[dept] (rdept) at (0, -6.8) {Surgery\\Internal Med.};
+  \node[dept] (odept) at (4.2, -6.8) {Internal Med.\\Surgery\\Obs.\ \& Gynae};
+  \node[dept] (ydept) at (8.4, -6.8) {Outpatient\\Pediatrics\\Diagnostics};
+  \node[dept] (gdept) at (12.6, -6.8) {Outpatient\\Dental\\Eye\\Public Health};
+  % Row 4: shared support
+  \node[support] (sup) at (6.3, -9.5) {Shared support: Nursing \quad Pharmacy \quad Health Information \quad HIT \quad Administration \quad Accounts};
+  % Intake: Complaint -> Gate -> BioBERT on elevated row; Gate fail drops to re-prompt
+  \draw[arrow] (in.east) -- (gate.west);
+  \draw[arrow] (gate.east) -- (nlp.west);
+  \draw[arrow] (gate.south) -- (5.5, 1.5) -- (4.5, 1.5) -- (reject.north);
+  % BioBERT -> all four colours (route down, across above reject, then fan from centre)
+  \coordinate (nlpdrop) at (6.3, -2.6);
+  \draw[arrow] (nlp.south) -- (10.5, 1.6) -- (6.3, 1.6) -- (nlpdrop);
+  \draw[arrow] (nlpdrop) -| (red.north);
+  \draw[arrow] (nlpdrop) -| (orange.north);
+  \draw[arrow] (nlpdrop) -| (yellow.north);
+  \draw[arrow] (nlpdrop) -| (green.north);
+  % Each colour -> matching department (vertical, column-aligned)
+  \draw[arrow] (red.south) -- (rdept.north);
+  \draw[arrow] (orange.south) -- (odept.north);
+  \draw[arrow] (yellow.south) -- (ydept.north);
+  \draw[arrow] (green.south) -- (gdept.north);
+  % Departments -> shared support (collection bus + four dashed drops)
+  \draw[bus] (0, -8.35) -- (12.6, -8.35);
+  \draw[arrow] (rdept.south) -- (0, -8.35);
+  \draw[arrow] (odept.south) -- (4.2, -8.35);
+  \draw[arrow] (ydept.south) -- (8.4, -8.35);
+  \draw[arrow] (gdept.south) -- (12.6, -8.35);
+  \draw[arrow, dashed] (0, -8.35) -- ($(sup.north west)!0.12!(sup.north east)$);
+  \draw[arrow, dashed] (4.2, -8.35) -- ($(sup.north west)!0.38!(sup.north east)$);
+  \draw[arrow, dashed] (8.4, -8.35) -- ($(sup.north west)!0.62!(sup.north east)$);
+  \draw[arrow, dashed] (12.6, -8.35) -- ($(sup.north west)!0.88!(sup.north east)$);
+\end{tikzpicture}}
+\caption{Complete NLP pathway map at \examplehospital{}: gate rejection and all four SATS colours with clinical destinations and shared support services.}
+\label{fig:pathway-map}
+\end{figure}
+
+\begin{remark}
+Routing is protocol-driven; nurses may override the chatbot suggestion after clinical assessment. The chatbot supplies an initial colour and department direction before vitals are measured, reducing idle time at intake.
+\end{remark}
+
+\paragraph{Gate rejection.}
+When \(g(X) < 0.35\), the pipeline stops before BioBERT (Table~\ref{tab:pathway-scenarios}). Nursing staff request a proper chief complaint; no colour or pathway card is issued and Health Information stores no triage record until valid clinical text is submitted.
+
+\paragraph{Red (\(\hat{c}=1\)).}
+Immediate life-threatening presentations (e.g.\ crushing chest pain with dyspnoea) map to Red with \(T_{\max}=0\). Surgery and Internal Medicine activate resuscitation pathways; Nursing records immediate vitals and TEWS; Administration bypasses routine registration; Hospital Information Technology raises a Code Red alert.
+
+\paragraph{Orange (\(\hat{c}=2\)).}
+Very urgent cases such as severe abdominal pain in pregnancy route to Internal Medicine, Surgery, or Obstetrics and Gynaecology within ten minutes. Nursing starts a countdown timer; Diagnostics may run stat laboratory work; escalation to the head nurse occurs if no clinician claims the patient within \(T_{\max}\).
+
+\paragraph{Yellow (\(\hat{c}=3\)).}
+The running illustrative complaint (\runningcomplaint{}) maps here at approximately 72\% confidence. Outpatient urgent stream, Pediatrics (when paediatric protocol applies), and parallel Diagnostics orders apply; Nursing sets a 60-minute reassessment timer and records the colour in Health Information.
+
+\paragraph{Green (\(\hat{c}\in\{4,5\}\)).}
+Non-urgent presentations (e.g.\ routine dental pain without fever) stream to Outpatient, Dental, Eye, or Public and Preventive Health within four hours. This diverts low-acuity patients away from acute waiting areas; Accounts handles billing after brief Nursing triage.
+
+\section{Medical relevance gate}
+\label{sec:gate}
+
+Running BioBERT on non-clinical text (greetings, sports chat) would waste compute and produce meaningless acuity scores. A lightweight rule-based gate scores clinical relevance before the deep model runs:
+\begin{equation}
+  g(X) = \mathrm{clip}\!\left(\sum_{j} s_j(X) - p(X),\, 0,\, 1\right),
+\end{equation}
+where \(s_j\) are non-negative feature scores from symptom lexicon hits and hospital-context phrases, and \(p(X)=0.5\) when a non-clinical or greeting-only pattern matches. Classification proceeds only if
+\begin{equation}
+  g(X) \geq 0.35.
+\end{equation}
+The threshold 0.35 was set in the prototype implementation to reject obvious non-medical input while accepting short but valid complaints (e.g.\ ``chest pain''). Complaints that fail the gate return a request for clinical detail rather than a colour.
+
+\begin{example}
+For the illustrative complaint with symptom hits ``headache'' (\(s_1=0.30\)) and ``feverish'' (\(s_2=0.25\)), with no greeting penalty (\(p(X)=0\)):
+\begin{align*}
+  \sum_j s_j &= 0.30 + 0.25 = 0.55, \\
+  g(X) &= \mathrm{clip}(0.55 - 0,\, 0,\, 1) = 0.55 \geq 0.35
+\end{align*}
+so classification proceeds. For ``Hello, how are you?'' with no symptom hits and greeting penalty \(p(X)=0.5\):
+\begin{align*}
+  \sum_j s_j &= 0, \\
+  g(X) &= \mathrm{clip}(0 - 0.5,\, 0,\, 1) = 0 < 0.35
+\end{align*}
+and the system requests a chief complaint instead of running BioBERT.
+\end{example}
+
+\section{End-to-end summary}
+\label{sec:e2e}
+
+For any chief complaint \(X\), the implemented text path (matching the prototype \texttt{/predict} endpoint) proceeds as follows:
+\begin{equation}
+\begin{aligned}
+  X &\xrightarrow[\ref{sec:gate}]{g} \tau(X) \xrightarrow[\ref{sec:tokenisation}--\ref{sec:h0}]{} H^{(0)} \\
+  &\xrightarrow[\ref{sec:encoder}--\ref{sec:attention}]{12} h_{\mathrm{[CLS]}} \xrightarrow[\ref{sec:classification}]{} \hat{\mathbf{y}} \xrightarrow[\ref{sec:fsats}]{} C_{\mathrm{NLP}} \xrightarrow[\ref{sec:pathways}]{} P(C_{\mathrm{NLP}}),
+\end{aligned}
+  \label{eq:e2e-chain}
+\end{equation}
+where each arrow label points to the section that defines that transformation. If \(g(X) < 0.35\), the chain stops after the gate and no colour is assigned.
+
+\begin{enumerate}
+\item \textbf{Clinical relevance gate.} Compute \(g(X)\); if \(g(X) < 0.35\), return a request for clinical detail and stop.
+\item \textbf{Tokenisation and embedding.} Map \(X\) to tokens, build \(H^{(0)} \in \mathbb{R}^{M \times 768}\) (Sections~\ref{sec:tokenisation}--\ref{sec:h0}).
+\item \textbf{BioBERT encoding.} Apply \(L=12\) encoder layers with self-attention (Sections~\ref{sec:encoder}--\ref{sec:attention}) to obtain \(h_{\mathrm{[CLS]}}\).
+\item \textbf{Classification.} Apply the softmax head (Section~\ref{sec:classification}):
+\begin{align*}
+  \hat{\mathbf{y}} &= \mathrm{softmax}(W h_{\mathrm{[CLS]}} + \mathbf{b}), \\
+  \hat{c} &= \arg\max_c \hat{y}_c.
+\end{align*}
+\item \textbf{Colour and pathway.} Apply \(C_{\mathrm{NLP}} = f_{\mathrm{SATS}}(\hat{c})\) and return pathway card \(P(C_{\mathrm{NLP}})\) (Sections~\ref{sec:fsats}--\ref{sec:pathways}).
+\end{enumerate}
+
+The illustrative complaint in this chapter instantiates the same pipeline; one worked outcome is level 3 (Yellow) at 72\% confidence for headache and feverish symptoms. TEWS (Section~\ref{sec:tews}) remains the nurse-facing vital-sign score when measurements become available.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=0.35cm and 0.25cm,
+  box/.style={draw=green!60!black, rectangle, fill=green!10, text width=1.55cm, align=center, minimum height=0.55cm, rounded corners, font=\scriptsize},
+  gatebox/.style={box, fill=orange!12},
+  arrow/.style={->, >=latex, thick, draw=black!60}]
+  \node[box] (input) {Complaint\\$X$};
+  \node[gatebox, right=of input] (gate) {Gate\\$g(X)$};
+  \node[box, right=of gate] (tok) {Tokenise\\embed};
+  \node[box, right=of tok] (bb) {BioBERT\\12 layers};
+  \node[box, right=of bb] (cls) {\texttt{[CLS]}\\summary};
+  \node[box, right=of cls] (head) {Softmax\\$\hat{\mathbf{y}}$};
+  \node[box, right=of head, fill=triageYellow!35] (out) {Colour\\pathway};
+  \foreach \a/\b in {input/gate, gate/tok, tok/bb, bb/cls, cls/head, head/out}
+    \draw[arrow] (\a) -- (\b);
+\end{tikzpicture}}
+\caption{Compact end-to-end NLP triage path (TEWS documented separately in Section~\ref{sec:tews}).}
+\label{fig:e2e}
+\end{figure}
+
+The diagram above matches the pipeline in Section~\ref{sec:overview}. In order:
+\begin{enumerate}
+\item \textbf{Complaint \(X\)} enters as free text from the patient or attendant.
+\item \textbf{Gate} computes \(g(X)\); non-clinical input is rejected before BioBERT runs.
+\item \textbf{Tokenise and embed} map text to integer IDs and build the matrix \(H^{(0)}\).
+\item \textbf{BioBERT} applies twelve encoder layers with self-attention across all tokens.
+\item \textbf{\texttt{[CLS]} summary} extracts the fixed-length vector \(h_{\mathrm{[CLS]}}\) from row 0.
+\item \textbf{Softmax} outputs acuity probabilities \(\hat{\mathbf{y}}\) over five classes.
+\item \textbf{Colour and pathway} apply \(f_{\mathrm{SATS}}(\hat{c})\) and return the pathway card \(P(C_{\mathrm{NLP}})\).
+\end{enumerate}
+
+\section{Implementation note}
+\label{sec:implementation}
+
+Figure~\ref{fig:system-architecture} shows the deployable system: patient-facing web interface, machine-learning API, and hospital routing layer. The NLP mathematics in Figures~\ref{fig:nlp-pipeline} and~\ref{fig:e2e} execute inside the API; department routing applies \examplehospital{} pathway rules after classification.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  x=1.0cm, y=0.85cm,
+  title/.style={font=\small\bfseries, anchor=center},
+  box/.style={draw=green!60!black, rectangle, fill=green!10, text width=2.0cm, align=center,
+    minimum height=0.75cm, rounded corners, font=\scriptsize, inner sep=2pt},
+  user/.style={box, fill=gray!12},
+  api/.style={box, fill=green!18},
+  route/.style={box, fill=triageYellow!25},
+  arrow/.style={->, >=latex, thick, draw=black!55},
+  darrow/.style={->, >=latex, thick, draw=black!45, dashed}]
+  \node[title] at (5.5, 4.0) {Deployable triage system (full stack)};
+  \draw[dashed, rounded corners, draw=gray!45] (-0.3, 0.4) rectangle (11.3, 4.3);
+  \node[user] (pat) at (0, 2.8) {Patient or\\attendant};
+  \node[box] (ui) at (2.2, 2.8) {Web\\chatbot UI};
+  \node[api] (api) at (4.6, 2.8) {\texttt{/predict}\\API (FastAPI)};
+  \node[box] (gate) at (6.8, 2.8) {Clinical\\gate};
+  \node[box] (bert) at (9.0, 2.8) {BioBERT\\classifier};
+  \node[box] (card) at (4.6, 1.5) {Pathway\\card};
+  \node[route] (dept) at (7.5, 1.5) {Department\\routing (17 units)};
+  \node[box, fill=gray!8] (tews) at (1.0, 1.5) {Nurse vitals\\(TEWS)};
+  \draw[arrow] (pat) -- (ui);
+  \draw[arrow] (ui) -- node[above, font=\tiny] {HTTP JSON} (api);
+  \draw[arrow] (api) -- (gate);
+  \draw[arrow] (gate) -- (bert);
+  \draw[arrow] (bert.south) -- ++(0,-0.35) -| (card.north);
+  \draw[arrow] (card) -- (dept);
+  \draw[darrow] (tews.east) -- (dept.west);
+  \node[font=\tiny\itshape, text=black!65] at (5.5, 0.75) {English chief complaint in; acuity, colour, pathway fields out};
+\end{tikzpicture}}
+\caption{System architecture: user interface, \texttt{/predict} API, BioBERT inference pipeline, pathway card, and department routing at \examplehospital{}. Nurse TEWS runs in parallel (dashed); prototype code in Appendix~\ref{app:github}.}
+\label{fig:system-architecture}
+\end{figure}
+
+The prototype exposes a \texttt{/predict} application programming interface (API) endpoint: JSON \textbf{English} chief complaint in; acuity probabilities, \(C_{\mathrm{NLP}}\), pathway fields, and gate metadata out. Model weights and tokenizer files ship with the repository listed in Appendix~\ref{app:github}. This thesis treats the mathematics above as the specification; empirical results appear in Chapter~\ref{ch:results}.

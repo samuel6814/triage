@@ -1,0 +1,22 @@
+\chapter{CONCLUSION}
+\label{ch:conclusion}
+
+\section{Summary}
+
+This thesis developed a mathematical pipeline from unstructured chief complaint text to South African Triage Scale (SATS) colour and clinical pathway at hospital intake. The chatbot accepts a single English free-text submission and returns acuity probabilities, a colour, and a pathway card aligned with SATS and \examplehospital{} department structure.
+
+Methodologically, the work specifies tokenisation, contextual embeddings, twelve-layer BioBERT encoding with multi-head self-attention, softmax classification, the deterministic map \(f_{\mathrm{SATS}}\), a clinical relevance gate, and department routing across seventeen hospital units. Training is documented as a three-stage stack: PubMed masked language modelling (Stage 1), encoder transfer from a prior triage checkpoint (Stage 2), and comprehensive project fine-tuning on the Triagegeist English benchmark (80{,}000 pairs, Section~\ref{sec:data-provenance}) with a reinitialised five-class head (Stage 3).
+
+Holdout evaluation reports 99.92\% accuracy, 0.9977 macro-F1, and 98.14\% Level 1 recall on 8{,}000 validation complaints, with approximately 100\,ms inference latency (Chapter~\ref{ch:results}, Figures~\ref{fig:latency}--\ref{fig:metrics-compare}). A full five-scenario pathway map (gate reject, Red, Orange, Yellow, Green) routes each NLP outcome to clinical and support departments at \examplehospital{}, addressing intake delay, queue congestion, and acuity discontinuity described in Chapter~\ref{ch:intro}.
+
+\section{Limitations and future work}
+
+\textbf{Data scope.} Reported holdout metrics come exclusively from the Triagegeist synthetic English benchmark (Section~\ref{sec:data-provenance}); the model is English-only at intake. A site visit to \examplehospital{} informed pathway design and generated supplementary English example complaints for prototype and qualitative analysis, but those examples were not used for fine-tuning. A natural next step is prospective collection of nurse-labeled chief complaints at \examplehospital{} for local retraining, and exploring optional fusion of vitals and TEWS alongside free text when measurements become available.
+
+\textbf{Class imbalance.} Chapter~\ref{ch:results} already evaluates baseline and SMOTE-augmented checkpoints with stratified holdout metrics. Future work can refine minority-class sensitivity for urgent levels while preserving specificity on routine presentations, building on the imbalance-mitigation pipeline documented in Section~\ref{sec:finetuned-analysis}.
+
+\textbf{Clinical validation.} Holdout evaluation establishes strong offline agreement with nurse labels. The next phase is a prospective pilot at \examplehospital{} to measure waiting times, nurse override rates, and patient outcomes in live intake, converting offline performance into operational evidence \citep{Mitchell2023}.
+
+\textbf{Pathway refinement.} The five-scenario pathway map is SATS-aligned and complete for gate reject, Red, Orange, Yellow, and Green routing. Ongoing collaboration with hospital administrators and clinical leads at \examplehospital{} will keep department routing tables current as service lines evolve \citep{Rominski2014,satsmanual}.
+
+\textbf{System integration.} The prototype \texttt{/predict} API and pathway cards already anchor the chatbot in a deployable pipeline. Deeper integration with Hospital Information Technology and Health Information systems would automate timer alerts and bed assignment, completing the Flow Management Engine vision across Administration, Diagnostics, and all clinical departments listed in Table~\ref{tab:knust-dept-routing}.

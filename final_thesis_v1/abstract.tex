@@ -1,0 +1,9 @@
+\chapter*{ABSTRACT}
+
+\textbf{Triage} is the structured process of assigning each arriving patient an urgency level so that hospital resources match clinical need. In low- and middle-income countries, including Ghana, overcrowding, delayed first assessment, and \emph{acuity discontinuity} (urgency colour stops guiding care after intake) affect outpatient departments, wards, and emergency streams alike. This thesis develops a hospital chatbot that maps unstructured \emph{chief complaints} (unstructured descriptions of why the patient has come) to South African Triage Scale (SATS) colours and clinical pathways.
+
+The mathematical model converts English patient text to a colour through a fine-tuned Biomedical Bidirectional Encoder Representations from Transformers (BioBERT) classifier. Tokenisation, contextual embeddings, multi-head self-attention, and softmax classification are specified with full formulas. A fixed map \(f_{\mathrm{SATS}}\) converts predicted acuity levels to Red, Orange, Yellow, or Green. The Triage Early Warning Score (TEWS) is presented as the parallel hospital standard for objective vital signs; when vitals are unavailable at intake, the text model supplies the initial colour. A clinical relevance gate filters non-medical input before classification.
+
+Holdout evaluation on the 80{,}000-pair Triagegeist benchmark reports 99.92\% accuracy. Synthetic Minority Over-sampling Technique (SMOTE) and stratified training mitigate class imbalance, raising Level~1 (Red) recall from 98.14\% to 100\% at a small precision cost, prioritising a safety-first clinical trade-off.
+
+The methodology is illustrated on a running complaint at \examplehospital{}: \runningcomplaint{} System architecture and the prototype \texttt{/predict} application programming interface (API) are documented in Chapter~\ref{ch:method} and Appendix~\ref{app:github}. Results and conclusion are reported in later chapters.

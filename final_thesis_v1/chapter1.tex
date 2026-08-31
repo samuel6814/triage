@@ -1,0 +1,32 @@
+\chapter{INTRODUCTION}
+\label{ch:intro}
+
+\section{Background}
+
+Hospitals in Ghana operate under sustained pressure: crowded waiting areas, limited nursing staff, and long queues before a clinician sees a new arrival. Triage is the mechanism that aligns patient urgency with resource allocation. In well-resourced systems, urgency is reassessed as patients move through diagnostics, wards, and outpatient streams. In resource-constrained settings, however, standardised protocols such as the South African Triage Scale (SATS) are often applied only at the first desk. Once a patient leaves that point, their colour-coded acuity may no longer steer bed allocation, laboratory orders, or re-assessment timers. We call this failure \emph{acuity discontinuity}.
+
+Teaching hospitals in Ghana, including \examplehospital{}, apply SATS to structure intake across clinical departments, not only in a single emergency bay. Colour codes (Red, Orange, Yellow, Green, and Blue for dignity protocols) express how quickly a patient must be seen and where they should stream next: resuscitation, acute beds, urgent waiting, or routine outpatient care. Nurses at triage also compute a Triage Early Warning Score (TEWS) from objective vital signs. Yet many delays begin earlier, when a patient arrives with only words: a headache, fever, weakness, or abdominal pain described in free text before any thermometer or pulse oximeter reading is available.
+
+This thesis proposes a digital \emph{Flow Management Engine} in the form of a hospital chatbot. The chatbot accepts a single English free-text \emph{chief complaint} (the primary reason the patient presents, in their own words; see Section~\ref{sec:chief-complaints}) and returns a SATS colour reflecting urgency together with acuity probabilities and a clinical pathway card that can guide routing across outpatient departments, wards, and intake queues. The core contribution is mathematical: a pipeline from unstructured complaint text to acuity probabilities, colour, and pathway card, developed in Chapter~\ref{ch:method}.
+
+\section{Problem statement}
+
+Low- and middle-income country (LMIC) hospitals struggle with crowded waiting rooms and limited human resources at intake. Patients may wait hours before first assessment. Critical cases are not always identified quickly, while less urgent presentations congest acute zones. Medical systems are confusing; without immediate direction, patients do not know whether to join the emergency stream, the polyclinic, or self-care advice.
+
+Manual, paper-based triage creates acuity discontinuity: patient status becomes static rather than dynamic. Two systemic failures follow.
+
+\begin{enumerate}
+\item \textbf{Lost urgency.} Patients triaged Orange or Red can lose time-critical priority when they move to imaging, laboratories, or wards, because no digital record preserves their colour and countdown timer.
+\item \textbf{Green congestion.} Non-urgent (Green) patients lack automated guidance toward outpatient or self-care routes, blocking beds and staff needed for life-saving care.
+\end{enumerate}
+
+Without a framework to manage flow hospital-wide, overcrowding and resource mismatch persist; the most vulnerable patients become invisible to the system after the first desk.
+
+\section{Objectives}
+
+\begin{enumerate}
+\item \textbf{Automate triage classification.} Develop a chatbot that classifies a single unstructured chief complaint submitted by the patient or attendant, producing acuity probabilities, a SATS colour, and a pathway card reflecting clinical urgency.
+\item \textbf{Guide clinical pathways.} Provide immediate, actionable next-step guidance: critical (Red) cases toward urgent care; non-urgent (Green) cases toward self-care or routine clinic streams.
+\item \textbf{Integrate with hospital protocols.} Align decision logic with SATS and evidence-based pathway tables so recommendations remain safe and auditable.
+\item \textbf{Collect anonymised data for refinement.} Use de-identified intake records to improve the classification model and to inform administrators about patient flow and common presentations.
+\end{enumerate}

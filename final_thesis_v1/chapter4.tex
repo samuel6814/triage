@@ -1,0 +1,409 @@
+\chapter{RESULTS}
+\label{ch:results}
+
+This chapter reports BioBERT model analysis (architecture and pre-fine-tuning capability), fine-tuned model evaluation (baseline and SMOTE-augmented variants), inference latency, pathway routing at \examplehospital{}, and anticipated impact on hospital workflow. Holdout evaluation results come from the stratified 10\% holdout (\(N_{\mathrm{eval}}=8{,}000\)) and the pathway design in Section~\ref{sec:pathways}. Expected operational benefits (waiting-time reduction, satisfaction, staff workload) are interpreted from classification outcomes, latency, and published triage literature \citep{kathsats,Mitchell2023}; prospective time-motion data at \examplehospital{} are not yet available.
+
+\section{BioBERT model analysis}
+\label{sec:biobert-analysis}
+
+Before project-specific fine-tuning, the deployed classifier rests on BioBERT-base \citep{lee2020biobert}: a twelve-layer bidirectional encoder with hidden dimension 768, twelve attention heads, maximum sequence length 128 tokens, and a WordPiece vocabulary of approximately 29{,}996 tokens (Section~\ref{sec:encoder}). Stages~1 and~2 (Section~\ref{sec:training-pipeline}) supply biomedical language understanding and partial triage-oriented encoder features; they do \emph{not} produce the five-class acuity mapping required at intake. Stage~3 reinitialises the classification head and trains on the Triagegeist English corpus (Section~\ref{sec:data-provenance}). Class imbalance in the training corpus (Level~3 is the mode; Level~1 is the minority) motivates Stage~3 mitigation strategies documented in Section~\ref{sec:finetuned-analysis}; it is not the focus of this section.
+
+Figure~\ref{fig:biobert-stack} summarises the three-stage training stack. Stage~1 applies masked language modelling on PubMed and PubMed Central text; Stage~2 transfers encoder weights from a prior two-class triage checkpoint with the old head discarded; Stage~3 is the comprehensive project fine-tuning that maps free-text complaints to five SATS acuity levels.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.92\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=0.45cm and 0.35cm,
+  stage/.style={draw=green!60!black, rounded corners, fill=green!8,
+    minimum width=2.6cm, minimum height=0.85cm, align=center, font=\scriptsize},
+  arrow/.style={->, >=latex, thick, draw=black!60}]
+  \node[stage] (s1) {Stage 1\\BioBERT MLM\\PubMed + PMC};
+  \node[stage, right=of s1] (s2) {Stage 2\\Encoder transfer\\2-class checkpoint};
+  \node[stage, right=of s2] (s3) {Stage 3\\Project fine-tuning\\80k complaints, 5 classes};
+  \node[stage, right=of s3, fill=triageYellow!25] (out) {Deployed\\triage model};
+  \foreach \a/\b in {s1/s2, s2/s3, s3/out} \draw[arrow] (\a) -- (\b);
+\end{tikzpicture}}
+\caption{Three-stage BioBERT training stack (Stages~1--2 pre-date project fine-tuning; Stage~3 produces the deployed five-class head).}
+\label{fig:biobert-stack}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} horizontal flow diagram (left-to-right pipeline).
+\item \textbf{Layout:} each box is one training stage; arrows show parameter flow.
+\item \textbf{Data source:} project training configuration (Chapter~\ref{ch:method}, Section~\ref{sec:training-pipeline}).
+\item \textbf{Key readings:} Stage~1 optimises masked language modelling only; Stage~2 transfers encoder weights without the obsolete two-class head; Stage~3 is the only stage that maps chief complaints to five acuity levels.
+\item \textbf{Takeaway:} the chatbot's urgency signal depends on completing Stage~3; Stages~1--2 alone cannot route patients safely.
+\end{itemize}
+
+Figure~\ref{fig:pre-finetune-capability} contrasts expected accuracy \emph{before} Stage~3 fine-tuning with the holdout result after fine-tuning. Each bar represents a different predictor; definitions are as follows:
+
+\begin{itemize}
+\item \textbf{Uniform random.} Selects one of five acuity levels with equal probability (20\% expected accuracy). No learning; a sanity-check lower bound.
+\item \textbf{Random head (encoder only).} BioBERT encoder weights are loaded from Stages~1--2 but the five-class linear head is \emph{untrained}. Tests whether biomedical pre-training alone can classify triage (expected \(\approx\)20\%, same as chance).
+\item \textbf{Majority-class bound.} Always predicts Level~3 (Yellow), the training-set mode. Achieves 36.15\% accuracy on this corpus but 0\% Red recall; a clinically unsafe ceiling for naive rules.
+\item \textbf{Fine-tuned BioBERT.} Full Stage~3 checkpoint evaluated on the held-out 8{,}000 rows excluded from training (same split as Table~\ref{tab:holdout-metrics}). This is the only \emph{measured} bar; the first three are theoretical or bound values.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{figures/ch4/pre_finetune_capability.pdf}
+\caption{Expected or holdout accuracy: pre-fine-tune bounds vs fine-tuned BioBERT on the 8{,}000-row holdout set.}
+\label{fig:pre-finetune-capability}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} grouped bar chart.
+\item \textbf{Axes:} vertical axis = accuracy (0--1); horizontal axis = predictor type (four bars).
+\item \textbf{Data source:} theoretical bounds for the first three bars; measured holdout accuracy for fine-tuned BioBERT (\(N=8{,}000\)).
+\item \textbf{Key readings:} uniform random 20.0\%, random head \(\approx\)20\%, majority-class bound 36.15\%, fine-tuned BioBERT 99.92\%.
+\item \textbf{Takeaway:} encoder pre-training alone is insufficient for safe triage routing; Stage~3 fine-tuning on nurse-labeled complaints is required.
+\end{itemize}
+
+Figure~\ref{fig:biobert-model-specs} records the architecture constants used in this project.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{figures/ch4/model_specs.pdf}
+\caption{BioBERT-base architecture constants (project configuration).}
+\label{fig:biobert-model-specs}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} horizontal bar chart.
+\item \textbf{Axes:} vertical axis = architecture parameter name; horizontal axis = numeric value (unitless counts or dimensions).
+\item \textbf{Data source:} project \texttt{config.json} and BioBERT-base specification \citep{lee2020biobert}.
+\item \textbf{Key readings:} 12 layers, 768 hidden units, 12 attention heads, 128 max tokens, \(\approx\)30k vocabulary.
+\item \textbf{Takeaway:} the 128-token limit bounds how much complaint history can enter a single inference call at intake.
+\end{itemize}
+
+\section{Fine-tuned model analysis}
+\label{sec:finetuned-analysis}
+
+\subsection{Evaluation protocol}
+
+The deployed classifier is the product of Stage~3 fine-tuning documented in Section~\ref{sec:training}. Two checkpoints are compared on the \emph{same} stratified 90/10 holdout split (\(N_{\mathrm{eval}}=8{,}000\)):
+
+\begin{enumerate}
+\item \textbf{Baseline fine-tuned BioBERT} (project default): uniform sampling, three epochs, learning rate \(2 \times 10^{-5}\), best validation cross-entropy 0.001812.
+\item \textbf{SMOTE-augmented variant}: stratified splitting plus synthetic oversampling of minority urgent classes to improve Level~1 recall at possible cost to overall accuracy.
+\end{enumerate}
+
+Metrics reported: accuracy, macro-F1, per-class precision/recall/F1, and inference latency (p50, p95, mean milliseconds per sample). Evaluation uses the same complaint texts and nurse labels as training; results measure \emph{historical text classification}, not live patient outcomes.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|r|r|}
+\hline
+\textbf{Metric} & \textbf{Baseline} & \textbf{SMOTE} \\
+\hline
+Accuracy & 0.9992 & 0.9985 \\
+Macro-F1 & 0.9977 & 0.9954 \\
+Recall Level 1 (Red) & 0.9814 & 1.0000 \\
+Precision Level 1 (Red) & 1.0000 & 0.9641 \\
+Latency p50 (ms/sample) & 100.30 & 95.50 \\
+Latency p95 (ms/sample) & 139.11 & 125.12 \\
+Latency mean (ms/sample) & 102.13 & 90.17 \\
+\hline
+\end{tabular}
+\caption{Holdout classification and latency metrics (stratified 10\% split, \(N=8{,}000\)).}
+\label{tab:holdout-metrics}
+\end{table}
+
+\subsection{Interpreting high holdout accuracy}
+\label{sec:high-accuracy}
+
+Holdout accuracy above 99\% can appear implausibly high without context. The following points clarify what the numbers represent and what they do \emph{not} prove.
+
+\textbf{Task definition.} The model predicts nurse-assigned acuity from chief-complaint text on a retrospective, in-distribution holdout (\(N=8{,}000\)) drawn from the Triagegeist synthetic English benchmark used for Stage~3 fine-tuning (Section~\ref{sec:data-provenance}). This is not external validation on a different hospital, time period, or patient population; KNUST-informed examples used for pathway illustration are excluded from these metrics.
+
+\textbf{Label source.} Labels come from structured triage records (\texttt{chief\_complaint\_raw} inner-joined with \texttt{triage\_acuity}). Because complaints and colours were recorded in the same clinical workflow, complaint text often encodes acuity explicitly (e.g.\ ``crushing chest pain'' vs ``routine dental check''). High agreement with nurse labels therefore measures \emph{label consistency on historical text}, not independent clinical correctness \citep{stewart2023nlp}.
+
+\textbf{What is not measured.} These metrics do not establish prospective patient safety, waiting-time reduction, or physician-confirmed diagnosis. They quantify offline agreement between model output and nurse-assigned colour on held-out rows from the training distribution.
+
+\textbf{Residual errors.} The baseline model is not perfect: it misses 6 of 322 Red cases (98.14\% Level~1 recall). Under-triage of urgent presentations remains the primary deployment risk \citep{Berkowitz2019}. The SMOTE variant achieves 100\% Red recall but lowers Red precision to 96.41\%, introducing false urgent alerts.
+
+\textbf{Literature context.} NLP triage systems evaluated on structured complaint text in similar retrospective settings can report high agreement with nurse labels \citep{stewart2023nlp,gligorijevic2018deep}. Such results indicate that text carries acuity signal before vitals are recorded; they do not replace prospective audit.
+
+\textbf{Generalisation caveat.} The prototype accepts \textbf{English} chief complaints only; holdout metrics reflect English text from the Triagegeist training corpus. Atypical phrasing or presentations absent from that benchmark may reduce agreement at live intake at \examplehospital{}. Deployment should treat low-confidence or contradictory presentations as mandatory nurse review \citep{satsmanual}.
+
+\subsection{SMOTE for class imbalance}
+
+\textbf{S}ynthetic \textbf{M}inority \textbf{O}ver-sampling \textbf{T}echnique (SMOTE) generates synthetic training examples for under-represented classes by interpolating between existing minority samples in feature space \citep{chawla2002smote}. Given two minority feature vectors \(\mathbf{x}_a\) and \(\mathbf{x}_b\), a synthetic point is
+\begin{equation}
+  \mathbf{x}_{\mathrm{new}} = \mathbf{x}_a + \lambda(\mathbf{x}_b - \mathbf{x}_a), \qquad \lambda \sim \mathrm{Uniform}(0,1).
+\end{equation}
+
+Raw chief-complaint text cannot be SMOTEd directly because strings are discrete and interpolation between token sequences is undefined. This project therefore applies imbalance mitigation in a text-classification pipeline:
+
+\begin{enumerate}
+\item \textbf{Stratified split.} Training and holdout partitions preserve class proportions (seed 42).
+\item \textbf{Minority oversampling.} Urgent levels are duplicated or augmented so gradient updates are not dominated by Level~3.
+\item \textbf{Text augmentation.} Paraphrase-style perturbations increase minority-class diversity without changing labels.
+\item \textbf{SMOTE-augmented checkpoint.} Synthetic oversampling in the embedding or feature space of the training pipeline produces the SMOTE variant evaluated below.
+\end{enumerate}
+
+The trade-off is visible on Level~1 (Red): SMOTE raises recall from 98.14\% to 100.00\% on holdout but lowers precision from 1.0000 to 0.9641 (a small number of non-Red complaints are upgraded to Red). Overall accuracy decreases slightly (99.92\% to 99.85\%). The baseline checkpoint remains the project default unless clinical stakeholders prioritise zero missed Red cases \citep{Berkowitz2019}.
+
+\subsection{Baseline fine-tuned model}
+
+On the holdout set, baseline BioBERT achieves 99.92\% accuracy and 0.9977 macro-F1 (Table~\ref{tab:holdout-metrics}). Level~1 (Red) recall is 98.14\% with perfect precision (1.0000): no holdout case labeled Red was predicted as a lower-urgency level, and no false Red alarms were raised. Section~\ref{sec:high-accuracy} explains why these values reflect label agreement on in-distribution data rather than infallible clinical judgment.
+
+Figure~\ref{fig:confusion-baseline} shows the confusion matrix. Off-diagonal mass is negligible; the six missed Level~1 cases (322 support, 98.14\% recall) represent the primary residual safety concern for deployment review.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{figures/ch4/baseline_confusion.pdf}
+\caption{Baseline fine-tuned BioBERT confusion matrix (holdout, \(N=8{,}000\)). Rows = true nurse label; columns = model prediction.}
+\label{fig:confusion-baseline}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} heatmap confusion matrix.
+\item \textbf{Axes:} rows = true nurse-assigned acuity (L1--L5); columns = model-predicted acuity; cell colour intensity = number of holdout cases in each true--predicted pair.
+\item \textbf{Data source:} baseline checkpoint, stratified holdout \(N=8{,}000\).
+\item \textbf{Key readings:} diagonal dominance (correct predictions); six off-diagonal cells where true Red was predicted as lower urgency.
+\item \textbf{Takeaway:} chief-complaint text carries strong acuity signal after Stage~3 fine-tuning, but the six missed Red cases require nurse override in deployment \citep{Berkowitz2019}.
+\end{itemize}
+
+\subsection{SMOTE-augmented variant}
+
+SMOTE augmentation raises Level~1 recall to 100\% on holdout (all 322 Red cases correctly identified) at the cost of a small accuracy decrease (99.85\%) and lower Red precision (96.41\%): a small number of non-Red complaints are upgraded to Red. Macro-F1 remains above 0.995.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{figures/ch4/smote_confusion.pdf}
+\caption{SMOTE-augmented BioBERT confusion matrix (same holdout split). Rows = true nurse label; columns = model prediction.}
+\label{fig:confusion-smote}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} heatmap confusion matrix (same layout as Figure~\ref{fig:confusion-baseline}).
+\item \textbf{Axes:} rows = true nurse label; columns = model prediction; cell value = case count.
+\item \textbf{Data source:} SMOTE checkpoint, same holdout \(N=8{,}000\).
+\item \textbf{Key readings:} zero missed Red cases (no off-diagonal mass leaving the Red row); additional mass in the Red column from lower-urgency true labels (false urgent alerts).
+\item \textbf{Takeaway:} SMOTE trades improved Red sensitivity for a small number of false urgent alerts; nurse confirmation remains required \citep{Berkowitz2019}.
+\end{itemize}
+
+\subsection{Per-class and headline comparison}
+
+Figure~\ref{fig:per-class-f1} compares per-class F1 scores. Both models exceed 0.98 on every level; the largest divergence is on Level~1, where SMOTE trades a small precision reduction for perfect recall.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{figures/ch4/per_class_f1_compare.pdf}
+\caption{Per-class F1: baseline vs SMOTE on holdout data (\(N=8{,}000\)).}
+\label{fig:per-class-f1}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} grouped bar chart.
+\item \textbf{Axes:} vertical axis = F1 score (0--1.05); horizontal axis = acuity level L1--L5; paired green/teal bars = baseline vs SMOTE.
+\item \textbf{Data source:} holdout evaluation, both checkpoints.
+\item \textbf{Key readings:} all levels exceed 0.98 F1 under both models; Level~1 shows the largest baseline--SMOTE gap.
+\item \textbf{Takeaway:} fine-tuning achieves balanced performance across all acuity levels, not only the majority Yellow class \citep{stewart2023nlp}.
+\end{itemize}
+
+Figure~\ref{fig:metrics-compare} summarises accuracy, macro-F1, and Level~1 recall side by side.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{figures/ch4/metrics_compare.pdf}
+\caption{Headline holdout metrics: baseline vs SMOTE (\(N=8{,}000\)).}
+\label{fig:metrics-compare}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} grouped bar chart.
+\item \textbf{Axes:} vertical axis = score (0--1.05); horizontal axis = metric name (accuracy, macro-F1, L1 recall); paired bars = baseline vs SMOTE.
+\item \textbf{Data source:} Table~\ref{tab:holdout-metrics}.
+\item \textbf{Key readings:} accuracy and macro-F1 differ by less than 0.004; L1 recall rises from 0.981 (baseline) to 1.000 (SMOTE).
+\item \textbf{Takeaway:} choose baseline for maximum Red precision; choose SMOTE when zero missed Red cases is the overriding safety requirement \citep{Berkowitz2019}.
+\end{itemize}
+
+Figure~\ref{fig:recall-by-class} compares recall for each acuity level under both models.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{figures/ch4/recall_by_class_compare.pdf}
+\caption{Recall by acuity level: baseline vs SMOTE (holdout, \(N=8{,}000\)).}
+\label{fig:recall-by-class}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} grouped bar chart.
+\item \textbf{Axes:} vertical axis = recall, fraction of true cases correctly identified (0--1.05); horizontal axis = acuity level L1--L5; paired bars = baseline vs SMOTE.
+\item \textbf{Data source:} holdout per-class recall from \texttt{comparison.json}.
+\item \textbf{Key readings:} L1 recall 0.981 (baseline) vs 1.000 (SMOTE); L2--L5 remain near 1.0 under both models.
+\item \textbf{Takeaway:} Stage~3 fine-tuning overcomes much of the 9:1 class imbalance risk for urgent levels on in-distribution data \citep{chawla2002smote,Berkowitz2019}.
+\end{itemize}
+
+Figure~\ref{fig:latency} compares inference latency statistics across both models.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/ch4/latency_compare.pdf}
+\caption{Inference latency on the 8{,}000-row holdout set (milliseconds per sample).}
+\label{fig:latency}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} grouped bar chart.
+\item \textbf{Axes:} vertical axis = latency in milliseconds; horizontal axis = statistic (median p50, 95th percentile p95, mean); paired bars = baseline vs SMOTE.
+\item \textbf{Data source:} measured on evaluation hardware, holdout \(N=8{,}000\).
+\item \textbf{Key readings:} baseline p50 = 100.30\,ms, p95 = 139.11\,ms; SMOTE p50 = 95.50\,ms.
+\item \textbf{Takeaway:} both checkpoints respond in well under one second, supporting real-time chatbot intake before nurse vitals are recorded \citep{stewart2023nlp}.
+\end{itemize}
+
+\begin{remark}
+High holdout accuracy on historical nurse labels indicates that chief complaints carry sufficient signal for acuity estimation before vitals are recorded \citep{stewart2023nlp,gligorijevic2018deep}. This measures label agreement, not live clinical outcomes (Section~\ref{sec:high-accuracy}). Borderline or low-confidence predictions should trigger mandatory nurse review in deployment \citep{satsmanual,Berkowitz2019}.
+\end{remark}
+
+\section{Inference latency}
+\label{sec:latency}
+
+Real-time intake requires sub-second response \citep{stewart2023nlp}. On the evaluation hardware, baseline BioBERT achieves median latency \(=\) 100.30\,ms per complaint (p95 \(=\) 139.11\,ms; mean \(=\) 102.13\,ms). The SMOTE checkpoint is slightly faster (p50 \(=\) 95.50\,ms; mean \(=\) 90.17\,ms) on the same split; see Figure~\ref{fig:latency}.
+
+At approximately 100\,ms per complaint, the chatbot can return acuity probabilities, SATS colour, and a pathway card before a nurse completes manual registration. The clinical relevance gate (Section~\ref{sec:gate}) rejects non-clinical input before BioBERT runs, saving compute and keeping triage staff focused on valid chief complaints. The prototype \texttt{/predict} API endpoint implements the same pipeline documented in Section~\ref{sec:e2e}.
+
+\section{Pathway routing at \examplehospital{}}
+\label{sec:pathway-results}
+
+The complete five-scenario pathway map (gate reject plus Red, Orange, Yellow, Green) is specified in Tables~\ref{tab:pathway-scenarios} and~\ref{tab:pathway-examples} and illustrated in Figure~\ref{fig:pathway-map}. Each scenario assigns primary clinical departments, support actions across Nursing, Pharmacy, Health Information, Hospital Information Technology, Administration, and Accounts, and an escalation rule \citep{satsmanual,Rominski2014}.
+
+\subsection{Nurse triage vs chatbot response}
+\label{sec:nurse-vs-chatbot}
+
+Table~\ref{tab:nurse-vs-chatbot} contrasts manual nurse triage with the hospital chatbot on dimensions relevant to intake at \examplehospital{}. Nurse-side timings are drawn from published LMIC triage literature; chatbot timings are measured on the holdout set.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{3.2cm}|p{5.2cm}|p{5.2cm}|}
+\hline
+\textbf{Dimension} & \textbf{Manual nurse triage} & \textbf{Hospital chatbot (this project)} \\
+\hline
+Time to first acuity signal &
+Queue-dependent; LMIC intake often delayed minutes to hours before nurse contact \citep{kathsats,Mitchell2023,Nurchis2025} &
+Approximately 100\,ms inference on evaluation hardware (Table~\ref{tab:holdout-metrics}, Figure~\ref{fig:latency}) \\
+Inputs used &
+Chief complaint + vitals + TEWS + clinical judgment \citep{satsmanual} &
+Text-only chief complaint; TEWS applied separately by nurse (Section~\ref{sec:tews}) \\
+Output &
+SATS colour + bedside assessment &
+SATS colour + pathway card + confidence score \\
+Validation basis &
+Live clinical decision at triage desk &
+Holdout agreement with historical nurse labels (Section~\ref{sec:high-accuracy}) \\
+Role at \examplehospital{} &
+Authoritative triage &
+Triage assist at arrival; nurse override mandatory for low confidence and all vitals \citep{stewart2023nlp} \\
+\hline
+\end{tabular}
+\caption{Comparison of manual nurse triage and chatbot-assisted intake. Nurse timings are literature-based; chatbot latency is measured.}
+\label{tab:nurse-vs-chatbot}
+\end{table}
+
+Once the chatbot assigns a colour in approximately 100\,ms, pathway timer rules take effect: Orange cases require clinician contact within ten minutes, Yellow within 60 minutes, and Green within four hours (Section~\ref{sec:pathways}, Table~\ref{tab:pathway-scenarios}) \citep{satsmanual,Sundstrom2014}. The chatbot does not replace nurse assessment; it provides an immediate acuity signal so that queue time before \emph{any} routing decision is reduced relative to waiting for a free triage nurse \citep{Mitchell2023,Nurchis2025}.
+
+\textbf{Gate rejection.} Non-clinical input receives no colour; Nursing re-prompts for a chief complaint. This prevents meaningless acuity scores and keeps acute queues free of idle interactions.
+
+\textbf{Red.} Life-threatening text (e.g.\ crushing chest pain with dyspnoea) routes immediately to Surgery and Internal Medicine with Code Red alerts via HIT. Administration bypasses routine registration so resuscitation is not delayed \citep{satsmanual}.
+
+\textbf{Orange.} Very urgent complaints (e.g.\ severe abdominal pain in pregnancy) activate Internal Medicine, Surgery, or Obstetrics and Gynaecology within ten minutes, with stat Diagnostics and a head-nurse escalation if unclaimed.
+
+\textbf{Yellow.} For the running illustrative complaint (\runningcomplaint{}), the model assigns level 3 at approximately 72\% confidence. The pathway card routes to Outpatient urgent stream, Pediatrics (when paediatric protocol applies), and parallel Diagnostics; Nursing sets a 60-minute reassessment timer.
+
+\textbf{Green.} Routine presentations (e.g.\ dental pain without fever) divert to Outpatient, Dental, Eye, or Public and Preventive Health within four hours, reducing congestion in acute waiting areas \citep{Yilmaz2021,Sundstrom2014}.
+
+Classification output (colour + confidence + department list) is the machine-readable input to this routing layer. Holdout evaluation (Section~\ref{sec:high-accuracy}) bounds the reliability of automated pathway cards at intake on in-distribution historical text.
+
+\section{Anticipated impact on healthcare delivery}
+\label{sec:impact}
+
+The following analysis interprets how the chatbot can support faster, clearer hospital flow at \examplehospital{}, drawing on holdout metrics where available and on published triage literature elsewhere. No prospective waiting-time trial has yet been conducted at \examplehospital{} \citep{Mitchell2023}.
+
+\subsection{Functional chatbot and workflow improvement}
+
+We anticipate a functional chatbot that accurately triages patients from a single chief complaint and improves hospital workflow by assigning SATS colour and department direction at intake \citep{stewart2023nlp,Mitchell2023}. Holdout evaluation reports 99.92\% accuracy and Level~1 recall of 98.14\% (or 100\% under SMOTE), indicating that text-only classification aligns closely with nurse labels on historical in-distribution data (Section~\ref{sec:high-accuracy}). Median inference latency of approximately 100\,ms on evaluation hardware supports immediate digital response at arrival (Table~\ref{tab:nurse-vs-chatbot}).
+
+Figure~\ref{fig:anticipated-workflow} compares time-to-first-acuity-signal: traditional intake (top) waits for a nurse; chatbot-assisted intake (bottom) classifies text immediately and runs nurse vitals in parallel.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  x=1.05cm, y=0.85cm,
+  title/.style={font=\small\bfseries, anchor=center},
+  box/.style={draw=green!60!black, rectangle, fill=green!10, text width=2.2cm, align=center,
+    minimum height=0.9cm, rounded corners, font=\small, inner sep=3pt},
+  old/.style={box, fill=gray!12},
+  new/.style={box, fill=green!15},
+  arrow/.style={->, >=latex, thick, draw=black!55},
+  foot/.style={font=\footnotesize\itshape, text=black!70, align=center}]
+  % Top panel: Traditional
+  \node[title] at (5.0, 7.2) {Traditional intake};
+  \draw[dashed, rounded corners, draw=gray!45] (-0.5, 4.3) rectangle (10.5, 7.7);
+  \node[old] (q) at (0, 6.0) {Patient\\arrives};
+  \node[old] (wait) at (3.0, 6.0) {Queue for\\nurse};
+  \node[old] (nurse) at (6.0, 6.0) {Nurse assigns\\colour};
+  \node[old] (unclear) at (9.0, 6.0) {Unclear\\destination};
+  \draw[arrow] (q) -- (wait);
+  \draw[arrow] (wait) -- (nurse);
+  \draw[arrow] (nurse) -- (unclear);
+  \node[foot] at (5.0, 4.85) {Wait: minutes to hours};
+  % Bottom panel: Chatbot-assisted
+  \node[title] at (5.0, 3.3) {Chatbot-assisted intake};
+  \draw[dashed, rounded corners, draw=green!45!black] (-0.5, 0.35) rectangle (10.5, 3.85);
+  \node[new] (c) at (1.2, 2.1) {Patient\\complaint};
+  \node[new] (bot) at (4.8, 2.1) {Chatbot\\classifies};
+  \node[new] (card) at (8.4, 2.1) {Pathway\\card issued};
+  \draw[arrow] (c) -- (bot);
+  \draw[arrow] (bot) -- (card);
+  \node[foot] at (4.8, 1.05) {Response: \(\approx\)100\,ms};
+  \node[foot] at (4.8, 0.65) {Nurse vitals (TEWS) in parallel};
+\end{tikzpicture}}
+\caption{Stacked intake comparison at \examplehospital{}. \textbf{Top:} patient queues minutes to hours before a nurse assigns colour. \textbf{Bottom:} chatbot classifies the complaint in \(\approx\)100\,ms and issues a pathway card; nurse vitals continue in parallel. Colour routing (Red/Orange vs Green) is detailed in Section~\ref{sec:pathway-results}.}
+\label{fig:anticipated-workflow}
+\end{figure}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+\item \textbf{Chart type:} stacked workflow diagram (two panels, top and bottom).
+\item \textbf{Layout:} each panel is one horizontal chain read left to right. Top: arrive $\rightarrow$ queue $\rightarrow$ nurse assigns colour $\rightarrow$ unclear destination. Bottom: complaint $\rightarrow$ chatbot classifies $\rightarrow$ pathway card issued.
+\item \textbf{Data source:} pathway design (Chapter~\ref{ch:method}); chatbot latency from holdout evaluation (Figure~\ref{fig:latency}); traditional wait times from LMIC triage literature \citep{kathsats,Mitchell2023}.
+\item \textbf{Key readings:} top footnote ``Wait: minutes to hours''; bottom footnotes ``Response: $\approx$100\,ms'' and ``Nurse vitals (TEWS) in parallel''. Red/Orange fast-track and Green digital queue are not shown here; see Section~\ref{sec:pathway-results}.
+\item \textbf{Takeaway:} the figure contrasts slow nurse-queue intake with immediate chatbot classification; nurse assessment is not replaced \citep{satsmanual,stewart2023nlp}.
+\end{itemize}
+
+\subsection{Reduced initial triage wait times}
+
+Published triage literature suggests wait times for initial triage may decrease when patients interact with the bot immediately rather than queue for a nurse \citep{Mitchell2023,Nurchis2025}. Holdout evaluation shows the model assigns colour and pathway in approximately 100\,ms once valid clinical text is submitted (Table~\ref{tab:nurse-vs-chatbot}). Non-urgent (Green) cases can be digitally queued for later consultation while urgent cases are fast-tracked through Red and Orange escalation rules (Table~\ref{tab:pathway-scenarios}), potentially reducing overall waiting duration \citep{Sundstrom2014,Yilmaz2021}. Parallel diagnostics orders flagged on Yellow and Green pathway cards may further shorten total time to definitive care \citep{Sundstrom2014}.
+
+\subsection{No overlooked critical cases}
+
+The chatbot algorithm, combined with Red/Orange pathway escalation, is designed to trigger immediate alerts to hospital staff when language suggests life-threatening conditions \citep{gligorijevic2018deep,satsmanual}. Level~1 recall of 98.14\% (baseline) or 100\% (SMOTE) on holdout data supports this design intent on in-distribution text; the six baseline false negatives warrant nurse override and prospective audit \citep{Berkowitz2019}. Waiting-time deterioration increases adverse outcomes when triage colour is not reassessed \citep{Nurchis2025}; digital timers on Orange and Yellow pathway cards mitigate this risk \citep{satsmanual}.
+
+\subsection{Patient satisfaction and appropriate categorisation}
+
+Patients may experience improved satisfaction when they receive quick feedback on urgency and feel guided through the system rather than left without direction \citep{stewart2023nlp}. Over time, the percentage of patients appropriately categorised (as confirmed by clinicians after assessment) will measure chatbot accuracy in live use. Holdout agreement with nurse labels (99.92\% accuracy) is a necessary but not sufficient precondition for clinical confirmation rates (Section~\ref{sec:high-accuracy}).
+
+\subsection{Staff workload and public-health insights}
+
+Nursing staff may report reduced triage documentation burden, devoting more time to direct patient care and vitals (TEWS) rather than initial information gathering \citep{stewart2023nlp,Mitchell2023}. The gate rejects non-clinical messages before BioBERT, filtering idle interactions (Section~\ref{sec:gate}). If scaled, anonymised complaint records could reveal public-health trends (e.g.\ common presentations by season), supporting Objective~4 in Chapter~\ref{ch:intro}; privacy and governance review would be required before aggregation.
+
+\subsection{Success criteria}
+
+Project success would be measured by smoother patient flow, colour-coded pathways guiding patients to the right place at the right time, and a reduction in adverse events or delays attributable to triage \citep{Rominski2014,kathsats}. Published NLP triage systems elsewhere report streamlined processes and optimised resource use in busy hospitals \citep{stewart2023nlp,Mitchell2023}.
+
+\textbf{Limitations.} Holdout metrics measure classification accuracy on historical chief complaints, not patient outcomes, waiting-time reduction, or satisfaction scores \citep{Mitchell2023,Nurchis2025}. Prospective validation at \examplehospital{} is required to quantify minutes saved and to confirm safe nurse override rates. Training data class imbalance may under-weight rare urgent phrasing; deployment should treat low-confidence or contradictory presentations as mandatory nurse review \citep{Berkowitz2019,satsmanual}. SMOTE increases Red recall but introduces false Red alerts (precision 96.41\%); the baseline checkpoint is the project default unless clinical stakeholders prioritise zero missed Red cases. Holdout accuracy on the 80k corpus is an upper bound on offline label agreement, not a guarantee at live intake (Section~\ref{sec:high-accuracy}).

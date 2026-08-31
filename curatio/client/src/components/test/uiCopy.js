@@ -29,6 +29,7 @@ export const UI_COPY = {
     tabMath: 'Math',
     charts: 'Probability charts',
     vizTour: 'Open full visualization tour',
+    sideActionsHint: 'Enter a chief complaint to enable Analyze and De-identify.',
   },
   tw: {
     title: 'Sɔhwɛ BioBERT Triage',
@@ -58,6 +59,7 @@ export const UI_COPY = {
     tabMath: 'Nkontabuo',
     charts: 'Probability charts',
     vizTour: 'Bue visualization tour',
+    sideActionsHint: 'Kyerɛw yareɛ ho asɛm ansa na Analyze ne De-identify abue.',
   },
 };
 

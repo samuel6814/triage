@@ -875,34 +875,6 @@ const TriageTestPage = () => {
               {copy.voice}
             </FeatureBtn>
           </FeatureBar>
-          <ActionRow>
-            <SecondaryBtn
-              type="button"
-              onClick={handleAnalyze}
-              disabled={!text.trim() || sideLoading === 'analyze'}
-            >
-              {sideLoading === 'analyze' ? <Loader2 size={14} className="spin" /> : <Stethoscope size={14} />}
-              {copy.analyze}
-            </SecondaryBtn>
-            <SecondaryBtn
-              type="button"
-              onClick={handleDeidentify}
-              disabled={!text.trim() || sideLoading === 'deidentify'}
-            >
-              {sideLoading === 'deidentify' ? <Loader2 size={14} className="spin" /> : <UserX size={14} />}
-              {copy.deidentify}
-            </SecondaryBtn>
-            {lang === 'tw' && (
-              <SecondaryBtn
-                type="button"
-                onClick={handleTranslateOnly}
-                disabled={!text.trim() || translating}
-              >
-                {translating ? <Loader2 size={14} className="spin" /> : null}
-                {translating ? copy.translating : copy.translate}
-              </SecondaryBtn>
-            )}
-          </ActionRow>
         </Card>
 
         <Card>
@@ -957,6 +929,40 @@ const TriageTestPage = () => {
                 <Label>{copy.englishUsed}</Label>
                 <EntityItem>{englishText || translationMeta?.english}</EntityItem>
               </div>
+            )}
+
+            <ActionRow style={{ marginTop: '1rem' }}>
+              <SecondaryBtn
+                type="button"
+                onClick={handleAnalyze}
+                disabled={!text.trim() || sideLoading === 'analyze'}
+              >
+                {sideLoading === 'analyze' ? <Loader2 size={14} className="spin" /> : <Stethoscope size={14} />}
+                {copy.analyze}
+              </SecondaryBtn>
+              <SecondaryBtn
+                type="button"
+                onClick={handleDeidentify}
+                disabled={!text.trim() || sideLoading === 'deidentify'}
+              >
+                {sideLoading === 'deidentify' ? <Loader2 size={14} className="spin" /> : <UserX size={14} />}
+                {copy.deidentify}
+              </SecondaryBtn>
+              {lang === 'tw' && (
+                <SecondaryBtn
+                  type="button"
+                  onClick={handleTranslateOnly}
+                  disabled={!text.trim() || translating}
+                >
+                  {translating ? <Loader2 size={14} className="spin" /> : null}
+                  {translating ? copy.translating : copy.translate}
+                </SecondaryBtn>
+              )}
+            </ActionRow>
+            {!text.trim() && (
+              <p style={{ margin: '0.5rem 0 0', fontSize: '0.82rem', color: '#64748b' }}>
+                {copy.sideActionsHint}
+              </p>
             )}
 
             <Label style={{ marginTop: '1.25rem' }}>{copy.vitals}</Label>

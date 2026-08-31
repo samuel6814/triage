@@ -1,0 +1,327 @@
+\section{Methodological overview}
+\label{sec:overview}
+
+The hospital chatbot draws on two complementary ideas from clinical practice; this thesis develops the text-based path in full and documents the Triage Early Warning Score (TEWS) as the parallel vital-sign standard.
+
+First, \textbf{clinical pathways} encode hospital protocols: symptoms and context map to an urgency colour and a destination (resuscitation bay, acute bed, urgent waiting, outpatient stream). Pathways are the product the chatbot shows to patients and staff after classification.
+
+Second, TEWS is the nurse-facing vital-sign score used at SATS triage desks. When heart rate (HR), respiratory rate (RR), mobility, temperature, Alert, Voice, Pain, Unresponsive (AVPU) consciousness, and trauma status are measured, TEWS produces a deterministic integer \(T\) and colour band \(C_{\mathrm{TEWS}}(T)\). TEWS is explained fully in Section~\ref{sec:tews} because it is the objective hospital standard; the chatbot's primary engine for \emph{free-text chief complaints} at intake is a deep attention model (Biomedical BERT, BioBERT), not a weighted sum of vitals.
+
+When vitals are not yet available, the text model below supplies the intake colour. Nurses may later record vitals and apply TEWS independently; this thesis specifies the natural language processing (NLP) path only.
+
+\subsection{Chief complaints}
+\label{sec:chief-complaints}
+
+The \emph{chief complaint} is the primary reason the patient presents, expressed in their own words (or an attendant's) as unstructured free text at intake, before vitals, physical examination, or formal diagnosis. Nurses and triage staff traditionally record this as prose on paper or electronic forms; it captures symptom onset, severity, and context (for example, ``headache and feverish, body aches, feel weak''). It is not a diagnosis, not a TEWS vital-sign score, and not a full medical history: it is only the presenting problem text \(X\) that this thesis classifies.
+
+The chatbot accepts one \textbf{English} chief-complaint string per submission. The running example \runningcomplaint{} illustrates a typical Yellow-level presentation used throughout this chapter; pipeline symbol \(X\) appears in Table~\ref{tab:pipeline-io} and Figure~\ref{fig:nlp-pipeline}.
+
+\subsection{Training data provenance}
+\label{sec:data-provenance}
+
+Model training and holdout evaluation draw on two distinct data layers.
+
+\textbf{Training and evaluation corpus.} Stage~3 fine-tuning uses the \emph{Triagegeist} synthetic emergency-department benchmark released by the Laitinen-Fredriksson Foundation on Kaggle \citep{triagegeist2025}. Structured intake records (\texttt{train.csv}, acuity labels) are inner-joined with free-text rows (\texttt{chief\_complaints.csv}) on \texttt{patient\_id}, yielding \(N = 80{,}000\) English \texttt{chief\_complaint\_raw} / \texttt{triage\_acuity} pairs. Vitals and demographics in the source files are excluded so the NLP path matches single-shot text input at intake (Section~\ref{sec:training}). Five-level competition labels map to SATS colours via \(f_{\mathrm{SATS}}\). A stratified 90/10 split (approximately 72{,}000 train / 8{,}000 holdout, seed~42) supplies all reported accuracy and recall figures in Chapter~\ref{ch:results}. This corpus was \textbf{not} collected at \examplehospital{}.
+
+\textbf{KNUST-informed contextual examples.} Following a site visit to \examplehospital{}, the authors generated supplementary English chief complaints based on observations of intake workflow, SATS colour assignment, and department structure. These examples test the prototype chatbot, validate pathway routing (Section~\ref{sec:pathways}), and illustrate the pipeline (for example, \runningcomplaint{} in Table~\ref{tab:pathway-scenarios}); this supports qualitative analysis only. They are \textbf{not} merged into the 80{,}000-pair fine-tuning corpus. Prospective collection of nurse-labeled complaints at \examplehospital{} for model retraining remains future work (Chapter~\ref{ch:conclusion}).
+
+\subsection{BERT and bidirectional context}
+
+Older language models read text sequentially (left-to-right or right-to-left). \citet{vaswani2017attention} showed that \emph{self-attention} lets every token attend to every other token in one pass. \citet{devlin2019bert} built Bidirectional Encoder Representations from Transformers (BERT) on this mechanism: during pre-training, random tokens are masked and predicted from full left \emph{and} right context via masked language modelling (MLM). The result is contextual embeddings: the vector for ``feverish'' differs depending on neighbouring words such as ``headache'' or ``not''.
+
+\subsection{BioBERT for biomedical text}
+
+General BERT embeddings under-represent clinical terms. \citet{lee2020biobert} continued MLM pre-training on PubMed and PMC, then released BioBERT with the same transformer skeleton as BERT but an embedding space tuned for biomedical language. For triage, BioBERT is fine-tuned on the Triagegeist corpus described in Section~\ref{sec:data-provenance}: supervised learning maps English complaint text \(X\) to acuity level probabilities \(\hat{\mathbf{y}}\), then to SATS colour via a fixed map \(f_{\mathrm{SATS}}\).
+
+\subsection{The \texttt{[CLS]} summary token}
+
+Classification does not read all token outputs separately. An artificial token \texttt{[CLS]} is inserted at position \(i=0\). After \(L=12\) encoder layers, its hidden state \(h_{\mathrm{[CLS]}} \in \mathbb{R}^{768}\) summarises the entire complaint and feeds the softmax classification head (Section~\ref{sec:cls}). The \texttt{[CLS]} row accumulates context from every other token through the stacked encoder layers.
+
+\subsection{Pipeline summary}
+
+Figure~\ref{fig:nlp-pipeline} previews the end-to-end natural language processing (NLP) path from a free-text chief complaint to a SATS colour and pathway card. Each box corresponds to one transformation; the subsections and sections that follow derive the formulas, symbols, and worked steps for every stage.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[node distance=0.4cm and 0.28cm]
+  \node[pipe] (raw) {Chief\\complaint $X$};
+  \node[pipe, right=of raw] (gate) {Clinical\\relevance gate};
+  \node[pipe, right=of gate] (tok) {Tokenize};
+  \node[pipe, right=of tok] (emb) {Embed\\768-d};
+  \node[pipe, right=of emb] (bb) {BioBERT\\12 layers};
+  \node[pipe, right=of bb] (sm) {Softmax\\5 classes};
+  \node[pipe, right=of sm, fill=triageYellow!25] (sats) {SATS\\colour};
+  \foreach \a/\b in {raw/gate, gate/tok, tok/emb, emb/bb, bb/sm, sm/sats}
+    \draw[flowarr] (\a) -- (\b);
+\end{tikzpicture}}
+\caption{NLP pipeline from chief complaint to SATS colour (TEWS is documented separately in Section~\ref{sec:tews}).}
+\label{fig:nlp-pipeline}
+\end{figure}
+
+\begin{enumerate}
+\item \textbf{Chief complaint \(X\).} The patient or attendant submits one unstructured \textbf{English} text string describing symptoms and relevant history (Section~\ref{sec:chief-complaints}). Tokenisation begins in Section~\ref{sec:tokenisation}.
+\item \textbf{Clinical relevance gate.} A rule-based score \(g(X)\) filters greetings and non-medical text before BioBERT runs; see Section~\ref{sec:gate}.
+\item \textbf{Tokenize.} WordPiece splits \(X\) into subword tokens with special markers \texttt{[CLS]}, \texttt{[SEP]}, and \texttt{<PAD>}; see Section~\ref{sec:tokenisation}.
+\item \textbf{Embed (768-d).} Each token ID maps to a 768-dimensional vector; positional and segment embeddings are added to form the input matrix \(H^{(0)}\); see Sections~\ref{sec:embeddings} and~\ref{sec:h0}.
+\item \textbf{BioBERT (12 layers).} Twelve encoder layers apply multi-head self-attention and feed-forward transforms; see Sections~\ref{sec:encoder} and~\ref{sec:attention}.
+\item \textbf{Softmax (5 classes).} The \texttt{[CLS]} summary vector \(h_{\mathrm{[CLS]}}\) passes through a classification head yielding acuity probabilities \(\hat{\mathbf{y}}\); see Section~\ref{sec:classification}.
+\item \textbf{SATS colour and pathway.} The predicted level \(\hat{c}\) maps to colour \(C_{\mathrm{NLP}} = f_{\mathrm{SATS}}(\hat{c})\) and pathway card \(P(C_{\mathrm{NLP}})\); see Sections~\ref{sec:fsats} and~\ref{sec:pathways}.
+\end{enumerate}
+
+Each stage above is derived and exemplified in the referenced sections. Section~\ref{sec:e2e} restates the full path for the implemented prototype.
+
+Table~\ref{tab:pipeline-io} records the mathematical object entering and leaving each stage so the reader can follow how one complaint string becomes a colour and pathway card.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{2.6cm}|p{4.2cm}|p{4.5cm}|}
+\hline
+\textbf{Stage} & \textbf{Input} & \textbf{Output} \\
+\hline
+Chief complaint & Patient text string & \(X\) (raw string) \\
+Clinical gate & \(X\) & Pass/fail via \(g(X)\) \\
+Tokenize & \(X\) & Token sequence \((t_1,\ldots,t_M)\), \(M \leq 128\) \\
+Embed & Token IDs & Input matrix \(H^{(0)} \in \mathbb{R}^{M \times 768}\) \\
+BioBERT & \(H^{(0)}\) & Final matrix \(H^{(12)}\); summary \(h_{\mathrm{[CLS]}}\) \\
+Softmax & \(h_{\mathrm{[CLS]}}\) & Acuity probabilities \(\hat{\mathbf{y}} \in \mathbb{R}^{5}\) \\
+SATS colour & \(\hat{\mathbf{y}}\) & Level \(\hat{c}\), colour \(C_{\mathrm{NLP}}\), pathway \(P(C_{\mathrm{NLP}})\) \\
+\hline
+\end{tabular}
+\caption{Pipeline stage inputs and outputs (NLP path).}
+\label{tab:pipeline-io}
+\end{table}
+
+\section{SATS colour chart}
+\label{sec:sats-chart}
+
+SATS assigns each living patient an urgency colour with a maximum waiting time \(T_{\max}\) and hospital destination \citep{satsmanual}. Figure~\ref{fig:sats-colours} separates immediate and special protocols from the decreasing-urgency scale used for living patients. Blue indicates deceased-on-arrival dignity protocol, not low urgency.
+
+\begin{figure}[H]
+\centering
+\makebox[\textwidth][c]{%
+\begin{tikzpicture}[x=1.2cm, y=0.9cm]
+  % Row 1: title, bars, subtitle
+  \node[font=\footnotesize\bfseries, anchor=west] at (0, 2.35) {Immediate and special protocols};
+  \fill[triageRed!85] (0, 1.55) rectangle ++(1.1, 0.38);
+  \node[font=\small, white] at (0.55, 1.74) {Red};
+  \fill[triageBlue!85] (1.45, 1.55) rectangle ++(1.1, 0.38);
+  \node[font=\small, white] at (2.0, 1.74) {Blue};
+  \node[font=\footnotesize, align=center] at (1.0, 1.15) {life-threatening or dignity protocol};
+
+  % Row 2: title, bars, arrow
+  \node[font=\footnotesize\bfseries, anchor=west] at (0, 0.75) {Living patients: decreasing urgency};
+  \fill[triageOrange!85] (0, 0.0) rectangle ++(1.1, 0.38);
+  \node[font=\small, white] at (0.55, 0.19) {Orange};
+  \fill[triageYellow!85] (1.45, 0.0) rectangle ++(1.1, 0.38);
+  \node[font=\small, black] at (2.0, 0.19) {Yellow};
+  \fill[triageGreen!85] (2.9, 0.0) rectangle ++(1.1, 0.38);
+  \node[font=\small, white] at (3.45, 0.19) {Green};
+  \draw[->, thick] (-0.05, -0.35) -- (4.1, -0.35);
+  \node[font=\footnotesize] at (2.0, -0.58) {most urgent \hspace{2.4cm} least urgent};
+\end{tikzpicture}}
+\caption{South African Triage Scale (SATS) colour bands used at hospital intake.}
+\label{fig:sats-colours}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|c|p{4.2cm}|}
+\hline
+\textbf{Colour} & \textbf{Meaning} & \(T_{\max}\) & \textbf{Typical destination} \\
+\hline
+Red & Immediate life threat & 0 min & Resuscitation bay \\
+Orange & Very urgent & 10 min & Acute / high-dependency bed \\
+Yellow & Urgent & 60 min & Emergency waiting / urgent stream \\
+Green & Non-urgent & \(<\) 4 h & Outpatient department (OPD) / minors / polyclinic \\
+Blue & Dignity protocol & N/A & Mortuary / private space \\
+\hline
+\end{tabular}
+\caption{SATS colours, waiting targets, and routing (SATS-aligned).}
+\label{tab:sats-routing}
+\end{table}
+
+\begin{remark}
+Red signals an immediate threat to life; Green indicates that the patient may safely wait in a routine stream. The chatbot outputs one of these colours so intake staff can route patients without re-interpreting free text.
+\end{remark}
+
+For the illustrative complaint in this chapter, the NLP model in Section~\ref{sec:classification} may assign moderate urgency (Yellow) with high probability; the same framework applies regardless of presenting symptoms.
+
+\section{TEWS: Triage Early Warning Score}
+\label{sec:tews}
+
+TEWS is the deterministic score nurses compute from six vital parameters at SATS triage \citep{satsmanual}. It provides an objective colour band when measurements exist.
+
+\subsection{Definition}
+
+Let \(\mathbf{v} = (v_1, \ldots, v_6)\) denote HR, RR, mobility, temperature, AVPU consciousness, and trauma flag. Each parameter maps to points \(f_k(v_k) \in \{0,1,2,3\}\) via SATS lookup tables. TEWS aggregates these contributions into one integer so that nurses at different desks can compare patients on a common scale. Weights \(w_k = 1\):
+\begin{equation}
+  T = \sum_{k=1}^{6} w_k \, f_k(v_k) = \sum_{k=1}^{6} f_k(v_k).
+  \label{eq:tews-sum}
+\end{equation}
+
+Summing six bounded terms yields a score \(T \in [0, 18]\) in principle, though typical values at triage are much lower. Because each \(f_k\) is defined from the SATS manual, the score is reproducible and auditable: two nurses who measure the same vitals obtain the same \(T\).
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|l|l|l|}
+\hline
+\(k\) & Parameter \(v_k\) & Source & Unit / scale \\
+\hline
+1 & Heart rate (HR) & SATS manual, TEWS table & beats/min \\
+2 & Respiratory rate (RR) & SATS manual, TEWS table & breaths/min \\
+3 & Mobility & SATS manual & walking / assisted / immobile \\
+4 & Temperature & SATS manual & \(^\circ\)C \\
+5 & AVPU consciousness & SATS manual & alert / verbal / pain / unresponsive \\
+6 & Trauma & SATS manual & present / absent \\
+\hline
+\end{tabular}
+\caption{TEWS parameters and documentation source.}
+\label{tab:tews-params}
+\end{table}
+
+\begin{remark}
+Each vital sign contributes zero to three points. Elevated HR, abnormal RR, or reduced consciousness increase \(T\); normal values contribute zero.
+\end{remark}
+
+\subsection{Piecewise scoring functions}
+
+The piecewise functions \(f_1\) and \(f_2\) encode tachycardia, bradycardia, and abnormal respiratory rate as higher point values, reflecting physiological stress seen at triage.
+
+Heart rate \(f_1\) (beats/min):
+\begin{equation}
+  f_1(v_1) = \begin{cases}
+    3 & v_1 \geq 130 \\
+    2 & 111 \leq v_1 \leq 129 \text{ or } v_1 \leq 40 \\
+    0 & 51 \leq v_1 \leq 100 \\
+    1 & \text{otherwise}
+  \end{cases}
+\end{equation}
+Elevated heart rate (tachycardia) or very low heart rate therefore increases \(T\) and may raise the TEWS colour band.
+
+Respiratory rate \(f_2\) (breaths/min):
+\begin{equation}
+  f_2(v_2) = \begin{cases}
+    3 & v_2 \geq 30 \\
+    2 & 21 \leq v_2 \leq 29 \\
+    0 & 9 \leq v_2 \leq 14 \\
+    1 & \text{otherwise}
+  \end{cases}
+\end{equation}
+Rapid breathing (tachypnoea) similarly adds points, capturing respiratory distress before full clinical assessment.
+
+Mobility \(f_3\): walking \(=0\); assisted \(=1\); immobile \(=2\)--\(3\) (SATS manual). Temperature \(f_4\): \(35.0\)--\(38.4\,^\circ\mathrm{C}\) \(=0\); borderline fever or hypothermia \(=1\); extreme values \(=2\)--\(3\). AVPU \(f_5\): alert \(=0\), verbal \(=1\), pain \(=2\), unresponsive \(=3\). Trauma \(f_6\): none \(=0\); major trauma \(=2\)--\(3\).
+
+\subsection{Colour map}
+
+The mapping \(C_{\mathrm{TEWS}}(T)\) converts the integer score into the same colour vocabulary used at the SATS desk, so vital-sign triage aligns with hospital routing rules \citep{satsmanual}:
+\begin{equation}
+  C_{\mathrm{TEWS}}(T) = \begin{cases}
+    \text{Red} & T > 7 \\
+    \text{Orange} & 5 \leq T \leq 6 \\
+    \text{Yellow} & 3 \leq T \leq 4 \\
+    \text{Green} & T \leq 2
+  \end{cases}
+  \label{eq:tews-colour}
+\end{equation}
+
+Thresholds in Equation~\eqref{eq:tews-colour} follow the standard SATS implementation: a single point difference can change the colour band, so nurses record each \(f_k\) carefully. The diagram below visualises these bands on the score axis.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.92\textwidth}{!}{%
+\begin{tikzpicture}[x=1.35cm, y=1cm]
+  \node[font=\small\bfseries] at (6.0, 1.65) {Triage Early Warning Score (TEWS) total $T$};
+  % Separated colour bands
+  \node[draw, rounded corners=2pt, fill=triageGreen!75, minimum width=2.4cm, minimum height=0.85cm, font=\footnotesize, align=center] (g) at (1.2, 0.85) {$T \leq 2$\\Green};
+  \node[draw, rounded corners=2pt, fill=triageYellow!75, minimum width=2.4cm, minimum height=0.85cm, font=\footnotesize, align=center] (y) at (4.0, 0.85) {$3$--$4$\\Yellow};
+  \node[draw, rounded corners=2pt, fill=triageOrange!75, minimum width=2.4cm, minimum height=0.85cm, font=\footnotesize, align=center] (o) at (6.8, 0.85) {$5$--$6$\\Orange};
+  \node[draw, rounded corners=2pt, fill=triageRed!75, minimum width=2.6cm, minimum height=0.85cm, font=\footnotesize, align=center] (r) at (9.7, 0.85) {$T > 7$\\Red};
+  % Axis
+  \draw[thick, -Stealth] (0, 0) -- (11.2, 0);
+  \foreach \x/\lab in {0/0, 2.4/2, 4.8/4, 7.2/6, 9.6/8, 11/9+}
+    \draw (\x, 0.06) -- (\x, -0.06) node[below, font=\footnotesize] {\lab};
+  \node[font=\footnotesize] at (5.6, -0.45) {Score $T$};
+\end{tikzpicture}}
+\caption{TEWS score ranges mapped to SATS colours (segments separated for readability).}
+\label{fig:tews-bands}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|l|c|c|r|}
+\hline
+\(k\) & Parameter & Measured \(v_k\) & \(f_k(v_k)\) & Running sum \\
+\hline
+1 & HR & 125 bpm & 2 & 2 \\
+2 & RR & 26 breaths/min & 2 & 4 \\
+3 & Mobility & walking & 0 & 4 \\
+4 & Temperature & \(36.8\,^\circ\mathrm{C}\) & 0 & 4 \\
+5 & AVPU & alert & 0 & 4 \\
+6 & Trauma & absent & 0 & 4 \\
+\hline
+\multicolumn{4}{r}{\textbf{Total \(T\):}} & \textbf{4} \\
+\hline
+\end{tabular}
+\caption{Term-by-term TEWS calculation for HR \(=125\) bpm, RR \(=26\) breaths/min, all other parameters normal.}
+\label{tab:tews-worked}
+\end{table}
+
+\begin{example}
+Suppose vitals are HR \(=125\) bpm and RR \(=26\) breaths/min; mobility, temperature, AVPU, and trauma are normal or absent. Table~\ref{tab:tews-worked} lists each \(f_k\) contribution; summing gives
+\begin{align*}
+  f_1(125) &= 2 && \text{(HR band }111\text{--}129), \\
+  f_2(26)  &= 2 && \text{(RR band }21\text{--}29), \\
+  f_k(\cdot) &= 0 && k=3,\ldots,6, \\
+  T &= 2+2 = 4, \\
+  C_{\mathrm{TEWS}}(4) &= \text{Yellow} \quad \text{(Equation~\eqref{eq:tews-colour})}.
+\end{align*}
+If only these two vitals were measured, the score is partial but still auditable. At intake, before vitals exist, the BioBERT path in Section~\ref{sec:classification} supplies the text-based colour.
+\end{example}
+
+\section{Introducing BERT}
+\label{sec:bert-bridge}
+
+TEWS ignores language. A patient may describe symptoms in free text before HR or RR are recorded. Subjective complaints often appear first; bidirectional encoding is required so that ``not feverish'' and ``very feverish'' are not treated alike.
+
+\citet{vaswani2017attention} introduced scaled dot-product attention (Section~\ref{sec:attention}). \citet{devlin2019bert} stacked attention into deep encoders with MLM pre-training. The input representation preview is
+\begin{equation}
+  E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(t_i),
+  \label{eq:embedding-sum-preview}
+\end{equation}
+where \(E_{\mathrm{word}}\) identifies the token, \(E_{\mathrm{pos}}\) encodes position \(i\), and \(E_{\mathrm{seg}}\) marks sentence segment (always segment \(0\) for a single complaint). Full detail appears in Section~\ref{sec:embeddings}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{2cm}|p{4.5cm}|p{4.8cm}|}
+\hline
+\textbf{Term} & \textbf{Meaning} & \textbf{Example in triage} \\
+\hline
+\(E_{\mathrm{word}}\) & Token identity: which word or subword? & ``headache'' vs ``feverish'' \\
+\(E_{\mathrm{pos}}(i)\) & Position in the sequence: order matters & ``head ache'' \(\neq\) ``ache head'' \\
+\(E_{\mathrm{seg}}\) & Sentence segment (A or B in paired inputs) & Always segment \(0\) for one complaint \\
+\hline
+\end{tabular}
+\caption{Breakdown of the three terms in Equation~\eqref{eq:embedding-sum-preview}.}
+\label{tab:embedding-breakdown}
+\end{table}
+
+\begin{remark}
+BERT processes the full sentence simultaneously. The representation of ``feel feverish'' depends on ``headache'' and neighbouring tokens in both directions, which is essential for triage wording.
+\end{remark}
+
+\section{Introducing BioBERT}
+\label{sec:biobert-bridge}
+
+BioBERT reuses BERT's architecture (12 layers, 768 hidden dimensions, 12 attention heads) but continues MLM on biomedical corpora. Fine-tuning on nurse-labeled chief complaints adjusts the classification head so \(h_{\mathrm{[CLS]}}\) maps to five acuity levels.
+
+Clinical tokens such as ``headache'', ``feverish'', ``aches'', and ``weak'' occupy regions of embedding space nearer related medical terms than in general BERT. After fine-tuning, their joint attention pattern supports acuity estimation for any presenting complaint, not only the illustrative example used in this chapter.
+
+\begin{remark}
+Hospital intake is frequently text-first. BioBERT provides the mathematical bridge from unstructured complaint text to the same colour vocabulary nurses use with TEWS and SATS.
+\end{remark}

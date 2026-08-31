@@ -1,0 +1,26 @@
+\chapter{LITERATURE REVIEW}
+\label{ch:lit}
+
+\section{Hospital overcrowding and triage delay}
+
+Overcrowding in low- and middle-income country (LMIC) hospitals affects outpatient departments, emergency intake, and inpatient wards simultaneously \citep{kathsats}. Delayed triage lengthens time-to-provider, increases left-without-being-seen rates, and correlates with poor outcomes for time-sensitive conditions. The South African Triage Scale (SATS) provides a five-colour framework (Red, Orange, Yellow, Green, Blue) with maximum waiting times \(T_{\max}\) and destination rules \citep{satsmanual}. Implementation at Komfo Anokye Teaching Hospital (KATH) demonstrated that standardised colour coding can structure flow even when staffing is constrained, provided urgency information travels with the patient.
+
+A persistent gap is the \emph{text-first} moment of arrival: many patients can describe symptoms before any vital sign is measured. Paper triage forms capture chief complaints as unstructured prose; converting that prose into the same colour logic used for vitals remains inconsistently formalised in Ghanaian hospital practice.
+
+\section{TEWS and vital-sign triage}
+
+The Triage Early Warning Score (TEWS) aggregates six SATS parameters (heart rate (HR), respiratory rate (RR), mobility, temperature, Alert, Voice, Pain, Unresponsive (AVPU) consciousness, and trauma flag) into a single integer \(T\) \citep{satsmanual}. Nurses use \(T\) at triage to assign a colour band: Red for \(T > 7\), Orange for \(5 \leq T \leq 6\), Yellow for \(3 \leq T \leq 4\), Green for \(T \leq 2\). TEWS is deterministic and objective; it does not read language. Subjective symptoms such as ``worst headache of my life'' or ``feverish and weak'' may appear in the complaint before corresponding vitals exist. Chapter~\ref{ch:method} presents TEWS mathematics as the hospital standard parallel to the text model.
+
+\section{Attention, BERT, and BioBERT}
+
+Sequential language models read text in one direction, limiting context for ambiguous clinical phrases. \citet{vaswani2017attention} introduced scaled dot-product self-attention, allowing each token to attend to all others in parallel. \citet{devlin2019bert} built BERT (Bidirectional Encoder Representations from Transformers) on this idea: masked language modelling (MLM) pre-training yields contextual embeddings \(E(t_i) = E_{\mathrm{word}} + E_{\mathrm{pos}} + E_{\mathrm{seg}}\) used across downstream tasks.
+
+\citet{lee2020biobert} continued pre-training on PubMed and PMC abstracts to produce Biomedical BERT (BioBERT), a domain-specific encoder whose embedding space places ``headache'', ``feverish'', and ``malaria'' nearer clinically related terms. Fine-tuning BioBERT on nurse-labeled chief complaints yields a supervised classifier from text to acuity levels.
+
+\section{NLP for emergency and hospital triage}
+
+\citet{stewart2023nlp} reviewed natural language processing (NLP) at emergency triage: chief-complaint classification, syndromic surveillance, and decision support remain active research areas with heterogeneous datasets. \citet{gligorijevic2018deep} showed that deep attention models can stratify emergency department patients from unstructured text. Most published systems target high-income corpora; formal mathematics from patient text to SATS colour for Ghanaian hospital intake, with pathway routing aligned to local implementation, is under-specified in the literature.
+
+\section{Research gap}
+
+Existing work separates vital-sign scores (TEWS), manual SATS colour assignment, and NLP classifiers trained abroad. There is no unified, examinable mathematical account of how a free-text complaint at KATH-style intake becomes a SATS colour and pathway card using BioBERT, while TEWS remains documented as the nurse-facing vital standard. Chapter~\ref{ch:method} fills that gap for the text path; later chapters will report evaluation.
