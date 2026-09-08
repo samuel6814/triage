@@ -1,0 +1,45 @@
+%====================================================
+\section{Methodology}
+
+\begin{frame}{NLP Pipeline Overview}
+	\begin{center}
+	\resizebox{0.98\textwidth}{!}{%
+	\begin{tikzpicture}[node distance=0.35cm and 0.22cm]
+	  \node[pipe] (raw) {Chief\\complaint $X$};
+	  \node[pipe, right=of raw] (gate) {Clinical\\gate};
+	  \node[pipe, right=of gate] (tok) {Tokenize};
+	  \node[pipe, right=of tok] (emb) {Embed\\768-d};
+	  \node[pipe, right=of emb] (bb) {BioBERT\\12 layers};
+	  \node[pipe, right=of bb] (sm) {Softmax\\5 classes};
+	  \node[pipe, right=of sm, fill=triageYellow!25] (sats) {SATS\\colour};
+	  \foreach \a/\b in {raw/gate, gate/tok, tok/emb, emb/bb, bb/sm, sm/sats}
+	    \draw[flowarr] (\a) -- (\b);
+	\end{tikzpicture}}
+	\end{center}
+	\medskip
+	\begin{itemize}
+		\item Gate rejects non-clinical text (e.g.\ greetings) before BioBERT runs.
+		\item Softmax yields five acuity probabilities \(\hat{\mathbf{y}}\) that sum to \(1\).
+		\item Chosen level \(\hat{c}\): highest probability; then \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\) and pathway card \(P(C)\).
+		\item BioBERT is a biomedical BERT encoder (PubMed/PMC), fine-tuned for five-class triage \citep{lee2020biobert}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Training Data and System Scope}
+	\begin{block}{Triagegeist fine-tuning corpus \citep{triagegeist2025}}
+		\begin{itemize}
+			\item Laitinen-Fredriksson Foundation (Kaggle, 2025): join \texttt{train.csv} acuity labels with \texttt{chief\_complaints.csv} on \texttt{patient\_id}.
+			\item Yields \(N=80{,}000\) English \texttt{chief\_complaint\_raw} / \texttt{triage\_acuity} pairs (vitals and demographics excluded).
+			\item Stratified 90/10 split (\(\approx\)72{,}000 train / 8{,}000 holdout, seed 42).
+			\item \textbf{Not} collected at \examplehospital{}.
+		\end{itemize}
+	\end{block}
+	\begin{block}{KNUST-informed examples}
+		Written after a site visit; used to test the prototype, validate pathway routing, and illustrate the pipeline.
+		\textbf{Not} merged into the \(80{,}000\)-pair fine-tuning set.
+	\end{block}
+	\begin{itemize}
+		\item Pipeline: gate \(\to\) tokenise \(\to\) embed \(\to\) BioBERT \(\to\) Softmax \(\to\) colour + pathway.
+		\item Nurses keep TEWS in parallel (staff stay in control).
+	\end{itemize}
+\end{frame}

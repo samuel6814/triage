@@ -1,0 +1,92 @@
+\section{Step 4 --- Attention (illustrative) and 12 layers}
+\label{sec:attn}
+
+In the real model, each layer builds
+\[
+  Q = H W_Q,\quad K = H W_K,\quad V = H W_V,
+\]
+then
+\[
+  \mathrm{Attention}(Q,K,V)
+  = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V,
+  \qquad d_k = 64
+\]
+(with 12 heads so \(12\times 64 = 768\)).
+
+We cannot multiply the true \(W_Q\) here. Instead we \textbf{solve a tiny attention problem} with \(d_k=2\) so every number is visible.
+
+\subsection*{Toy setup: \texttt{[CLS]} listening to three keys}
+
+Suppose the query for \texttt{[CLS]} and three keys (symptom-like / filler) are:
+
+\begin{align*}
+  q &= [1.0,\, 2.0], \\
+  k_1 &= [1.0,\, 0.0] \quad\text{(``head''-like)}, \\
+  k_2 &= [0.0,\, 1.0] \quad\text{(``fever''-like)}, \\
+  k_3 &= [0.2,\, 0.1] \quad\text{(``I''-like filler)}, \\
+  v_1 &= [1,\, 0],\quad
+  v_2 = [0,\, 1],\quad
+  v_3 = [0,\, 0].
+\end{align*}
+
+\subsection*{Compute scores \(e_j = (q\cdot k_j)/\sqrt{d_k}\)}
+
+Here \(\sqrt{d_k}=\sqrt{2}\approx 1.414\).
+
+\begin{align*}
+  q\cdot k_1 &= 1.0,\quad
+  e_1 = 1.0/1.414 \approx 0.707, \\
+  q\cdot k_2 &= 2.0,\quad
+  e_2 = 2.0/1.414 \approx 1.414, \\
+  q\cdot k_3 &= 0.4,\quad
+  e_3 = 0.4/1.414 \approx 0.283.
+\end{align*}
+
+\subsection*{Softmax weights \(\alpha_j\)}
+
+\begin{align*}
+  \exp(e_1) &\approx 2.028,\quad
+  \exp(e_2) \approx 4.114,\quad
+  \exp(e_3) \approx 1.327, \\
+  \sum\exp(e_j) &\approx 7.469, \\
+  \alpha_1 &\approx 0.271,\quad
+  \alpha_2 \approx 0.551,\quad
+  \alpha_3 \approx 0.178.
+\end{align*}
+
+Check: \(0.271+0.551+0.178 = 1\).
+
+\texttt{[CLS]} listens most to the ``fever''-like key (\(\alpha_2\approx 0.55\)), then ``head'', then filler.
+
+\subsection*{Mix values}
+
+\[
+  \mathrm{output}
+  = \alpha_1 v_1 + \alpha_2 v_2 + \alpha_3 v_3
+  \approx 0.271\,[1,0] + 0.551\,[0,1] + 0.178\,[0,0]
+  = [0.271,\, 0.551].
+\]
+
+\begin{stepbox}
+Scores \(\to\) weights that sum to 1 \(\to\) weighted mix of value vectors.
+That is one attention head on a toy. BioBERT does this with \(d_k=64\), 12 heads, inside each of 12 layers.
+\end{stepbox}
+
+\subsection*{After 12 real layers}
+
+\[
+  H^{(0)} \to H^{(1)} \to \cdots \to H^{(12)}.
+\]
+Take the first row:
+\[
+  h_{\mathrm{[CLS]}} = H^{(12)}_{0,:} \in \mathbb{R}^{768}.
+\]
+
+\begin{notebox}
+We do not write out the true \(768\) numbers. For the next step we only need:
+``\(h_{\mathrm{[CLS]}}\) is a fixed 768-vector summary of our complaint.''
+\end{notebox}
+
+\begin{saybox}
+``Attention: match query to keys, scale, softmax, mix values. Twelve layers later, read \texttt{[CLS]}.''
+\end{saybox}

@@ -1,0 +1,636 @@
+%==============================================================================
+%  Chapter 2 Guide: How to Write a Literature Review
+%  Compile: make  (or pdflatex chapter2-guide.tex twice)
+%==============================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{forest}{HTML}{166534}
+\definecolor{vibrant}{HTML}{22C55E}
+\definecolor{deepforest}{HTML}{064E3B}
+\definecolor{slate}{HTML}{1E293B}
+\definecolor{codebg}{HTML}{F8FAFC}
+
+\hypersetup{linkcolor=forest, urlcolor=forest}
+
+\titleformat{\section}{\Large\bfseries\color{forest}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{deepforest}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{slate}}{\thesubsubsection}{0.5em}{}
+
+\setlist{leftmargin=1.4em, topsep=4pt, itemsep=2pt}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{slate!30},
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=6pt,
+  belowskip=6pt,
+}
+
+\newtcolorbox{tipbox}{
+  enhanced, breakable, colback=forest!6, colframe=forest,
+  boxrule=0.7pt, arc=2pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\color{white}, coltitle=white,
+  title={Tip}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{warnbox}{
+  enhanced, breakable, colback=vibrant!8, colframe=vibrant!70!black,
+  boxrule=0.7pt, arc=2pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=deepforest,
+  title={Watch out}, attach title to upper={\par\smallskip}}
+
+\newtcolorbox{examplebox}{
+  enhanced, breakable, colback=slate!4, colframe=slate!55,
+  boxrule=0.6pt, arc=2pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries, coltitle=slate,
+  title={Example}, attach title to upper={\par\smallskip}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{forest}{Chapter 2 Guide: Literature Review}}
+\fancyhead[R]{\small\textcolor{forest}{\thepage}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\title{\textbf{Chapter 2 Guide}\\[0.35em]
+\large How to Write a Literature Review\\[0.25em]
+\normalsize A practical handbook for thesis and project writing}
+\author{}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+A literature review is a critical synthesis that positions your study, not a list of paper summaries.
+This handbook follows established research-writing practice and walks through search, reading, thematic organisation, synthesis, gap writing, and revision.
+Section~\ref{sec:worked} gives a domain-agnostic mini outline you can fill for any thesis topic; it is a \emph{template only} and does not replace a thesis Chapter~2.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{What a literature review is (and is not)}
+
+\subsection{What it is}
+A literature review is a \textbf{structured argument} built from published work. You:
+\begin{itemize}
+  \item map what is already known on your topic;
+  \item group findings into \textbf{themes};
+  \item compare methods, settings, and limits;
+  \item show where evidence is strong, weak, or missing;
+  \item end with a \textbf{research gap} that your study addresses.
+\end{itemize}
+In research-writing terms (Hart; Ridley; and similar guides), the review \textbf{evaluates and organises} knowledge so the reader sees why your question is worth asking.
+
+\subsection{What it is not}
+\begin{center}
+\begin{tabular}{@{}p{0.32\textwidth}p{0.58\textwidth}@{}}
+\toprule
+\textbf{Not this} & \textbf{Why it fails} \\
+\midrule
+Annotated bibliography & Lists papers one by one with no argument \\
+Paper dump & ``Author A said\ldots\ Author B said\ldots'' with no link \\
+Background story only & Context without critique or gap \\
+Copy of abstracts & Summary without your analytical voice \\
+Proof that you read a lot & Volume without selection or synthesis \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{tipbox}
+\textbf{Test:} if you remove the citations, does a clear story about the field still remain? If not, you are listing, not reviewing.
+\end{tipbox}
+
+%------------------------------------------------------------------------------
+\section{Purpose in a thesis or project}
+
+In a final-year or postgraduate thesis, the literature review usually does five jobs:
+\begin{enumerate}
+  \item \textbf{Situate the problem} --- show the issue exists and matters.
+  \item \textbf{Define key terms} --- triage, acuity, pathway, embedding, Softmax, and so on.
+  \item \textbf{Survey prior approaches} --- protocols, scores, NLP models.
+  \item \textbf{Justify your method} --- why this model, colour map, or gate.
+  \item \textbf{Lead into objectives} --- the gap must match what you will do next.
+\end{enumerate}
+
+\subsection{The funnel}
+Keep this shape when outlining:
+\begin{lstlisting}
+Broad context (hospital pressure, triage need)
+        |
+Specific strands (vitals scores; NLP; domain models)
+        |
+Limits and mismatches (setting, data, missing local routing)
+        |
+Research gap
+        |
+Bridge to methodology / objectives
+\end{lstlisting}
+Presentation literature slides and thesis Chapter~2 should follow the same funnel: context \(\to\) strands \(\to\) gap.
+
+%------------------------------------------------------------------------------
+\section{Types of review}
+
+Be honest about which type you are writing.
+
+\begin{center}
+\begin{tabular}{@{}p{0.22\textwidth}p{0.38\textwidth}p{0.28\textwidth}@{}}
+\toprule
+\textbf{Type} & \textbf{What it is} & \textbf{Typical for} \\
+\midrule
+Narrative (traditional) &
+Thematic synthesis guided by your question; search structured but not always fully reproducible &
+Most BSc / MPhil chapters \\
+Systematic &
+Pre-defined question, strict inclusion, exhaustive search, often PRISMA &
+Evidence reviews; rare as full BSc chapter \\
+Scoping &
+Maps breadth of a field; less depth of appraisal &
+Early exploration \\
+Integrative &
+Combines empirical and theoretical work into a framework &
+Advanced conceptual chapters \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warnbox}
+For most mathematics / applied AI final-year projects, write a \textbf{narrative thematic review}.
+Do not call the chapter ``systematic'' unless you followed systematic methods end to end.
+\end{warnbox}
+
+%------------------------------------------------------------------------------
+\section{Before writing: search and selection}
+\label{sec:search}
+
+Writing starts with \textbf{finding and filtering}, not with a blank chapter file.
+
+\subsection{Clarify the review question}
+Turn the topic into searchable sub-questions, for example:
+\begin{itemize}
+  \item How has free-text chief-complaint NLP been used for hospital triage?
+  \item How do SATS and TEWS structure urgency and routing?
+  \item What do Transformer / BioBERT models contribute to clinical text classification?
+\end{itemize}
+
+\subsection{Build keyword sets}
+\begin{center}
+\begin{tabular}{@{}p{0.28\textwidth}p{0.34\textwidth}p{0.28\textwidth}@{}}
+\toprule
+\textbf{Concept A} & \textbf{Concept B} & \textbf{Concept C} \\
+\midrule
+triage, acuity, SATS, TEWS &
+chief complaint, NLP, text classification &
+BioBERT, BERT, attention, LMIC, Ghana, pathway \\
+\bottomrule
+\end{tabular}
+\end{center}
+Combine with AND / OR. Example query:
+\begin{lstlisting}
+("chief complaint" OR "presenting complaint")
+AND (triage OR acuity)
+AND (NLP OR BERT OR BioBERT)
+\end{lstlisting}
+
+\subsection{Where to search}
+\begin{itemize}
+  \item Google Scholar
+  \item PubMed / PMC (clinical and BioBERT lineage)
+  \item IEEE Xplore / ACM (systems and NLP)
+  \item University library databases
+  \item Official manuals (e.g.\ SATS training manual) as primary protocol sources
+\end{itemize}
+
+\subsection{Inclusion and exclusion}
+Write the rules down. Example:
+\begin{itemize}
+  \item \textbf{Include:} English (or working language); triage, pathways, or clinical NLP; peer-reviewed or recognised protocol; relevant to text or vitals at intake.
+  \item \textbf{Exclude:} pure imaging AI with no text path; opinion pieces with no method; duplicates; topics that never touch your gap.
+\end{itemize}
+
+\subsection{Snowballing}
+From 3--5 seed papers (e.g.\ BioBERT; a triage NLP review; SATS manual; a local overcrowding study):
+\begin{itemize}
+  \item check \textbf{references} (backward);
+  \item check \textbf{who cited them} (forward on Scholar).
+\end{itemize}
+
+\subsection{Search log}
+Keep a table:
+\begin{center}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Date & Database & Query & Hits & Kept & Notes \\
+\midrule
+\ldots & Scholar & chief complaint NLP triage & 120 & 8 & review useful \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Stop rule}
+Stop searching when new papers \textbf{repeat the same themes} and no longer change your gap statement.
+
+%------------------------------------------------------------------------------
+\section{Reading workflow}
+
+Do not read every paper at the same depth.
+
+\subsection{Three passes}
+\begin{enumerate}
+  \item \textbf{Skim} --- title, abstract, conclusion, figures. Keep / drop / maybe.
+  \item \textbf{Structure} --- introduction, method, results, limits. Fill a note card.
+  \item \textbf{Critique} --- what would fail if we applied this to \emph{your} setting?
+\end{enumerate}
+
+\subsection{Note card (one paper = one card)}
+\begin{lstlisting}
+Citation:
+Year / venue:
+Setting (country, hospital type):
+Research question:
+Method (data, model, vitals vs text):
+Main finding (1-2 sentences):
+Limitations (authors' + yours):
+How I will use this (theme + gap role):
+Quote worth paraphrasing (page):
+\end{lstlisting}
+
+\subsection{File notes by theme, not by author}
+Use tags such as: overcrowding / SATS; TEWS / vitals; attention / BERT / BioBERT; NLP triage; pathways / routing.
+When you write, open a \textbf{theme}, not an author alphabet.
+
+%------------------------------------------------------------------------------
+\section{Organisation patterns}
+
+\begin{center}
+\begin{tabular}{@{}p{0.22\textwidth}p{0.38\textwidth}p{0.28\textwidth}@{}}
+\toprule
+\textbf{Pattern} & \textbf{How it works} & \textbf{When} \\
+\midrule
+Thematic (preferred) &
+Sections = ideas &
+Almost always for thesis chapters \\
+Chronological &
+Early work \(\to\) recent work &
+History of one narrow idea \\
+Methodological &
+Rule-based vs classical ML vs deep learning &
+Comparing technique families \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Why theme beats author-by-author}
+
+\begin{examplebox}
+\textbf{Weak:} Smith (2018) found X. Jones (2019) found Y. Lee (2020) proposed BioBERT.
+
+\textbf{Stronger:} Clinical text models moved from bag-of-words classifiers to contextual encoders.
+BioBERT continues BERT pre-training on PubMed/PMC so biomedical terms cluster more usefully in embedding space (Lee et al., 2020).
+Triage applications of deep attention to chief complaints exist, but most use high-income corpora (Stewart et al., 2023).
+\end{examplebox}
+
+%------------------------------------------------------------------------------
+\section{Summary vs synthesis}
+
+\subsection{Summary (necessary but not enough)}
+Restates what one source says:
+\begin{quote}
+Lee et al.\ (2020) introduced BioBERT by continuing BERT training on PubMed and PMC.
+\end{quote}
+
+\subsection{Synthesis (what markers look for)}
+Connects sources, contrasts them, and points toward your problem:
+\begin{quote}
+Vital-sign scores such as TEWS give an objective colour band once measurements exist, but they do not read free text (SATS manual).
+In parallel, NLP triage research classifies chief complaints with deep models, largely on high-income datasets (Stewart et al., 2023).
+What remains under-specified for Ghanaian intake is an examinable chain from English complaint text to SATS colour and local pathway routing.
+\end{quote}
+
+\begin{center}
+\begin{tabular}{@{}p{0.42\textwidth}p{0.48\textwidth}@{}}
+\toprule
+\textbf{Summary only} & \textbf{Synthesis} \\
+\midrule
+Lists findings & Relates findings to each other \\
+Neutral report & Takes an analytical position \\
+Ends anywhere & Ends at a gap or tension \\
+``X said'' & ``X and Y together imply\ldots, but Z is missing'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{tipbox}
+\textbf{Rule of thumb:} each paragraph should answer ``so what for my project?'' in the last sentence or two.
+\end{tipbox}
+
+%------------------------------------------------------------------------------
+\section{Critical appraisal}
+
+For every important source, ask:
+\begin{enumerate}
+  \item \textbf{Setting} --- high-income ED vs LMIC teaching hospital; can results transfer?
+  \item \textbf{Data} --- size, language, label source (nurse acuity vs diagnosis)?
+  \item \textbf{Input} --- text only, vitals only, or multimodal?
+  \item \textbf{Output} --- diagnosis, disposition, acuity, colour, pathway?
+  \item \textbf{Evaluation} --- accuracy alone, or also recall on rare urgent classes, latency, safety?
+  \item \textbf{Limits} --- what authors admit, and what they ignore.
+  \item \textbf{Relevance to your gap} --- supports method, problem, or shows what is still missing?
+\end{enumerate}
+
+Prefer calm critique:
+\begin{quote}
+Most published NLP triage systems target high-income corpora; local department routing is rarely formalised.
+\end{quote}
+Avoid dismissive language such as ``these papers are useless.''
+
+%------------------------------------------------------------------------------
+\section{Chapter and section architecture}
+
+\subsection{Typical thesis chapter shape}
+\begin{enumerate}
+  \item Short opener: what this chapter covers.
+  \item Theme 1: broadest clinical or operational context.
+  \item Theme 2: established hospital standard (e.g.\ vitals score).
+  \item Theme 3: technical lineage (attention \(\to\) BERT \(\to\) domain model).
+  \item Theme 4: applied NLP triage literature.
+  \item Research gap: explicit, matching objectives.
+  \item Bridge sentence to methodology.
+\end{enumerate}
+
+Prefer \textbf{few focused sections} over many tiny ones. Each section should carry one claim family.
+
+\subsection{Presentation slides}
+On a slide, show only the compressed funnel: 3--5 bullets plus the gap.
+The chapter holds the synthesis; the slide holds the map.
+
+%------------------------------------------------------------------------------
+\section{Academic voice and paragraph craft}
+
+\subsection{Paragraph skeleton}
+\begin{enumerate}
+  \item \textbf{Topic sentence} --- your claim about the literature.
+  \item \textbf{Evidence} --- 1--3 citations with brief findings.
+  \item \textbf{Analysis} --- compare, limit, or interpret.
+  \item \textbf{So-what} --- link to problem, method, or gap.
+\end{enumerate}
+
+\begin{examplebox}
+\textbf{Topic:} Text arrives before vitals at intake.\\
+\textbf{Evidence:} Chief complaints are unstructured prose; TEWS needs measured parameters.\\
+\textbf{Analysis:} Vitals-only pathways cannot cover the first minutes of arrival.\\
+\textbf{So-what:} A text path is needed alongside TEWS, not instead of it.
+\end{examplebox}
+
+\subsection{Tense}
+\begin{center}
+\begin{tabular}{@{}lp{0.62\textwidth}@{}}
+\toprule
+\textbf{Use} & \textbf{For} \\
+\midrule
+Past & Specific completed studies (``Lee et al.\ (2020) trained\ldots'') \\
+Present & Established knowledge (``SATS uses five colour bands\ldots'') \\
+Present perfect & Line of research up to now (``Researchers have applied NLP to triage\ldots'') \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Hedging and signposting}
+Use precise hedges: suggests, reports, associated with, under-specified, limited evidence.\\
+Avoid overclaiming: proves, all hospitals, always.\\
+Signpost: ``A related limitation is\ldots''; ``In contrast to vitals-based scores\ldots''; ``These strands motivate the gap below.''
+
+Avoid filler openings (``In this modern era of AI\ldots'') and habitual em dashes; prefer commas, colons, or new sentences.
+
+%------------------------------------------------------------------------------
+\section{Citations and ethics}
+
+\begin{itemize}
+  \item Cite to support a claim; definitions from manuals need the manual.
+  \item \textbf{Default:} paraphrase and cite. Quote rarely (precise protocol wording).
+  \item Do not copy sentence structure with only synonym swaps.
+  \item Citation clusters are fine only if sources share the same point.
+  \item Prefer primary sources; if citing via a review, follow department style.
+  \item Do not invent citations; keep PDFs or stable links in a reference manager.
+\end{itemize}
+
+%------------------------------------------------------------------------------
+\section{Writing the research gap}
+\label{sec:gap}
+
+The gap is the payoff of the review. Objectives and method must answer it.
+
+\subsection{Gap formula}
+\begin{lstlisting}
+Prior work establishes A and B.
+However, C remains missing / under-specified for setting S.
+Therefore this study does D.
+\end{lstlisting}
+
+\subsection{Weak vs strong}
+
+\begin{examplebox}
+\textbf{Weak:} Little research has been done on hospital chatbots in Ghana.\\
+(Vague; may be false; does not specify what is missing.)
+
+\textbf{Stronger:} Existing work separates vital-sign scores (TEWS), manual SATS colour assignment, and NLP classifiers trained mainly on high-income corpora.
+There is no unified, examinable account of how free-text chief complaints at a Ghanaian teaching-hospital-style intake become a SATS colour and a local pathway card, while TEWS remains the nurse-facing vital standard.
+\end{examplebox}
+
+\subsection{Match gap to pipeline (illustrative)}
+If your contribution is an examinable chain such as
+\[
+X \;\to\; \hat{\mathbf{y}} \;\to\; C_{\mathrm{NLP}} \;\to\; P(C),
+\]
+then the gap paragraph should mention \textbf{text \(\to\) colour \(\to\) local routing}, not a vague ``AI in hospitals.''
+
+Aim for \textbf{one coherent gap}, even if several missing pieces feed into it.
+
+%------------------------------------------------------------------------------
+\section{Common mistakes checklist}
+
+\begin{itemize}[label=$\square$]
+  \item Author-by-author laundry list
+  \item No critique (only praise or neutral summary)
+  \item Themes missing; chronology used with no reason
+  \item Gap too broad (``no one studied AI'')
+  \item Gap does not match stated objectives
+  \item Method not justified by literature
+  \item Local / LMIC transfer ignored when claiming hospital relevance
+  \item Mixing TEWS and NLP without clarifying different inputs
+  \item Orphan citations (text vs bibliography mismatch)
+  \item Over-quoting
+  \item Informal tone or unsupported superlatives
+  \item Sections that never return to the research question
+  \item Ending without an explicit gap subsection
+\end{itemize}
+
+%------------------------------------------------------------------------------
+\section{Revision checklist}
+
+\subsection{Structure}
+\begin{itemize}[label=$\square$]
+  \item Opener states purpose of the chapter
+  \item Sections are thematic and in funnel order
+  \item Each section ends with a clear takeaway
+  \item Gap subsection is explicit and specific
+  \item Bridge to methodology exists
+\end{itemize}
+
+\subsection{Argument}
+\begin{itemize}[label=$\square$]
+  \item Synthesis appears in most paragraphs
+  \item Contradictions or limits are acknowledged
+  \item Gap follows logically from the themes
+\end{itemize}
+
+\subsection{Scholarship}
+\begin{itemize}[label=$\square$]
+  \item Core seed papers present and correctly cited
+  \item Protocol manuals cited where colours / timers are defined
+  \item Recent and foundational sources both appear where needed
+  \item Bibliography matches department style
+\end{itemize}
+
+\subsection{Clarity and alignment}
+\begin{itemize}[label=$\square$]
+  \item Terms defined on first use; abbreviations expanded once
+  \item Sentences readable aloud
+  \item Problem, objectives, and gap use the same vocabulary
+  \item Presentation literature slide does not contradict the chapter
+\end{itemize}
+
+%------------------------------------------------------------------------------
+\section{Mini worked outline (illustrative template)}
+\label{sec:worked}
+
+\begin{warnbox}
+Use this as a \textbf{domain-agnostic shape}. Replace every bracketed placeholder with your own topic, sources, and wording.
+It is a \textbf{template}, not a substitute for thesis Chapter~2.
+\end{warnbox}
+
+\paragraph{Theme A --- Broader context / problem setting.}
+Claim: [why the topic matters in the real world or in the science].\\
+Evidence types: [background studies; policy; operational or scientific context papers].\\
+So-what: [what this implies for your research question].
+
+\paragraph{Theme B --- Established standard or classical approach.}
+Claim: [the accepted method, protocol, baseline, or classical theory in the field].\\
+Evidence types: [manuals, standard algorithms, widely cited baselines].\\
+Limit: [what this standard does \emph{not} cover that your project needs].\\
+So-what: [why a further strand of literature is required].
+
+\paragraph{Theme C --- Core technical / theoretical lineage.}
+Claim: [the key models, theorems, or frameworks your method builds on].\\
+Evidence types: [foundational papers; textbooks; method surveys].\\
+So-what: [why this lineage justifies the tools you will use].
+
+\paragraph{Theme D --- Applied / closely related studies.}
+Claim: [recent work closest to your exact task].\\
+Evidence types: [empirical papers; applied case studies; reviews of near neighbours].\\
+Limit: [setting, data, language, or scope that does not match yours].\\
+So-what: [near work is not the same as solving your specific problem].
+
+\paragraph{Theme E --- Research gap (payoff).}
+Prior: Themes A--D establish [A] and [B].\\
+Missing: [X] remains under-specified for setting [S].\\
+Bridge: this study addresses that gap by [one sentence on your contribution / method chain].
+
+\begin{tipbox}
+\textbf{Viva closer:} ``The literature gives established approaches and related models; what was missing for us was a clear, examinable account of [your specific chain or question].''
+\end{tipbox}
+
+%------------------------------------------------------------------------------
+\section{Quick templates (copy and fill)}
+
+\subsection{Search log row}
+\begin{lstlisting}
+Date:
+Database:
+Query:
+Results (n):
+Titles screened:
+Full texts read:
+Kept (citations):
+Reason excluded (examples):
+\end{lstlisting}
+
+\subsection{Paper note card}
+\begin{lstlisting}
+Citation:
+Setting:
+Input (text / vitals / both):
+Output (acuity / colour / diagnosis / other):
+Method:
+Finding:
+Limit:
+Use in my review (theme):
+Supports gap? (yes/no + how):
+\end{lstlisting}
+
+\subsection{Synthesis paragraph}
+\begin{lstlisting}
+[Topic sentence: claim about the field.]
+[Source 1 finding + citation.]
+[Source 2 finding + citation; agreement or contrast.]
+[Limit or transfer issue for my setting.]
+[So-what: link to problem, method, or gap.]
+\end{lstlisting}
+
+\subsection{Gap paragraph}
+\begin{lstlisting}
+Prior work establishes [A] and [B] (citations).
+These approaches leave [C] under-specified for [setting].
+In particular, [what exact chain or artefact is missing].
+This study addresses that gap by [one sentence on contribution].
+\end{lstlisting}
+
+\subsection{Theme section outline}
+\begin{lstlisting}
+Section title:
+One-sentence section claim:
+3-6 sources to weave:
+Limits to mention:
+Closing so-what sentence:
+\end{lstlisting}
+
+%------------------------------------------------------------------------------
+\section{Further reading (craft guides)}
+
+These are guides on \emph{how} to write reviews (consult your library for editions):
+\begin{itemize}
+  \item Chris Hart --- \emph{Doing a Literature Review}
+  \item Diana Ridley --- \emph{The Literature Review: A Step-by-Step Guide for Students}
+  \item Jill Jesson et al.\ --- \emph{Doing Your Literature Review}
+  \item PRISMA materials --- only if you attempt a systematic-style review
+\end{itemize}
+Topic citations (BioBERT, SATS, Stewart, and so on) belong in the thesis bibliography, not necessarily here.
+
+\section*{Final reminder}
+A good literature review is judged by \textbf{clarity of argument and honesty of gap}, not by how many papers you name.
+Select carefully, synthesise by theme, critique transfer to your setting, and make the gap match your objectives.
+
+\end{document}

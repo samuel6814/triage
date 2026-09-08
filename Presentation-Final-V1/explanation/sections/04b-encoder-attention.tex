@@ -1,0 +1,145 @@
+\subsection{Encoder layers: attention, FFN, residual, LayerNorm}
+\label{sec:expl-encoder}
+
+\begin{intuitbox}
+One encoder layer does two jobs: (1)~let every token look at every other token (self-attention);
+(2)~nonlinearly transform each token row alone (feed-forward network).
+Residuals keep old information; LayerNorm keeps numbers stable across depth.
+\end{intuitbox}
+
+\begin{whybox}
+The slide shows the attention formula. Examiners may ask what else sits inside each of the twelve layers---this subsection answers that.
+\end{whybox}
+
+BioBERT applies the same block \(L=12\) times. The update from layer \(\ell-1\) to layer \(\ell\) is
+\begin{align}
+  Z^{(\ell)} &= \mathrm{LayerNorm}\!\bigl(H^{(\ell-1)} + \mathrm{MultiHeadAttention}(H^{(\ell-1)})\bigr),
+  \label{eq:Zell}\\
+  H^{(\ell)} &= \mathrm{LayerNorm}\!\bigl(Z^{(\ell)} + \mathrm{FFN}(Z^{(\ell)})\bigr),
+  \label{eq:Hell}\\
+  \mathrm{FFN}(x) &= W_2\,\mathrm{ReLU}(W_1 x + b_1) + b_2.
+  \label{eq:FFN}
+\end{align}
+In BERT-base / BioBERT-base:
+\(W_1 \in \mathbb{R}^{768 \times 3072}\), \(W_2 \in \mathbb{R}^{3072 \times 768}\),
+\(b_1 \in \mathbb{R}^{3072}\), \(b_2 \in \mathbb{R}^{768}\).
+The inner width \(3072 = 4\times 768\) gives the FFN capacity to transform each row nonlinearly.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{9cm}@{}}
+\toprule
+Component & What it does \\
+\midrule
+Multi-head attention & Twelve parallel heads; each learns different token relationships \\
+FFN & Expand to 3072 dims with ReLU, then project back to 768 \\
+LayerNorm & Rescale activations for stable deep training \\
+Residual (\(+\)) & Add sub-layer input to output so earlier signal is not erased \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Stacking twelve times.}
+\[
+  H^{(0)} \xrightarrow{\text{Layer 1}} H^{(1)} \xrightarrow{\text{Layer 2}} \cdots \xrightarrow{\text{Layer 12}} H^{(12)} = H^{(L)}.
+\]
+Rough intuition (not a hard theorem): shallow layers emphasise words and short phrases;
+middle layers combine symptoms (``headache'' + ``feverish'' + ``weak'');
+deep layers encode broader urgency patterns. All \(M\) rows are processed in parallel at each layer.
+
+\begin{remark}
+The \texttt{[CLS]} row of \(H^{(12)}\) is exactly \(h_{\mathrm{[CLS]}}\) from Equation~\eqref{eq:hcls}.
+\end{remark}
+
+\begin{saybox}
+``Each layer: attend, add \& normalise, feed-forward, add \& normalise. Do that twelve times. Then read \texttt{[CLS]}.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\subsection{Self-attention in detail (slide 18)}
+\label{sec:expl-attn}
+
+\begin{intuitbox}
+Attention lets every token decide how much to listen to every other token.
+``severe'' should strengthen ``headache''; ``no'' should weaken ``pain''.
+\end{intuitbox}
+
+\begin{whybox}
+This is the heart of transformers. Know \(Q,K,V\), the scale \(\sqrt{d_k}\), and what \(\alpha_j\) means.
+\end{whybox}
+
+\paragraph{Four computational steps.}
+From the current hidden matrix \(H\):
+\begin{enumerate}
+  \item \textbf{Project} into queries, keys, and values.
+  \item \textbf{Score} pairwise compatibility.
+  \item \textbf{Normalise} scores into attention weights.
+  \item \textbf{Combine} value rows into context-aware outputs.
+\end{enumerate}
+
+\begin{align}
+  Q &= H W_Q, \qquad K = H W_K, \qquad V = H W_V,
+  \label{eq:QKV}\\
+  S &= \frac{QK^{\top}}{\sqrt{d_k}},
+  \label{eq:S}\\
+  A &= \mathrm{softmax}(S),
+  \label{eq:A}\\
+  \mathrm{output} &= A V.
+  \label{eq:AV}
+\end{align}
+Equivalently, the compact formula on the slide \citep{vaswani2017attention}:
+\begin{equation}
+  \mathrm{Attention}(Q,K,V)
+  = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V,
+  \qquad d_k = 64.
+  \label{eq:attn}
+\end{equation}
+
+\paragraph{What \(Q\), \(K\), \(V\) mean in words.}
+\begin{itemize}
+  \item \(Q\) (query): ``what am I looking for at this position?''
+  \item \(K\) (key): ``what do I offer as a matchable label?''
+  \item \(V\) (value): ``what content should be mixed if I match?''
+\end{itemize}
+
+\paragraph{Why divide by \(\sqrt{d_k}\)?}
+Dot products of \(d_k\)-dimensional vectors grow with \(d_k\).
+Without scaling, softmax saturates (weights become nearly \(0\) or \(1\)), gradients vanish, and learning stalls.
+The factor \(\sqrt{d_k}\) keeps scores in a healthy range (\(d_k=64\) per head in BioBERT base).
+
+\paragraph{Attention weights \(\alpha_j\).}
+For one query row, the softmax over keys assigns weight \(\alpha_j\) to token \(j\):
+\begin{equation}
+  \alpha_j = \frac{\exp(e_j)}{\sum_{k=1}^{m}\exp(e_k)}, \qquad \sum_{j=1}^{m}\alpha_j = 1,
+  \label{eq:alpha}
+\end{equation}
+where \(e_j\) is the scaled score for key \(j\) and \(m\) is the sequence length (masked pads do not participate).
+\textbf{Meaning:} \(\alpha_j\) is how much this position listens to token \(j\).
+Symptom tokens typically receive higher weight than fillers such as ``I'' or ``and''.
+
+\paragraph{Multi-head attention.}
+Twelve heads run in parallel with different \(W_Q,W_K,W_V\).
+Outputs are concatenated and projected back to \(768\) dimensions so heads can specialise
+(e.g.\ symptom co-occurrence vs negation vs intensity words).
+
+\paragraph{Toy attention pattern (intuition only).}
+When the query is \texttt{[CLS]}, illustrative (not measured) weights might look like:
+\begin{center}
+\small
+\begin{tabular}{@{}lc@{}}
+\toprule
+Token & Relative weight \\
+\midrule
+head / \texttt{\#\#ache} & high \\
+fever / \texttt{\#\#ish} & high \\
+weak & medium--high \\
+I, have, a, and & low \\
+\texttt{<PAD>} & zero (masked) \\
+\bottomrule
+\end{tabular}
+\end{center}
+So the summary vector emphasises clinical wording, not filler words.
+
+\begin{saybox}
+``\(QK^\top\) scores who listens to whom; divide by \(\sqrt{64}\); softmax makes weights that sum to one; multiply by \(V\). Twelve heads, then stack twelve layers.''
+\end{saybox}

@@ -1,17 +1,33 @@
 \section{Tokenisation}
 \label{sec:tokenisation}
 
-Neural networks require fixed-size numerical input. Tokenisation is the first transformation: it maps raw complaint text \(X\) into a bounded sequence of subword tokens. The maximum length \(M \leq 128\) matches the BioBERT configuration used at inference and allows batching of complaints of different lengths by padding shorter sequences.
+\subsection{Input \(X\)}
 
+The NLP path begins with a single English \emph{chief complaint} string \(X\): the primary reason the patient presents, in free text. It is not a diagnosis, not a TEWS vital-sign vector, and not a full medical history. Non-clinical messages may be rejected by the relevance gate (Section~\ref{sec:gate}) before tokenisation runs. Only clinical \(X\) proceeds into the encoder.
+
+\subsection{The tokenisation map \(\tau\)}
+
+Neural networks require fixed-size numerical input. Tokenisation is the first transformation after the gate: a map \(\tau\) sends raw complaint text \(X\) into a bounded sequence of subword tokens with integer IDs.
 \begin{equation}
   X \xrightarrow{\tau} (t_1, \ldots, t_M), \quad M \leq 128.
+  \label{eq:tau-map}
 \end{equation}
+Here \(\tau\) is the \textbf{WordPiece tokenisation map} used by BERT and BioBERT: a \emph{deterministic discrete encoding} that segments the string using a fixed vocabulary and emits token IDs (including special markers). It is \textbf{not} a neural network layer; it does not learn during fine-tuning. Learning begins at the embedding lookup that follows.
 
-\textbf{WordPiece} is the subword algorithm used by BERT and BioBERT. Common clinical words (``fever'', ``pain'') remain whole; rare or misspelled forms split into pieces (e.g.\ ``headache'' \(\to\) \texttt{head}+\texttt{\#\#ache}). This keeps the vocabulary finite while still representing novel spellings. Vocabulary \(\mathcal{V}\) has \(|\mathcal{V}| \approx 28{,}996\) entries; each token ID indexes a row in the embedding table. When a word splits into two subwords, it occupies \textbf{two positions} in the sequence (see rows 4 and 7 in Table~\ref{tab:token-ids}), so \(M\) counts subword tokens, not raw words.
+\subsection{Why the maximum length is \(M = 128\)}
+
+The project fixes maximum sequence length at \(M = 128\) tokens because that is the BioBERT-base / deployment configuration used for training and inference. The cap has three roles:
+\begin{itemize}
+\item \textbf{Architecture match.} BioBERT was pre-trained and fine-tuned with this window; changing \(M\) would require a different checkpoint or expensive re-adaptation.
+\item \textbf{Batching.} Padding every complaint to length 128 yields rectangular tensors so many requests can share the same matrix multiply at intake.
+\item \textbf{Bound on context.} At most 128 subword positions (including \texttt{[CLS]}, \texttt{[SEP]}, and pads) enter one forward pass; longer free text must be truncated or summarised before submission.
+\end{itemize}
 
 \begin{remark}
-The fixed length \(M=128\) is a practical choice: BioBERT was trained with this cap, and padding shorter complaints to 128 lets the hospital batch many requests through the same matrix operations at intake.
+The fixed length \(M=128\) is therefore both an architecture match and a practical batching choice: BioBERT was trained with this cap, and padding shorter complaints to 128 lets the hospital batch many requests through the same matrix operations at intake.
 \end{remark}
+
+\textbf{WordPiece} keeps common clinical words (``fever'', ``pain'') whole and splits rare or complex forms (e.g.\ ``headache'' \(\to\) \texttt{head}+\texttt{\#\#ache}). Vocabulary \(\mathcal{V}\) has \(|\mathcal{V}| \approx 28{,}996\) entries; each token ID indexes a row in the embedding table. When a word splits into two subwords, it occupies \textbf{two positions} in the sequence (see rows 4 and 7 in Table~\ref{tab:token-ids}), so \(M\) counts subword tokens, not raw words.
 
 Three special tokens structure every input sequence:
 \begin{itemize}
@@ -157,6 +173,24 @@ The final input vector for token \(t_i\) at position \(i\) is the element-wise s
   \label{eq:embedding-sum-full}
 \end{equation}
 
+\subsection{Why three embedding components}
+
+The model does not use a single lookup. Each token must pass through \textbf{three} additive components before the encoder stack, for distinct reasons:
+\begin{enumerate}
+\item \textbf{Word embedding \(E_{\mathrm{word}}\).} Encodes \emph{what} the subword is (clinical meaning of ``feverish'' versus ``football'').
+\item \textbf{Position embedding \(E_{\mathrm{pos}}(i)\).} Encodes \emph{where} the token sits in the complaint. Transformers have no built-in left-to-right recurrence; without position, ``severe pain then mild'' could not be distinguished from the reverse order.
+\item \textbf{Segment embedding \(E_{\mathrm{seg}}(s)\).} Marks sentence A versus B in paired BERT tasks. For a single chief complaint we always use \(s=0\); the term is kept so the BioBERT checkpoint remains architecturally compatible even though a second segment is unused at intake.
+\end{enumerate}
+Omitting word embeddings would remove meaning; omitting position would scramble order-sensitive clinical phrasing; omitting segment would break compatibility with the pre-trained BERT/BioBERT weight layout. The three components are therefore not decorative: they are the minimal input interface the Transformer expects.
+
+\subsection{Why the hidden dimension is \(D = 768\)}
+
+BioBERT-base uses hidden width \(D = 768\). That width is fixed by the published architecture \citep{lee2020biobert,devlin2019bert} and matches
+\begin{equation}
+  12 \text{ attention heads} \times 64 \text{ dimensions per head} = 768.
+\end{equation}
+Every token vector, every encoder layer, and the classification summary \(h_{\mathrm{[CLS]}}\) live in \(\mathbb{R}^{768}\). The width is large enough to encode rich biomedical semantics yet small enough to stack twelve layers and train on large corpora. Changing \(D\) would require a different model family; this project therefore keeps \(D=768\) throughout.
+
 \begin{table}[H]
 \centering
 \small
@@ -221,11 +255,14 @@ Stacking the embedding vector for each of the \(M\) tokens forms the initial hid
 \begin{equation}
   H^{(0)} \in \mathbb{R}^{M \times 768}.
 \end{equation}
-Row \(i\) is built by applying Equation~\eqref{eq:embedding-sum-full} at position \(i\): look up the word vector, add the positional vector \(E_{\mathrm{pos}}(i)\), add the segment vector \(E_{\mathrm{seg}}(0)\), and stack the result. Each row is one token; each column is one learned feature dimension. Viewed this way, a chief complaint is a table of numbers that the encoder layers progressively transform.
+\textbf{Rows versus columns.} By convention in this thesis:
+\begin{itemize}
+\item \textbf{Rows} (\(M \leq 128\)) index \textbf{token positions} in the sequence (row \(0\) is \texttt{[CLS]}, then the WordPiece tokens, then \texttt{[SEP]} and pads).
+\item \textbf{Columns} (\(768\)) index \textbf{hidden feature dimensions} of the BioBERT representation.
+\end{itemize}
+Row \(i\) is built by applying Equation~\eqref{eq:embedding-sum-full} at position \(i\): look up the word vector, add the positional vector \(E_{\mathrm{pos}}(i)\), add the segment vector \(E_{\mathrm{seg}}(0)\), and stack the result. Viewed this way, a chief complaint is a table of numbers that the encoder layers progressively transform. The same row/column convention holds for \(H^{(\ell)}\) after each encoder layer: shape stays \(M \times 768\); only the entries change as self-attention mixes information \emph{across rows}.
 
-\begin{remark}
-Rows are tokens and columns are features. The matrix shape \(M \times 768\) is preserved through all twelve encoder layers; only the entries change as self-attention distributes context across rows.
-\end{remark}
+Later, the classification weight matrix \(W \in \mathbb{R}^{5 \times 768}\) uses the complementary layout: \textbf{rows} are the five acuity classes and \textbf{columns} are the \(768\) features that multiply \(h_{\mathrm{[CLS]}}\) (Section~\ref{sec:classification}).
 
 \begin{table}[H]
 \centering
@@ -406,7 +443,15 @@ The product \(QK^\top\) measures how strongly each token should attend to every 
 \section{Classification softmax}
 \label{sec:classification}
 
-The classification head maps the summary vector \(h_{\mathrm{[CLS]}}\) to five acuity logits, then applies softmax to obtain a probability distribution. Logits are unconstrained real scores; softmax converts them into non-negative probabilities that sum to one, which is the standard output format for multi-class clinical classifiers:
+\subsection{Mutually exclusive acuity categories}
+
+When a patient submits a chief complaint, their clinical urgency for routing is treated as falling into \textbf{exactly one} of the five SATS-aligned acuity levels \(\{1,2,3,4,5\}\). A presentation cannot be Level~1 (immediate) and Level~5 (routine) at the same decision instant. Because only one level is selected for the pathway colour, the five categories are modelled as \textbf{mutually exclusive}. That modelling choice determines the output layer: the network must produce a distribution over five options, not five independent yes/no scores.
+
+If the head used five independent sigmoid units, each class probability could be high at once (for example \(\hat{y}_1=0.9\) and \(\hat{y}_5=0.8\)), which would not define a single routing colour. Softmax avoids that inconsistency by normalising across the five logits together.
+
+\subsection{Softmax as the probability translator}
+
+After BioBERT encoding, the classification head maps the summary vector \(h_{\mathrm{[CLS]}} \in \mathbb{R}^{768}\) to five unconstrained real scores called \textbf{logits}:
 \begin{equation}
 \begin{aligned}
   \mathbf{z} &= W h_{\mathrm{[CLS]}} + \mathbf{b}, \\
@@ -415,7 +460,45 @@ The classification head maps the summary vector \(h_{\mathrm{[CLS]}}\) to five a
 \end{aligned}
   \label{eq:softmax-class}
 \end{equation}
-with \(W \in \mathbb{R}^{5 \times 768}\), \(\mathbf{b} \in \mathbb{R}^{5}\), logits \(z_c\), and \(\sum_{c=1}^{5} \hat{y}_c = 1\). The predicted level is \(\hat{c} = \arg\max_c \hat{y}_c\). Expressing output as probabilities allows downstream routing logic to consider confidence (e.g.\ a dominant Yellow at 72\% versus a near tie between Yellow and Green).
+with \(W \in \mathbb{R}^{5 \times 768}\) (\textbf{rows} = acuity classes, \textbf{columns} = features), \(\mathbf{b} \in \mathbb{R}^{5}\), logits \(z_c\), and \(\sum_{c=1}^{5} \hat{y}_c = 1\). Softmax enforces the two elementary rules of a finite probability distribution: every \(\hat{y}_c\) is non-negative, and the five values sum to one. The predicted level is \(\hat{c} = \arg\max_c \hat{y}_c\). Expressing output as probabilities allows downstream routing logic to consider confidence (for example a dominant Yellow at about \(69\%\) versus a near tie between Yellow and Green).
+
+This \textbf{classification Softmax} (over five acuity classes) is distinct from the \textbf{attention Softmax} inside each encoder layer (over token positions). Both use the same functional form; they act on different axes of the model. Attention Softmax asks ``which tokens matter for this query?''; classification Softmax asks ``which acuity level is most probable for this complaint?''
+
+\begin{remark}
+The linear map \(\mathbf{z}=W h_{\mathrm{[CLS]}}+\mathbf{b}\) is the triage analogue of a multi-class ``score sheet'': each row of \(W\) emphasises features in \(h_{\mathrm{[CLS]}}\) that favour one acuity level. Softmax then converts those raw scores into a comparable probability vector for hospital routing.
+\end{remark}
+
+\subsection{Categorical distribution (\(K=5\))}
+
+By producing five probabilities that sum to one, Softmax parameterises a \textbf{Categorical distribution} over the acuity levels. A Categorical distribution is the discrete law for exactly \(K\) mutually exclusive outcomes; here \(K=5\). The vector \(\hat{\mathbf{y}}\) is the parameter of that law:
+\begin{equation}
+  \hat{y}_c = P(\text{acuity}=c \mid X), \qquad c\in\{1,2,3,4,5\}.
+\end{equation}
+Informally, \(\hat{\mathbf{y}}\) behaves like a weighted five-sided die whose face probabilities are determined by the complaint text. Sampling from that die would draw a random acuity; hospital routing instead takes the mode \(\hat{c}=\arg\max_c\hat{y}_c\) (and may escalate to a nurse when the mode is not dominant).
+
+Stage~3 training maximises the probability of the nurse-assigned level under this Categorical model. Equivalently, it minimises the negative log-likelihood (NLL)
+\begin{equation}
+  \mathcal{L}_{\mathrm{NLL}} = -\log \hat{y}_{y} = -\log P(y\mid X),
+\end{equation}
+which is exactly the cross-entropy loss used in Section~\ref{sec:training-pipeline} when labels are one-hot.
+
+\subsection{Bernoulli as the \(K=2\) building block}
+
+The \textbf{Bernoulli} distribution is the two-outcome special case (\(K=2\)): a single trial with results \(\{0,1\}\) and success probability \(p\). Softmax with two logits \((z_0,z_1)\) yields
+\begin{equation}
+  p = \frac{\exp(z_1)}{\exp(z_0)+\exp(z_1)} = \sigma(z_1-z_0),
+\end{equation}
+where \(\sigma\) is the logistic sigmoid. That identity shows why binary logistic regression is Softmax with \(K=2\). The five-class triage head is the same mathematical idea generalised from a weighted coin to five mutually exclusive faces.
+
+\begin{example}[Bernoulli building block]
+Suppose a toy two-class head distinguishes ``urgent'' versus ``non-urgent'' with logits \(z_{\mathrm{U}}=1.0\) and \(z_{\mathrm{N}}=-0.5\). Then
+\begin{align*}
+  \exp(z_{\mathrm{U}}) &= e^{1.0}\approx 2.72, \\
+  \exp(z_{\mathrm{N}}) &= e^{-0.5}\approx 0.61, \\
+  P(\mathrm{urgent}) &= \frac{2.72}{2.72+0.61}\approx 0.82.
+\end{align*}
+Raising \(z_{\mathrm{U}}\) relative to \(z_{\mathrm{N}}\) increases urgent probability exactly as raising one acuity logit relative to the others increases that class probability in the five-class Softmax.
+\end{example}
 
 \begin{table}[H]
 \centering
@@ -425,9 +508,9 @@ with \(W \in \mathbb{R}^{5 \times 768}\), \(\mathbf{b} \in \mathbb{R}^{5}\), log
 \textbf{Symbol} & \textbf{Definition} \\
 \hline
 \(h_{\mathrm{[CLS]}}\) & 768-dimensional summary vector from final encoder layer \\
-\(W, \mathbf{b}\) & Learned classification weight matrix and bias \\
+\(W, \mathbf{b}\) & Learned classification weight matrix (\(5\times 768\)) and bias \\
 \(z_c\) & Logit (pre-softmax score) for acuity level \(c\) \\
-\(\hat{y}_c\) & Probability of level \(c \in \{1,\ldots,5\}\) \\
+\(\hat{y}_c\) & Categorical probability of level \(c \in \{1,\ldots,5\}\) \\
 \(\hat{c}\) & Predicted level: index of largest \(\hat{y}_c\) \\
 \hline
 \end{tabular}
@@ -435,7 +518,7 @@ with \(W \in \mathbb{R}^{5 \times 768}\), \(\mathbf{b} \in \mathbb{R}^{5}\), log
 \label{tab:class-symbols}
 \end{table}
 
-\begin{example}
+\begin{example}[Five-class Softmax for the running complaint]
 Suppose illustrative logits for levels 1--5 are
 \begin{align*}
   \mathbf{z} &= [-1.2,\,-0.5,\,1.8,\,0.3,\,-0.9], \\
@@ -445,8 +528,12 @@ Suppose illustrative logits for levels 1--5 are
   \hat{c} &= 3, \\
   f_{\mathrm{SATS}}(3) &= \text{Yellow}.
 \end{align*}
-Level 3 has the largest probability (\(\hat{y}_3 \approx 0.69\), rounded to 72\% in deployment logs; Section~\ref{sec:fsats}).
+Level 3 has the largest Categorical probability (\(\hat{y}_3 \approx 0.69\), rounded to 72\% in some deployment logs; Section~\ref{sec:fsats}). The mass on neighbouring Orange (\(0.07\)) and Green (\(0.15+0.05\)) shows residual uncertainty: Softmax does not claim certainty, only a ranked distribution suitable for pathway assist with nurse oversight when confidence is low (RQ7 in Section~\ref{sec:rqs}).
 \end{example}
+
+\begin{remark}
+Softmax probabilities are calibrated only to the extent that the training distribution matches live intake. High \(\hat{y}_c\) on Triagegeist holdout text is not a clinical guarantee at \examplehospital{}; low-confidence or contradictory presentations remain mandatory nurse review.
+\end{remark}
 
 \section{Model training pipeline}
 \label{sec:training-pipeline}
@@ -830,6 +917,57 @@ so classification proceeds. For ``Hello, how are you?'' with no symptom hits and
 \end{align*}
 and the system requests a chief complaint instead of running BioBERT.
 \end{example}
+
+\section{Worked numerical walkthrough}
+\label{sec:walkthrough}
+
+This section traces one complaint through every stage of the NLP pipeline in Figure~\ref{fig:nlp-pipeline} and Section~\ref{sec:e2e} with concrete numbers, so the Softmax and pathway sections are not left abstract. Let
+\[
+  X = \text{\runningcomplaint{}}
+\]
+as elsewhere in the thesis.
+
+\paragraph{Step 1: Gate.}
+Symptom lexicon hits for ``headache'' (\(0.30\)) and ``feverish'' (\(0.25\)), with no greeting penalty, give \(g(X)=0.55\geq 0.35\) (Section~\ref{sec:gate}). Classification proceeds.
+
+\paragraph{Step 2: Tokenisation.}
+WordPiece yields a short sequence with \texttt{[CLS]}, symptom subwords, \texttt{[SEP]}, and pads to length \(M=128\). Only the first few positions carry clinical content; pads are masked in attention. The map \(\tau\) is deterministic: the same string always produces the same IDs.
+
+\paragraph{Step 3: Embeddings and \(H^{(0)}\).}
+Each of the \(M\) positions receives a 768-dimensional vector
+\[
+  H^{(0)}_{i,:} = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(0).
+\]
+Shape \(H^{(0)}\in\mathbb{R}^{128\times 768}\): rows are tokens, columns are features (Section~\ref{sec:h0}).
+
+\paragraph{Step 4: Twelve encoder layers.}
+Self-attention mixes information across rows. After layer \(\ell=12\), row~0 is the summary \(h_{\mathrm{[CLS]}}\in\mathbb{R}^{768}\). Schematic attention (Table~\ref{tab:attn-toy}) illustrates higher weight on symptom tokens than on fillers.
+
+\paragraph{Step 5: Softmax.}
+Using the illustrative logits of Section~\ref{sec:classification},
+\[
+  \hat{\mathbf{y}}\approx [0.03,\,0.07,\,0.69,\,0.15,\,0.05],\qquad
+  \hat{c}=3.
+\]
+This is a Categorical distribution with mode Level~3.
+
+\paragraph{Step 6: Colour and pathway.}
+\[
+  C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(3)=\text{Yellow}.
+\]
+The pathway card is
+\[
+  P(\text{Yellow})=\bigl(60\,\mathrm{min},\;
+  \text{Outpatient urgent / Pediatrics},\;
+  \text{actions},\;
+  \text{escalation}\bigr)
+\]
+as in Table~\ref{tab:pathway-scenarios}. Nursing sets a 60-minute reassessment timer; Diagnostics may run in parallel.
+
+\paragraph{Step 7: Parallel TEWS (when vitals arrive).}
+Suppose later measurements give TEWS integer \(T=4\). Then \(C_{\mathrm{TEWS}}\) is Yellow on the SATS vital bands (Section~\ref{sec:tews}). Text colour and vital colour agree in this illustration; if they disagreed, nurse judgment and SATS discriminators govern, not automatic Softmax override.
+
+The walkthrough shows why every mathematical object in Chapter~\ref{ch:method} appears in the deployed API response: gate metadata, \(\hat{\mathbf{y}}\), \(C_{\mathrm{NLP}}\), and pathway fields.
 
 \section{End-to-end summary}
 \label{sec:e2e}

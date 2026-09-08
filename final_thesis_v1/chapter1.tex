@@ -7,26 +7,85 @@ Hospitals in Ghana operate under sustained pressure: crowded waiting areas, limi
 
 Teaching hospitals in Ghana, including \examplehospital{}, apply SATS to structure intake across clinical departments, not only in a single emergency bay. Colour codes (Red, Orange, Yellow, Green, and Blue for dignity protocols) express how quickly a patient must be seen and where they should stream next: resuscitation, acute beds, urgent waiting, or routine outpatient care. Nurses at triage also compute a Triage Early Warning Score (TEWS) from objective vital signs. Yet many delays begin earlier, when a patient arrives with only words: a headache, fever, weakness, or abdominal pain described in free text before any thermometer or pulse oximeter reading is available.
 
-This thesis proposes a digital \emph{Flow Management Engine} in the form of a hospital chatbot. The chatbot accepts a single English free-text \emph{chief complaint} (the primary reason the patient presents, in their own words; see Section~\ref{sec:chief-complaints}) and returns a SATS colour reflecting urgency together with acuity probabilities and a clinical pathway card that can guide routing across outpatient departments, wards, and intake queues. The core contribution is mathematical: a pipeline from unstructured complaint text to acuity probabilities, colour, and pathway card, developed in Chapter~\ref{ch:method}.
+This project proposes a digital \emph{Flow Management Engine} in the form of a hospital chatbot for color-coded clinical pathways using Bidirectional Encoder Representations from Transformers (BERT). The chatbot accepts a single English free-text \emph{chief complaint} (the primary reason the patient presents, in their own words; see Section~\ref{sec:chief-complaints}) and returns a SATS colour reflecting urgency together with acuity probabilities and a clinical pathway card that can guide routing across outpatient departments, wards, and intake queues. The core contribution is mathematical: a pipeline from unstructured complaint text to acuity probabilities, colour, and pathway card, developed in Chapter~\ref{ch:method}. The deployed encoder is BioBERT, a biomedical BERT checkpoint fine-tuned for five-class triage.
+
+\section{Motivation and significance}
+
+Three operational facts motivate the work.
+
+\begin{enumerate}
+\item \textbf{Text arrives before vitals.} At home, in a queue, or at a kiosk, patients can describe symptoms long before six TEWS parameters are measured. A language model that produces an initial SATS colour therefore fills a real temporal gap between arrival and nurse assessment \citep{stewart2023nlp}.
+\item \textbf{Colour must travel with the patient.} SATS colours already exist in Ghanaian hospital policy \citep{Rominski2014,kathsats}. The unsolved problem is not inventing colours, but binding them to destination, maximum waiting time \(T_{\max}\), and escalation so that urgency does not vanish after the intake desk \citep{satsmanual,Sundstrom2014}.
+\item \textbf{Green congestion harms Red and Orange care.} Non-urgent presentations occupying acute capacity (sometimes called the Green Tag Burden) delay time-critical patients \citep{Yilmaz2021}. Digital diversion of Green pathways toward outpatient or specialty streams is therefore a flow-management requirement, not a convenience feature.
+\end{enumerate}
+
+For mathematics students and hospital stakeholders alike, the significance is twofold. First, the thesis shows how contemporary Transformer mathematics (tokenisation, embeddings, self-attention, Softmax) can be stated rigorously enough for examination while remaining deployable as a chatbot API. Second, it links that mathematics to an auditable hospital protocol: every predicted acuity level maps through a fixed function \(f_{\mathrm{SATS}}\) to a colour and then to a pathway card \(P(C)\) at \examplehospital{}.
 
 \section{Problem statement}
 
 Low- and middle-income country (LMIC) hospitals struggle with crowded waiting rooms and limited human resources at intake. Patients may wait hours before first assessment. Critical cases are not always identified quickly, while less urgent presentations congest acute zones. Medical systems are confusing; without immediate direction, patients do not know whether to join the emergency stream, the polyclinic, or self-care advice.
 
-Manual, paper-based triage creates acuity discontinuity: patient status becomes static rather than dynamic. Two systemic failures follow.
+Manual, paper-based triage creates acuity discontinuity: patient status becomes static rather than dynamic. Five systemic failures follow.
 
 \begin{enumerate}
+\item \textbf{Pre-triage bottleneck.} Delay accumulates before any colour is assigned, because the first human assessor is overloaded.
 \item \textbf{Lost urgency.} Patients triaged Orange or Red can lose time-critical priority when they move to imaging, laboratories, or wards, because no digital record preserves their colour and countdown timer.
 \item \textbf{Green congestion.} Non-urgent (Green) patients lack automated guidance toward outpatient or self-care routes, blocking beds and staff needed for life-saving care.
+\item \textbf{Text-only arrival.} At the door, vitals are often incomplete; subjective language (``worst headache'', ``feverish and weak'') is available but unused by TEWS until measurements exist.
+\item \textbf{Protocol gap for chatbots.} Generic consumer symptom checkers are not aligned to SATS hospital pathways or local operational routing (for example outpatient urgent stream versus acute resuscitation).
 \end{enumerate}
 
 Without a framework to manage flow hospital-wide, overcrowding and resource mismatch persist; the most vulnerable patients become invisible to the system after the first desk.
 
-\section{Objectives}
+\section{Aim and objectives}
+
+\subsection{General objective}
+
+To design and specify a hospital chatbot that maps an unstructured English chief complaint to a SATS colour-coded clinical pathway, using a fine-tuned BioBERT classifier and protocol tables aligned to Ghanaian hospital intake.
+
+\subsection{Specific objectives}
 
 \begin{enumerate}
 \item \textbf{Automate triage classification.} Develop a chatbot that classifies a single unstructured chief complaint submitted by the patient or attendant, producing acuity probabilities, a SATS colour, and a pathway card reflecting clinical urgency.
 \item \textbf{Guide clinical pathways.} Provide immediate, actionable next-step guidance: critical (Red) cases toward urgent care; non-urgent (Green) cases toward self-care or routine clinic streams.
-\item \textbf{Integrate with hospital protocols.} Align decision logic with SATS and evidence-based pathway tables so recommendations remain safe and auditable.
+\item \textbf{Integrate with hospital protocols.} Align decision logic with SATS and evidence-based pathway tables so recommendations remain safe and auditable, with TEWS documented as the parallel nurse-facing vital-sign standard.
 \item \textbf{Collect anonymised data for refinement.} Use de-identified intake records to improve the classification model and to inform administrators about patient flow and common presentations.
 \end{enumerate}
+
+\section{Research questions}
+\label{sec:rqs}
+
+The project is organised around the following research questions.
+
+\begin{enumerate}
+\item[\textbf{RQ1}] Can unstructured English chief complaints be mapped to SATS acuity levels \(1\)--\(5\) with clinically usable holdout accuracy?
+\item[\textbf{RQ2}] Does correct acuity prediction imply correct colour assignment under the fixed map \(f_{\mathrm{SATS}}\)?
+\item[\textbf{RQ3}] How should predicted colours translate into pathway cards \(P(C)\) (destination, \(T_{\max}\), actions, escalation) at \examplehospital{}?
+\item[\textbf{RQ4}] Can a chatbot deliver pre-desk acuity and pathway guidance from text alone before nurse vitals are complete?
+\item[\textbf{RQ5}] How well does a clinical relevance gate reject non-clinical input before BioBERT runs?
+\item[\textbf{RQ6}] How does class imbalance affect Level~1 (Red) recall, and what mitigation (including SMOTE) is appropriate?
+\item[\textbf{RQ7}] What Softmax confidence behaviour should trigger mandatory nurse oversight at deployment?
+\item[\textbf{RQ8}] Can Green-pathway diversion be specified so that low-acuity patients leave acute queues without removing nurse authority?
+\end{enumerate}
+
+\section{Scope and limitations}
+\label{sec:scope}
+
+\textbf{In scope.} English chief complaint \(X\); clinical relevance gate; WordPiece tokenisation; BioBERT-base encoding (\(M=128\), \(D=768\), twelve layers); Softmax classification over five mutually exclusive acuity levels; deterministic colour map \(f_{\mathrm{SATS}}\); pathway cards \(P(C)\) for gate reject, Red, Orange, Yellow, and Green at \examplehospital{}; TEWS mathematics as the documented parallel vital-sign standard; holdout evaluation on the Triagegeist English corpus; Curatio prototype exposing \texttt{/predict}.
+
+\textbf{Out of scope.} Full Bayesian network structure learning; learned fusion of TEWS with NLP as a single trained head; prospective randomised clinical trial; full Hospital Information System (HIS) integration; multilingual (for example Twi) intake models; Blue dignity pathway prediction from the five-class head (Blue remains a protocol category on arrival, not a Softmax class).
+
+The chatbot is a \textbf{triage assist}: nurses retain override authority, especially for low-confidence Softmax outputs and all vital-sign decisions \citep{stewart2023nlp,satsmanual}.
+
+\section{Contributions}
+
+\begin{itemize}
+\item A fully specified mathematical pipeline from free-text complaint to SATS colour and pathway card, including tokenisation \(\tau\), embeddings, multi-head self-attention, and Categorical Softmax classification.
+\item An evaluated BioBERT Stage~3 fine-tune on 80{,}000 Triagegeist English pairs, with baseline and SMOTE checkpoints, latency, and per-class metrics.
+\item Protocol-mapped pathway tables and department routing for seventeen units at \examplehospital{}, including Green diversion.
+\item A deployable chatbot/\texttt{/predict} prototype with medical gating, documented alongside TEWS as the nurse vital-sign path.
+\end{itemize}
+
+\section{Organisation of the thesis}
+
+Chapter~\ref{ch:lit} reviews hospital overcrowding, SATS and TEWS, Transformer and BioBERT literature, and NLP for triage, ending in the research gap. Chapter~\ref{ch:method} develops the methodology: chief complaints and data provenance, TEWS, a neural-network and Transformer primer, then the full text pipeline through Softmax, colour mapping, pathways, and the gate. Chapter~\ref{ch:results} analyses the BioBERT model first, then reports holdout performance, pathway routing, and anticipated hospital impact. Chapter~\ref{ch:conclusion} summarises findings against the research questions, restates limitations, and outlines future work.

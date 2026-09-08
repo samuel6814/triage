@@ -1,0 +1,145 @@
+\section{Results, impact, and closing}
+\label{sec:results}
+
+\subsection{Evaluation protocol (slide 22)}
+
+\begin{whybox}
+Defines what was measured before you flash numbers. Honesty about scope builds trust.
+\end{whybox}
+
+\begin{itemize}
+  \item Stratified \(10\%\) holdout from Triagegeist: \(N_{\mathrm{eval}}=8{,}000\) (seed \(42\)).
+  \item Same English complaint texts and nurse acuity labels as the training distribution.
+  \item Metrics: accuracy, macro-F1, per-class precision/recall/F1, latency (p50, p95, mean).
+\end{itemize}
+
+\begin{remark}[What the numbers mean---and do not mean]
+Holdout scores measure agreement with historical nurse labels on \textbf{in-distribution} Triagegeist text.
+They are \textbf{not} prospective waiting-time or outcome trials at \examplehospital{} \citep{stewart2023nlp}.
+Say this out loud if asked ``does this prove patients get better care at KNUST?''
+\end{remark}
+
+\begin{saybox}
+``We evaluate on eight thousand held-out Triagegeist complaints. High scores mean the model matches nurse labels on that benchmark---not that we have finished a clinical trial at KNUST.''
+\end{saybox}
+
+\subsection{Holdout metrics and SMOTE trade-off (slide 23)}
+
+\begin{whybox}
+Shows headline performance and the safety trade-off for the rare Red class.
+\end{whybox}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Metric & Baseline & SMOTE \\
+\midrule
+Accuracy & \(0.9992\) & \(0.9985\) \\
+Macro-F1 & \(0.9977\) & \(0.9954\) \\
+Recall Level~1 (Red) & \(0.9814\) & \(1.0000\) \\
+Precision Level~1 (Red) & \(1.0000\) & \(0.9641\) \\
+Latency p50 (ms) & \(100.30\) & \(95.50\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{How to explain the trade-off.}
+\begin{itemize}
+  \item \textbf{Baseline (default):} nearly perfect overall accuracy; perfect Red \emph{precision}
+    (when it says Red, it was Red) but Red \emph{recall} \(0.9814\) (a few Reds missed).
+  \item \textbf{SMOTE} \citep{chawla2002smote}: oversamples minority classes in training.
+    Red recall becomes \(100\%\) (safer net for critical cases) with a small drop in Red precision
+    and a tiny drop in overall accuracy/F1.
+\end{itemize}
+
+\paragraph{Recall vs precision in one sentence.}
+Recall (Red) = among true Reds, how many did we catch?
+Precision (Red) = among predicted Reds, how many were truly Red?
+For critical triage, missing a Red (low recall) is often worse than an extra Orange/Yellow alert.
+
+\begin{saybox}
+``Baseline is extremely accurate with perfect Red precision. SMOTE pushes Red recall to one hundred percent for a safer clinical net, at a small precision cost.''
+\end{saybox}
+
+\subsection{Headline chart and confusion matrix (slides 24--25)}
+
+\begin{whybox}
+Visual confirmation of the table; confusion matrix shows where errors (if any) sit.
+\end{whybox}
+
+\paragraph{Bar chart.}
+Same story as the table: baseline vs SMOTE on accuracy, macro-F1, Level~1 recall.
+Point at Red recall rising under SMOTE.
+
+\paragraph{Confusion matrix (baseline).}
+Rows = true labels, columns = predicted labels (or as labelled on the figure).
+A strong diagonal means almost all complaints are classified correctly on the holdout.
+If asked about off-diagonal cells: those are the rare mistakes; relate them to recall/precision.
+
+\begin{saybox}
+``The confusion matrix is nearly diagonal on the holdout---errors are rare. That matches the \(0.999\) accuracy.''
+\end{saybox}
+
+\subsection{Latency and nurse vs chatbot (slide 26)}
+
+\begin{whybox}
+Answers ``is this fast enough for intake?'' and contrasts queue time with model time.
+\end{whybox}
+
+\begin{itemize}
+  \item Median inference \(\approx 100\)\,ms per complaint on evaluation hardware.
+  \item Nurse path: minutes to hours to first colour (queue).
+  \item Chatbot: English text \(\to\) colour + pathway card in about a tenth of a second.
+  \item Nurse still performs TEWS and can override \citep{Mitchell2023}.
+\end{itemize}
+
+\begin{saybox}
+``The model responds in about one hundred milliseconds. The nurse still owns vitals and the final clinical decision.''
+\end{saybox}
+
+\subsection{Anticipated intake workflow (slide 27)}
+
+\begin{whybox}
+Closes the story visually: traditional long queue vs chatbot-assisted path with TEWS in parallel.
+\end{whybox}
+
+\textbf{Traditional:} arrive \(\to\) queue \(\to\) nurse colour \(\to\) often unclear destination (minutes to hours).
+
+\textbf{Chatbot-assisted:} complaint \(\to\) classify \(\to\) pathway card (\(\approx 100\)\,ms), nurse TEWS in parallel.
+
+\begin{saybox}
+``We are not removing the nurse. We insert a fast text-based colour and pathway while vitals continue as usual.''
+\end{saybox}
+
+\subsection{Anticipated impact (slide 28)}
+
+\begin{whybox}
+Four plain claims for a mixed audience. No jargon needed here.
+\end{whybox}
+
+\begin{enumerate}
+  \item \textbf{Faster start:} suggest urgency as soon as the problem is described.
+  \item \textbf{Safer for critical patients:} designed to catch the most urgent cases (tie to high Red recall).
+  \item \textbf{Clearer next steps:} pathway card says where to go and what to do.
+  \item \textbf{Nurses stay in charge:} assistive tool; vitals and override remain with staff.
+\end{enumerate}
+
+\begin{saybox}
+``Faster first signal, fewer missed critical cases on the benchmark, clearer routing, and nurses remain in control.''
+\end{saybox}
+
+\subsection{Selected references (slide 29)}
+
+\begin{whybox}
+You will not read this aloud. Know the big names if asked: Lee (BioBERT), Stewart (NLP triage review),
+SATS manual, Chawla (SMOTE), Triagegeist, plus local/context citations.
+\end{whybox}
+
+\subsection{One-minute closing script}
+
+\begin{saybox}[Closing]
+``We built an examinable pipeline from English chief complaint text to SATS colour and a KNUST pathway card,
+with BioBERT mathematics, a clinical gate, and strong holdout agreement on Triagegeist.
+The nurse keeps TEWS and override. That is the contribution of this project.''
+\end{saybox}

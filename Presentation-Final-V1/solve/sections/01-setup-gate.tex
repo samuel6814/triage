@@ -1,0 +1,67 @@
+\section{Setup: what we are solving}
+\label{sec:setup}
+
+\subsection*{Step 0 --- The complaint and the goal}
+
+\textbf{Chief complaint \(X\):} \runningcomplaint{}
+
+\textbf{Goal:} follow the pipeline until we get a colour \(C_{\mathrm{NLP}}\) and a pathway card \(P(C)\):
+\[
+  X \xrightarrow{g} \tau(X) \to H^{(0)}
+  \xrightarrow{12} h_{\mathrm{[CLS]}}
+  \to \hat{\mathbf{y}}
+  \xrightarrow{f_{\mathrm{SATS}}} C_{\mathrm{NLP}}
+  \to P(C_{\mathrm{NLP}}).
+\]
+
+\begin{saybox}
+``We will walk one sentence from gate to Yellow pathway, showing numbers at every stage we can.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\section{Step 1 --- Clinical gate}
+\label{sec:gate}
+
+Before BioBERT runs, score whether \(X\) looks clinical.
+
+\[
+  g(X) = \mathrm{clip}\!\Bigl(\sum_j s_j(X) - p(X),\, 0,\, 1\Bigr).
+\]
+Proceed only if \(g(X) \ge 0.35\).
+
+\subsection*{Scores for our complaint}
+
+Symptom lexicon hits (illustrative, matching the thesis style):
+
+\begin{center}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Hit & Score \(s_j\) \\
+\midrule
+headache & \(0.30\) \\
+feverish & \(0.25\) \\
+aches / weak (body) & \(0.20\) \\
+\midrule
+\(\sum_j s_j\) & \(0.75\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Greeting / non-clinical penalty: \(p(X)=0\) (this is a real complaint, not ``hello'').
+
+\[
+  g(X) = \mathrm{clip}(0.75 - 0,\, 0,\, 1) = 0.75 \ge 0.35.
+\]
+
+\begin{resultbox}
+\textbf{Gate decision:} PASS. Continue to tokenisation.\\
+(If this had been ``Hello, how are you?'' with \(p(X)=0.5\) and no symptoms, \(g=0\) and we would stop.)
+\end{resultbox}
+
+\begin{stepbox}
+We did not assign a colour yet. We only decided the text is clinical enough for BioBERT.
+\end{stepbox}
+
+\begin{saybox}
+``Gate score \(0.75\) beats the \(0.35\) threshold, so we proceed.''
+\end{saybox}

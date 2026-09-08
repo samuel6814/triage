@@ -1,0 +1,63 @@
+\section{Problem statement, research gap, and objectives}
+\label{sec:problem}
+
+\subsection{Problem statement (slide 8)}
+
+\begin{whybox}
+States the pain in two blocks: lost urgency for Red/Orange patients, and Green congestion blocking capacity.
+\end{whybox}
+
+\paragraph{Lost urgency.}
+Critical patients can lose time-critical priority when they move between imaging, labs, and wards.
+There is often no digital record that carries colour and a countdown timer with them.
+
+\paragraph{Green congestion.}
+Non-urgent patients lack automated guidance to outpatient or self-care routes.
+They occupy space and staff needed for life-saving care.
+
+\begin{saybox}
+``Two failures: urgent patients lose their colour as they move, and non-urgent patients clog the stream. We want a digital colour and pathway that travels with the patient.''
+\end{saybox}
+
+\subsection{Research gap (slide 9)}
+
+\begin{whybox}
+This is the academic justification. Examiners listen carefully here.
+\end{whybox}
+
+The gap has three layers:
+\begin{enumerate}
+  \item Formal mathematics from patient text \(\to\) SATS colour \(\to\) local pathway for Ghanaian intake is under-specified.
+  \item Most NLP triage papers use high-income corpora; local department routing is rarely formalised.
+  \item TEWS covers vitals; the text-first moment lacks an examinable pipeline.
+\end{enumerate}
+
+\paragraph{What this thesis fills.}
+\[
+  X \;\to\; \hat{\mathbf{y}} \;\to\; C_{\mathrm{NLP}} \;\to\; P(C)
+\]
+at \examplehospital{}, for English chief complaints.
+
+\begin{saybox}
+``We fill the gap with an end-to-end, examinable chain: English complaint to probabilities, colour, and pathway card.''
+\end{saybox}
+
+\subsection{Objectives (slide 10)}
+
+\begin{whybox}
+Maps the thesis aims to what the chatbot does.
+\end{whybox}
+
+\textbf{General objective:} develop a hospital chatbot that classifies unstructured English chief complaints into SATS colours and clinical pathways at intake.
+
+\textbf{Specific objectives (remember the four):}
+\begin{enumerate}
+  \item Automate triage classification from a single chief complaint.
+  \item Guide clinical pathways (urgent vs routine streams).
+  \item Integrate with SATS and \examplehospital{} routing.
+  \item Support refinement via visit-informed pathway design.
+\end{enumerate}
+
+\begin{saybox}
+``Our aim is one sentence: from one English chief complaint, produce a colour and a pathway that matches SATS-style routing at KNUST University Hospital.''
+\end{saybox}

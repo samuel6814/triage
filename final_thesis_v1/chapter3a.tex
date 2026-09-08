@@ -71,6 +71,18 @@ Figure~\ref{fig:nlp-pipeline} previews the end-to-end natural language processin
 
 Each stage above is derived and exemplified in the referenced sections. Section~\ref{sec:e2e} restates the full path for the implemented prototype.
 
+\subsection{Safety and nurse authority}
+
+The chatbot is designed as a \textbf{Flow Management Engine assist}, not as an autonomous discharge or treatment authority. Three design choices enforce that posture throughout Chapter~\ref{ch:method}:
+
+\begin{enumerate}
+\item \textbf{Gate before model.} Non-clinical text never receives a colour (Section~\ref{sec:gate}).
+\item \textbf{Softmax as a distribution.} Output is \(\hat{\mathbf{y}}\), not a binary ``safe/unsafe'' certificate; low confidence and near ties escalate to nurses (Section~\ref{sec:classification}).
+\item \textbf{TEWS remains nurse-owned.} When vitals exist, TEWS and SATS discriminators govern bedside colour; the text path does not silently overwrite them (Section~\ref{sec:tews}).
+\end{enumerate}
+
+Pathway cards therefore propose destinations and timers that nurses can accept, modify, or reject. That principle is repeated in the results discussion (Section~\ref{sec:discussion}) and in the research questions on Softmax confidence (RQ7).
+
 Table~\ref{tab:pipeline-io} records the mathematical object entering and leaving each stage so the reader can follow how one complaint string becomes a colour and pathway card.
 
 \begin{table}[H]
@@ -250,6 +262,35 @@ Thresholds in Equation~\eqref{eq:tews-colour} follow the standard SATS implement
 \label{fig:tews-bands}
 \end{figure}
 
+\subsection{Relationship to the text Softmax path}
+
+TEWS and BioBERT Softmax share a colour vocabulary (Red, Orange, Yellow, Green) but differ in inputs and mathematics:
+
+\begin{itemize}
+\item TEWS is a \textbf{weighted sum of six vital features} \(T=\sum_k w_k f_k(v_k)\) with \(w_k=1\) in the standard adult score, then a piecewise colour map \(C_{\mathrm{TEWS}}(T)\).
+\item Softmax is a \textbf{Categorical distribution over five acuity levels} from complaint text, then the deterministic map \(f_{\mathrm{SATS}}\).
+\end{itemize}
+
+They are complementary, not competitors. At arrival, text may be the only signal; after nurse assessment, TEWS and clinical discriminators remain authoritative. This thesis therefore documents both, implements Softmax fully, and never treats TEWS absence as a chatbot limitation: nurses already compute TEWS when vitals exist.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{5.2cm}|p{5.2cm}|}
+\hline
+\textbf{Aspect} & \textbf{TEWS} & \textbf{BioBERT Softmax} \\
+\hline
+Input & Six vitals / flags \(v_k\) & English chief complaint \(X\) \\
+Core map & Integer sum \(T\) & Probabilities \(\hat{\mathbf{y}}\) \\
+Colour rule & \(C_{\mathrm{TEWS}}(T)\) bands & \(f_{\mathrm{SATS}}(\hat{c})\) \\
+When available & After measurement & At text submission \\
+Authority & Nurse desk standard & Intake assist (overridable) \\
+\hline
+\end{tabular}
+\caption{Side-by-side comparison of TEWS and the text Softmax path.}
+\label{tab:tews-vs-softmax}
+\end{table}
+
 \begin{table}[H]
 \centering
 \small
@@ -282,6 +323,21 @@ Suppose vitals are HR \(=125\) bpm and RR \(=26\) breaths/min; mobility, tempera
 \end{align*}
 If only these two vitals were measured, the score is partial but still auditable. At intake, before vitals exist, the BioBERT path in Section~\ref{sec:classification} supplies the text-based colour.
 \end{example}
+
+\section{Neural networks, Transformers, and BERT}
+\label{sec:nn-transformer-primer}
+
+The text path of this project is implemented as a \textbf{neural network}: a composition of learnable maps that send numerical vectors to numerical vectors. Each map (a layer) has weights adjusted during training so that the overall composition predicts the correct acuity level from complaint text. Classical rule lists cannot capture the variety of English phrasing at intake; stacked nonlinear layers with attention can.
+
+In the triage setting the input is already discrete after tokenisation (Section~\ref{sec:tokenisation}): integer IDs indexing an embedding table. The network never ``reads English letters'' directly; it reads vectors in \(\mathbb{R}^{768}\) and repeatedly transforms them. Training adjusts those transformations so that the final Softmax puts high probability on the nurse-assigned acuity level.
+
+A \textbf{Transformer} \citep{vaswani2017attention} is a neural architecture whose central mechanism is \emph{self-attention}: every token in a sequence can attend to every other token in one parallel step. Unlike recurrent networks that read left-to-right only, a Transformer encoder builds context from the full window of tokens at once. That property matters for triage language, where negation and severity modifiers (``no pain'', ``severe headache'') must reshape the meaning of neighbouring words. Scaled dot-product attention (Section~\ref{sec:attention}) is the concrete formula used inside each BioBERT layer.
+
+\textbf{BERT} (Bidirectional Encoder Representations from Transformers) \citep{devlin2019bert} is a deep Transformer \emph{encoder} pre-trained with masked language modelling so that each token representation depends on left and right context. Masked language modelling hides random tokens and asks the model to recover them from surrounding biomedical or general text; the result is a reusable encoder rather than a chat generator. \textbf{BioBERT} \citep{lee2020biobert} continues that pre-training on PubMed and PubMed Central text, then this project fine-tunes the encoder for five-class acuity prediction (Chapter~\ref{ch:results}).
+
+Why BioBERT rather than a general BERT checkpoint alone? Domain continued pre-training places clinical vocabulary (``dyspnoea'', ``malaria'', ``epigastric'') in a representation space already shaped by biomedical corpora, so Stage~3 fine-tuning on chief complaints starts closer to triage language than a purely Wikipedia-trained encoder would.
+
+The remainder of this chapter specifies the pipeline in order: English input \(X\), clinical gate, WordPiece tokenisation \(\tau\), three embedding components, twelve encoder layers, Softmax classification over mutually exclusive SATS levels, colour map \(f_{\mathrm{SATS}}\), and pathway card \(P(C)\).
 
 \section{Introducing BERT}
 \label{sec:bert-bridge}

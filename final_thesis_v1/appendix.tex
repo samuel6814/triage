@@ -8,3 +8,72 @@ The implemented prototype and fine-tuned BioBERT artefacts are maintained at:
 \texttt{https://github.com/samuel6814/triage}
 
 No full source code is reproduced in this thesis; the mathematical specification in Chapter~\ref{ch:method} and the system architecture in Figure~\ref{fig:system-architecture} are the primary references.
+
+\section{Prototype \texttt{/predict} response fields}
+
+A successful clinical submission returns a JSON object whose fields mirror the mathematics of Chapter~\ref{ch:method}. Table~\ref{tab:api-fields} lists the principal keys.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{9.5cm}|}
+\hline
+\textbf{Field} & \textbf{Meaning} \\
+\hline
+\texttt{gate\_score} & Clinical relevance \(g(X)\) in \([0,1]\) \\
+\texttt{gate\_passed} & True if \(g(X)\geq 0.35\) \\
+\texttt{probabilities} & Softmax vector \(\hat{\mathbf{y}}\) over levels 1--5 \\
+\texttt{predicted\_level} & \(\hat{c}=\arg\max_c\hat{y}_c\) \\
+\texttt{sats\_colour} & \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\) \\
+\texttt{pathway} & Pathway card \(P(C)\): \(T_{\max}\), destination, actions, escalation \\
+\texttt{confidence} & Mode probability \(\hat{y}_{\hat{c}}\) for nurse display \\
+\hline
+\end{tabular}
+\caption{Principal \texttt{/predict} response fields and their mathematical counterparts.}
+\label{tab:api-fields}
+\end{table}
+
+Gate failures omit colour and pathway fields and instead return a prompt requesting a clinical chief complaint.
+
+\section{Stage~3 fine-tuning checklist}
+
+For reproducibility, Stage~3 training used the following checklist (full values in Table~\ref{tab:hyperparams}):
+
+\begin{enumerate}
+\item Join Triagegeist \texttt{train.csv} and \texttt{chief\_complaints.csv} on \texttt{patient\_id}.
+\item Keep only English \texttt{chief\_complaint\_raw} and \texttt{triage\_acuity}; drop vitals and demographics.
+\item Stratified 90/10 split with seed~42 (\(N_{\mathrm{train}}\approx 72{,}000\), \(N_{\mathrm{eval}}=8{,}000\)).
+\item Load BioBERT encoder; discard any prior two-class head; initialise \(W\in\mathbb{R}^{5\times 768}\), \(\mathbf{b}\in\mathbb{R}^{5}\).
+\item Train three epochs, batch size 16, learning rate \(2\times 10^{-5}\), weight decay 0.01, max length 128, FP16 enabled.
+\item Select the checkpoint with best validation cross-entropy (0.001812 at epoch 3 for the baseline run).
+\item Optional SMOTE branch: oversample minority urgent classes before the same training recipe; compare on the \emph{same} holdout split.
+\end{enumerate}
+
+\section{Glossary of principal symbols}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Symbol} & \textbf{Definition} \\
+\hline
+\(X\) & English chief-complaint string \\
+\(\tau\) & WordPiece tokenisation map \\
+\(M\) & Sequence length (maximum 128) \\
+\(D\) & Hidden dimension (768) \\
+\(H^{(\ell)}\) & Hidden-state matrix after encoder layer \(\ell\) \\
+\(h_{\mathrm{[CLS]}}\) & Summary vector (row 0 of \(H^{(12)}\)) \\
+\(W,\mathbf{b}\) & Classification weight matrix and bias \\
+\(\mathbf{z},\hat{\mathbf{y}}\) & Logits and Softmax (Categorical) probabilities \\
+\(\hat{c}\) & Predicted acuity level \\
+\(f_{\mathrm{SATS}}\) & Level-to-colour map \\
+\(C_{\mathrm{NLP}}\) & NLP-assigned SATS colour \\
+\(P(C)\) & Pathway card for colour \(C\) \\
+\(g(X)\) & Clinical relevance gate score \\
+\(T\) & TEWS integer from vitals \\
+\hline
+\end{tabular}
+\caption{Compact glossary of symbols used across Chapters~\ref{ch:method}--\ref{ch:results}.}
+\label{tab:glossary}
+\end{table}

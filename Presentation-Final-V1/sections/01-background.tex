@@ -1,0 +1,60 @@
+%====================================================
+\section{Background}
+
+\begin{frame}{Hospital Overcrowding}
+	\begin{center}
+		\includegraphics[width=0.92\textwidth,height=0.68\textheight,keepaspectratio]{hospital-overcrowding.png}
+	\end{center}
+	\vspace{0.15em}
+	{\footnotesize Source: GhanaFact (\url{https://ghanafact.com/fact-check-korle-bu-teaching-hospital-overwhelmed-with-patients/})}
+\end{frame}
+
+\begin{frame}{Hospital Intake Under Pressure}
+	\begin{itemize}
+		\item Crowded waiting areas, limited nursing staff, long queues before first assessment.
+		\item Teaching hospitals in Ghana, including \examplehospital{}, use the South African Triage Scale (SATS).
+		\item Colour codes guide \emph{how fast} a patient must be seen and \emph{where} they stream next.
+		\item \textbf{Acuity discontinuity:} urgency colour is often applied only at the first desk; after that it may no longer steer beds, labs, or re-assessment timers \citep{Rominski2014,kathsats}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{SATS Colour Bands}
+	\begin{center}
+	\resizebox{0.95\textwidth}{!}{%
+	\begin{tikzpicture}[x=2.1cm, y=1.0cm]
+	  \node[draw=triageRed!80!black, fill=triageRed!35, rounded corners, minimum width=1.9cm, minimum height=1.1cm, align=center, font=\small\bfseries] at (0,0) {Red\\{\normalsize immediate}};
+	  \node[draw=triageOrange!80!black, fill=triageOrange!35, rounded corners, minimum width=1.9cm, minimum height=1.1cm, align=center, font=\small\bfseries] at (1.1,0) {Orange\\{\normalsize $<$10 min}};
+	  \node[draw=triageYellow!80!black, fill=triageYellow!40, rounded corners, minimum width=1.9cm, minimum height=1.1cm, align=center, font=\small\bfseries] at (2.2,0) {Yellow\\{\normalsize $<$60 min}};
+	  \node[draw=triageGreen!80!black, fill=triageGreen!30, rounded corners, minimum width=1.9cm, minimum height=1.1cm, align=center, font=\small\bfseries] at (3.3,0) {Green\\{\normalsize routine}};
+	  \node[draw=triageBlue!80!black, fill=triageBlue!25, rounded corners, minimum width=1.9cm, minimum height=1.1cm, align=center, font=\small\bfseries] at (4.4,0) {Blue\\{\normalsize dignity}};
+	\end{tikzpicture}}
+	\end{center}
+	\medskip
+	\begin{itemize}
+		\item Red / Orange: fast-track urgent care; Yellow: urgent waiting; Green: outpatient / routine.
+		\item Blue: deceased-on-arrival dignity protocol (not low urgency).
+		\item Protocol source: SATS training manual \citep{satsmanual}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Text First, Then Vitals}
+	\begin{block}{Chief complaint}
+		Delays often start with \textbf{only words}: headache, fever, weakness, described in free text before any thermometer or pulse reading.
+	\end{block}
+	\begin{block}{TEWS (nurse standard)}
+		HR, RR, mobility, temperature, AVPU, trauma \(\to\) score \(T\) and a SATS colour band \citep{satsmanual}.
+	\end{block}
+	\begin{exampleblock}{This project}
+		English chief complaint \(\to\) SATS colour + pathway card before vitals; TEWS stays in parallel.
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Literature Review}
+	\small
+	\begin{itemize}
+		\item \textbf{Overcrowding and SATS.} LMIC intake pressure and acuity discontinuity; SATS colours with \(T_{\max}\) structure flow when urgency travels with the patient \citep{kathsats,satsmanual}. Text-first arrival remains under-formalised.
+		\item \textbf{TEWS.} Vital-sign score \(T\) maps to a colour band; objective, and does not read free-text complaints \citep{satsmanual}.
+		\item \textbf{Attention \(\to\) BioBERT.} Self-attention \(\to\) BERT; BioBERT continues on PubMed/PMC so clinical terms cluster in embedding space \citep{vaswani2017attention,lee2020biobert}.
+		\item \textbf{NLP at triage.} Complaint classification is active research, mostly on high-income corpora; local SATS colour plus pathway mathematics is under-specified \citep{stewart2023nlp,gligorijevic2018deep}.
+	\end{itemize}
+\end{frame}

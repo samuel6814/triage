@@ -1,0 +1,101 @@
+\section{Title, outline, and background}
+\label{sec:front}
+
+\subsection{Title page and outline (slides 1--2)}
+
+\begin{whybox}
+The title page names the project, authors, supervisor, and department.
+The outline shows the five big blocks of the talk: Background, Problem/Objectives,
+Methodology (including mathematics), Results, Impact.
+\end{whybox}
+
+\begin{saybox}
+``Today we present a hospital chatbot that reads an English chief complaint and returns
+a SATS colour plus a pathway card for \examplehospital{}. The talk moves from the hospital
+problem, through the mathematics of BioBERT triage, to holdout results and anticipated impact.''
+\end{saybox}
+
+\paragraph{Core idea of the project.}
+Patients often arrive with \emph{words only}. Nurses later measure vitals (TEWS).
+Our system acts at the text-first moment: free-text complaint \(X\) \(\to\) acuity probabilities
+\(\hat{\mathbf{y}}\) \(\to\) colour \(C_{\mathrm{NLP}}\) \(\to\) pathway card \(P(C)\).
+Nurses keep TEWS and the right to override.
+
+\subsection{Hospital overcrowding photo (slide 3)}
+
+\begin{whybox}
+A visual of overcrowded wards grounds the problem in Ghanaian hospital reality before any equations.
+Source attribution: GhanaFact fact-check article on Korle-Bu overcrowding imagery.
+\end{whybox}
+
+\begin{saybox}
+``This is the world our system sits in: too many patients, limited beds and staff.
+Triage has to decide who is seen first and where they go next.''
+\end{saybox}
+
+\subsection{Hospital intake under pressure (slide 4)}
+
+\begin{whybox}
+Defines the operational setting: crowded queues, SATS at teaching hospitals including
+\examplehospital{}, and \emph{acuity discontinuity}---colour assigned at the first desk may not travel with the patient.
+\end{whybox}
+
+\textbf{Acuity discontinuity} means: urgency is decided once at intake, then often forgotten when the patient moves to imaging, labs, or wards. Colour and countdown do not reliably steer later decisions \citep{Rominski2014,kathsats}.
+
+\begin{saybox}
+``Even when SATS is used, urgency can be lost after the first desk. That is the discontinuity we want a digital colour-plus-pathway record to reduce.''
+\end{saybox}
+
+\subsection{SATS colour bands (slide 5)}
+
+\begin{whybox}
+Everyone in the room must share the same colour language before you talk about NLP.
+\end{whybox}
+
+\begin{definition}[SATS colours]
+The South African Triage Scale uses five colours \citep{satsmanual}:
+\begin{itemize}[nosep]
+  \item \textbf{Red:} immediate / resuscitation stream.
+  \item \textbf{Orange:} very urgent (about \(<10\) minutes).
+  \item \textbf{Yellow:} urgent (about \(<60\) minutes).
+  \item \textbf{Green:} routine / outpatient stream.
+  \item \textbf{Blue:} deceased-on-arrival dignity protocol (not ``low urgency'').
+\end{itemize}
+\end{definition}
+
+Our chatbot maps predicted acuity levels to Red/Orange/Yellow/Green for living patients.
+Blue is a dignity protocol, not an NLP output class in this prototype.
+
+\subsection{Text first, then vitals (slide 6)}
+
+\begin{whybox}
+Separates the two clocks of triage: words arrive before thermometers.
+\end{whybox}
+
+\begin{itemize}
+  \item \textbf{Chief complaint:} primary reason for visit, in the patient's (or attendant's) own words.
+  \item \textbf{TEWS:} nurse score from HR, RR, mobility, temperature, AVPU, trauma \(\to\) colour from vitals.
+  \item \textbf{This project:} English text \(\to\) colour + pathway \emph{before} vitals; TEWS stays in parallel.
+\end{itemize}
+
+\begin{saybox}
+``We do not replace the nurse. We give a first acuity signal from English text while TEWS remains the vital-sign standard.''
+\end{saybox}
+
+\subsection{Literature review (slide 7)}
+
+\begin{whybox}
+Shows you know the field: overcrowding/SATS, TEWS limits, BioBERT lineage, NLP triage gaps.
+\end{whybox}
+
+\paragraph{Four points to master.}
+\begin{enumerate}
+  \item LMIC overcrowding and SATS with waiting times \(T_{\max}\) \citep{kathsats,satsmanual}; text-first arrival still under-formalised.
+  \item TEWS is objective and does \textbf{not} read language \citep{satsmanual}.
+  \item Self-attention \(\to\) BERT \(\to\) BioBERT on PubMed/PMC \citep{vaswani2017attention,lee2020biobert}.
+  \item NLP at ED triage is active but mostly high-income; local SATS+pathway math is thin \citep{stewart2023nlp,gligorijevic2018deep}.
+\end{enumerate}
+
+\begin{saybox}
+``The literature gives us BioBERT and triage NLP abroad. What is missing is an examinable map from Ghanaian intake text to SATS colour and a local pathway card---that is our gap.''
+\end{saybox}

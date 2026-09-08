@@ -1,12 +1,12 @@
 \chapter{RESULTS}
 \label{ch:results}
 
-This chapter reports BioBERT model analysis (architecture and pre-fine-tuning capability), fine-tuned model evaluation (baseline and SMOTE-augmented variants), inference latency, pathway routing at \examplehospital{}, and anticipated impact on hospital workflow. Holdout evaluation results come from the stratified 10\% holdout (\(N_{\mathrm{eval}}=8{,}000\)) and the pathway design in Section~\ref{sec:pathways}. Expected operational benefits (waiting-time reduction, satisfaction, staff workload) are interpreted from classification outcomes, latency, and published triage literature \citep{kathsats,Mitchell2023}; prospective time-motion data at \examplehospital{} are not yet available.
+This chapter begins with the \textbf{model itself}: BioBERT architecture constants, the three-stage training stack, and evidence that Stage~3 fine-tuning is required before the encoder can support safe acuity prediction. Only after that model analysis does the chapter report holdout classification metrics (baseline and SMOTE-augmented variants), inference latency, pathway routing at \examplehospital{}, and anticipated impact on hospital workflow. Holdout numbers come from the stratified 10\% holdout (\(N_{\mathrm{eval}}=8{,}000\)). Expected operational benefits are interpreted from classification outcomes, latency, and published triage literature \citep{kathsats,Mitchell2023}; prospective time-motion data at \examplehospital{} are not yet available.
 
 \section{BioBERT model analysis}
 \label{sec:biobert-analysis}
 
-Before project-specific fine-tuning, the deployed classifier rests on BioBERT-base \citep{lee2020biobert}: a twelve-layer bidirectional encoder with hidden dimension 768, twelve attention heads, maximum sequence length 128 tokens, and a WordPiece vocabulary of approximately 29{,}996 tokens (Section~\ref{sec:encoder}). Stages~1 and~2 (Section~\ref{sec:training-pipeline}) supply biomedical language understanding and partial triage-oriented encoder features; they do \emph{not} produce the five-class acuity mapping required at intake. Stage~3 reinitialises the classification head and trains on the Triagegeist English corpus (Section~\ref{sec:data-provenance}). Class imbalance in the training corpus (Level~3 is the mode; Level~1 is the minority) motivates Stage~3 mitigation strategies documented in Section~\ref{sec:finetuned-analysis}; it is not the focus of this section.
+The first results question is not ``how accurate is the chatbot on a table?'' but ``what model is deployed, and does it work only after the right training?'' Before project-specific fine-tuning, the classifier rests on BioBERT-base \citep{lee2020biobert}: a twelve-layer bidirectional encoder with hidden dimension \(768\), twelve attention heads, maximum sequence length \(128\) tokens, and a WordPiece vocabulary of approximately \(29{,}996\) tokens (Section~\ref{sec:encoder}). Stages~1 and~2 (Section~\ref{sec:training-pipeline}) supply biomedical language understanding and partial triage-oriented encoder features; they do \emph{not} produce the five-class acuity mapping required at intake. Stage~3 reinitialises the classification head and trains on the Triagegeist English corpus (Section~\ref{sec:data-provenance}). Class imbalance in the training corpus (Level~3 is the mode; Level~1 is the minority) motivates Stage~3 mitigation strategies documented in Section~\ref{sec:finetuned-analysis}; it is not the focus of this section.
 
 Figure~\ref{fig:biobert-stack} summarises the three-stage training stack. Stage~1 applies masked language modelling on PubMed and PubMed Central text; Stage~2 transfers encoder weights from a prior two-class triage checkpoint with the old head discarded; Stage~3 is the comprehensive project fine-tuning that maps free-text complaints to five SATS acuity levels.
 
@@ -83,6 +83,8 @@ Figure~\ref{fig:biobert-model-specs} records the architecture constants used in 
 \section{Fine-tuned model analysis}
 \label{sec:finetuned-analysis}
 
+Having established the BioBERT configuration, the three-stage training stack, and the necessity of Stage~3 fine-tuning for triage routing, the remainder of this chapter reports quantitative holdout performance and operational implications.
+
 \subsection{Evaluation protocol}
 
 The deployed classifier is the product of Stage~3 fine-tuning documented in Section~\ref{sec:training}. Two checkpoints are compared on the \emph{same} stratified 90/10 holdout split (\(N_{\mathrm{eval}}=8{,}000\)):
@@ -130,6 +132,14 @@ Holdout accuracy above 99\% can appear implausibly high without context. The fol
 \textbf{Literature context.} NLP triage systems evaluated on structured complaint text in similar retrospective settings can report high agreement with nurse labels \citep{stewart2023nlp,gligorijevic2018deep}. Such results indicate that text carries acuity signal before vitals are recorded; they do not replace prospective audit.
 
 \textbf{Generalisation caveat.} The prototype accepts \textbf{English} chief complaints only; holdout metrics reflect English text from the Triagegeist training corpus. Atypical phrasing or presentations absent from that benchmark may reduce agreement at live intake at \examplehospital{}. Deployment should treat low-confidence or contradictory presentations as mandatory nurse review \citep{satsmanual}.
+
+\textbf{Operational reading of Softmax.} Because \(\hat{\mathbf{y}}\) is a Categorical distribution, the nurse-facing display should show more than the mode colour. A useful rule of thumb for assistive deployment is:
+\begin{itemize}
+\item \textbf{Dominant mode} (\(\hat{y}_{\hat{c}}\geq 0.70\)): route with the pathway card; nurse may still override.
+\item \textbf{Moderate confidence} (\(0.50\leq \hat{y}_{\hat{c}}<0.70\)): show colour and the next-highest competing level; flag for early nurse review.
+\item \textbf{Near tie} (\(\hat{y}_{\hat{c}}<0.50\) or two levels nearly equal): do not treat the chatbot colour as decisive; escalate to nurse assessment immediately.
+\end{itemize}
+These thresholds are operational heuristics for RQ7, not trained decision rules; prospective calibration at \examplehospital{} may revise them.
 
 \subsection{SMOTE for class imbalance}
 
@@ -407,3 +417,20 @@ Nursing staff may report reduced triage documentation burden, devoting more time
 Project success would be measured by smoother patient flow, colour-coded pathways guiding patients to the right place at the right time, and a reduction in adverse events or delays attributable to triage \citep{Rominski2014,kathsats}. Published NLP triage systems elsewhere report streamlined processes and optimised resource use in busy hospitals \citep{stewart2023nlp,Mitchell2023}.
 
 \textbf{Limitations.} Holdout metrics measure classification accuracy on historical chief complaints, not patient outcomes, waiting-time reduction, or satisfaction scores \citep{Mitchell2023,Nurchis2025}. Prospective validation at \examplehospital{} is required to quantify minutes saved and to confirm safe nurse override rates. Training data class imbalance may under-weight rare urgent phrasing; deployment should treat low-confidence or contradictory presentations as mandatory nurse review \citep{Berkowitz2019,satsmanual}. SMOTE increases Red recall but introduces false Red alerts (precision 96.41\%); the baseline checkpoint is the project default unless clinical stakeholders prioritise zero missed Red cases. Holdout accuracy on the 80k corpus is an upper bound on offline label agreement, not a guarantee at live intake (Section~\ref{sec:high-accuracy}).
+
+\section{Discussion of findings}
+\label{sec:discussion}
+
+Taken together, the model-first analysis and the holdout tables support three claims that answer the research questions in Chapter~\ref{ch:intro}.
+
+\paragraph{Stage~3 is indispensable.}
+Figure~\ref{fig:pre-finetune-capability} shows that biomedical pre-training and encoder transfer alone behave like chance or majority-class guessing for five-class acuity. Only after fine-tuning on nurse-labeled chief complaints does the Softmax head become a usable triage assist. That finding justifies treating Stage~3 as the project's central machine-learning contribution, not as a minor calibration step.
+
+\paragraph{Colour follows acuity under \(f_{\mathrm{SATS}}\).}
+Because \(f_{\mathrm{SATS}}\) is deterministic, colour-routing accuracy equals acuity accuracy except for the intentional collapse of levels~4 and~5 into Green. Operational mistakes therefore arise from wrong \(\hat{c}\), not from an ambiguous colour map. Softmax confidence still matters: a Yellow prediction at \(69\%\) with substantial Green mass (Section~\ref{sec:classification}) should not be treated as equivalent to a near-certain Red.
+
+\paragraph{Pathways make colour operational.}
+Tables~\ref{tab:pathway-scenarios}--\ref{tab:knust-dept-routing} and Figure~\ref{fig:anticipated-workflow} show how a millisecond-scale text colour becomes a hospital action: timers, destinations, and support departments. The anticipated impact section is necessarily interpretive until prospective time-motion data exist; the contribution at this stage is a complete, examinable protocol binding rather than a measured minutes-saved claim.
+
+\paragraph{Safety posture.}
+High holdout accuracy does not license unsupervised discharge decisions. The deployed posture is triage assist with nurse override, TEWS in parallel, gate rejection of non-clinical text, and mandatory review for low Softmax confidence or text--vitals conflict \citep{stewart2023nlp,Berkowitz2019}. That posture is consistent with SATS training manuals and with under-triage quality literature.

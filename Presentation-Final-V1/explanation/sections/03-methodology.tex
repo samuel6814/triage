@@ -1,0 +1,117 @@
+\section{Methodology overview (before the equations)}
+\label{sec:method-overview}
+
+The Methodology section of the talk has two layers: (i)~what data and system pieces you use,
+(ii)~the mathematics of each pipeline stage. This chapter covers layer~(i). The next chapter
+goes to the mathematical core.
+
+\subsection{Chief complaints as input (slide 11)}
+
+\begin{definition}[Chief complaint \(X\)]
+The primary reason the patient presents, in their own words, as unstructured free text at intake.
+It is \emph{not} a diagnosis, not TEWS, and not a full medical history.
+\end{definition}
+
+\begin{whybox}
+Forces clarity on the input variable. Everything later is a function of \(X\).
+\end{whybox}
+
+\paragraph{Why English only?}
+BioBERT's WordPiece vocabulary and the Triagegeist training pairs are English.
+The prototype does not claim Twi or mixed-language support.
+
+\paragraph{Running example.}
+At \examplehospital{} we reuse: \runningcomplaint{}
+Walk this sentence through gate \(\to\) tokens \(\to\) colour when an examiner asks for an example.
+
+\begin{saybox}
+``Our only input is the English chief complaint text \(X\). Vitals are the nurse's job in parallel.''
+\end{saybox}
+
+\subsection{Training data provenance (slide 12)}
+
+\begin{whybox}
+Stops the ``where did the numbers come from?'' question. Two layers must never be confused.
+\end{whybox}
+
+\paragraph{Layer A --- Triagegeist (metrics source).}
+Synthetic ED benchmark \citep{triagegeist2025}.
+Merge \texttt{train.csv} + \texttt{chief\_complaints.csv} \(\to\) \(N=80{,}000\) English pairs
+(complaint text, acuity label).
+Stage~3 project fine-tuning and the 90/10 holdout use these pairs.
+\textbf{All reported accuracy / F1 / recall numbers come from Layer~A.}
+
+\paragraph{Layer B --- KNUST visit examples.}
+Written after a site visit to \examplehospital{} (workflow, SATS colours, departments).
+Used for pathway demos and qualitative checks.
+\textbf{Not} merged into the 80k training set---so they do not inflate metrics.
+
+\begin{saybox}
+``Eighty thousand Triagegeist pairs train and evaluate the classifier. KNUST examples shape pathways and demos; they are not in the training metrics.''
+\end{saybox}
+
+\subsection{NLP pipeline overview (slide 13)}
+
+\begin{whybox}
+One diagram for the whole story before equations. Examiners should see the chain once.
+\end{whybox}
+
+Pipeline stages in order:
+\[
+  X \;\to\; \text{clinical gate} \;\to\; \text{tokenise} \;\to\; \text{embed (768-d)}
+  \;\to\; \text{BioBERT (\(L=12\))} \;\to\; \text{softmax (5 classes)}
+  \;\to\; \text{SATS colour} \;\to\; P(C).
+\]
+
+\begin{itemize}
+  \item Gate rejects non-clinical text (greetings) before BioBERT runs.
+  \item Softmax produces five probabilities that sum to \(1\).
+  \item Chosen level \(\hat{c}\): the class with the \emph{highest} probability.
+  \item Fixed map \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\), then pathway card \(P(C_{\mathrm{NLP}})\).
+\end{itemize}
+
+\begin{saybox}
+``Gate first, then BioBERT, then pick the most likely acuity level, map it to a colour, and attach a pathway card.''
+\end{saybox}
+
+\subsection{Pathways at \examplehospital{} (slide 14)}
+
+\begin{whybox}
+Connects colours to destinations and timers---the clinical product, not only a class label.
+\end{whybox}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Colour & Destination (summary) & Timer \\
+\midrule
+Gate reject & Re-prompt for clinical text & n/a \\
+Red & Resuscitation / immediate & Immediate \\
+Orange & Acute / high-dependency & \(\approx 10\) min \\
+Yellow & Urgent waiting / OPD urgent & \(\approx 60\) min \\
+Green & Routine OPD / digital queue & Longer \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Seventeen hospital units were mapped (clinical + support). Pathway cards carry colour, destination, timer, and escalation.
+
+\begin{saybox}
+``A colour alone is not enough. The card says where to go and how soon.''
+\end{saybox}
+
+\subsection{System architecture (slide 15)}
+
+\begin{whybox}
+Shows the software path and that nurses remain in the loop.
+\end{whybox}
+
+Solid path: patient/attendant \(\to\) web UI \(\to\) \texttt{/predict} API \(\to\) gate \(\to\) BioBERT
+\(\to\) pathway card \(\to\) department routing.
+
+Dashed path: nurse TEWS in parallel into routing. Staff can override.
+
+\begin{saybox}
+``The chatbot is an assistive API in a web UI. TEWS and clinical override stay with the nurse.''
+\end{saybox}

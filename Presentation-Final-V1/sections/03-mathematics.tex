@@ -1,0 +1,64 @@
+%====================================================
+\section{Mathematics}
+
+\begin{frame}{Tokenisation, Embeddings, and \texttt{[CLS]}}
+	\begin{itemize}
+		\item WordPiece splits \(X\) into subword tokens (max length \(M \leq 128\)); special tokens \texttt{[CLS]}, \texttt{[SEP]}, \texttt{<PAD>}.
+		\item Each token gets a 768-d vector by summing word + position + segment embeddings:
+		\[
+		  E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(0).
+		\]
+		\item Stack rows \(\to\) input matrix \(H^{(0)} \in \mathbb{R}^{M \times 768}\).
+		\item After \(L=12\) encoder layers, classification reads the summary
+		\[
+		  h_{\mathrm{[CLS]}} \in \mathbb{R}^{768}.
+		\]
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Self-Attention}
+	\begin{block}{Scaled dot-product attention}
+		\[
+		  \mathrm{Attention}(Q,K,V)
+		  = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V,
+		  \qquad d_k = 64.
+		\]
+	\end{block}
+	\begin{center}
+	\resizebox{0.85\textwidth}{!}{%
+	\begin{tikzpicture}[node distance=0.4cm and 0.5cm,
+	  box/.style={draw=green!60!black, rounded corners, fill=green!8, align=center, font=\small, inner sep=4pt}]
+	  \node[box] (q) {Q: what am I looking for?};
+	  \node[box, right=of q] (k) {K: what do I match?};
+	  \node[box, right=of k] (v) {V: what content to pass?};
+	  \node[box, below=1.0cm of k] (s) {Score \(\to\) scale \(\to\) Softmax weights \(\to\) mix \(V\)};
+	  \draw[flowarr] (q) -- (s);
+	  \draw[flowarr] (k) -- (s);
+	  \draw[flowarr] (v) -- (s);
+	\end{tikzpicture}}
+	\end{center}
+	\begin{itemize}
+		\item Twelve heads: \(12 \times 64 = 768\); stack \(L=12\) identical encoder layers \citep{vaswani2017attention}.
+		\item Why: each symptom token can weigh every other token (e.g.\ negation + pain).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Softmax, Colour Map, and Gate}
+	\begin{block}{Five-class head}
+		\[
+		  \mathbf{z} = W h_{\mathrm{[CLS]}} + \mathbf{b},
+		  \qquad
+		  \hat{y}_c = \frac{\exp(z_c)}{\sum_{j=1}^{5}\exp(z_j)}.
+		\]
+		Pick \(\hat{c}\) with the largest \(\hat{y}_c\); then \(f_{\mathrm{SATS}}\): \(1\to\)Red, \(2\to\)Orange, \(3\to\)Yellow, \(4{,}5\to\)Green.
+	\end{block}
+	\begin{block}{Clinical gate}
+		\[
+		  g(X) = \mathrm{clip}\!\Bigl(\sum_j s_j(X) - p(X),\, 0,\, 1\Bigr),
+		  \qquad \text{proceed iff } g(X) \geq 0.35.
+		\]
+	\end{block}
+	\begin{alertblock}{End-to-end}
+		\(X \xrightarrow{g} \tau(X) \to H^{(0)} \xrightarrow{12} h_{\mathrm{[CLS]}} \to \hat{\mathbf{y}} \xrightarrow{f_{\mathrm{SATS}}} C_{\mathrm{NLP}} \to P(C)\).
+	\end{alertblock}
+\end{frame}

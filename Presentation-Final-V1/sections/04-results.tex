@@ -1,0 +1,64 @@
+%====================================================
+\section{Results}
+
+\begin{frame}{Model Performance}
+	\begin{block}{Holdout evaluation}
+		Stratified 10\% holdout, \(N=8{,}000\) English Triagegeist complaints \citep{triagegeist2025}.
+	\end{block}
+	\begin{center}
+	\small
+	\begin{tabular}{|l|r|}
+	\hline
+	\textbf{Metric (baseline BioBERT)} & \textbf{Value} \\
+	\hline
+	Accuracy & 99.92\% \\
+	Macro-F1 & 0.9977 \\
+	Recall Level 1 (Red) & 98.14\% \\
+	Mean latency & \(\approx\)102\,ms / sample \\
+	\hline
+	\end{tabular}
+	\end{center}
+	\medskip
+	\begin{itemize}
+		\item Strong agreement with nurse acuity labels on held-out English complaints (RQ1).
+		\item Fast enough for prototype intake assistance (RQ2).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Impact on Hospital Intake}
+	\begin{center}
+	\resizebox{0.90\textwidth}{!}{%
+	\begin{tikzpicture}[
+	  x=0.95cm, y=0.65cm,
+	  title/.style={font=\small\bfseries, anchor=center},
+	  box/.style={draw=green!60!black, rectangle, fill=green!10, text width=2.0cm, align=center,
+	    minimum height=0.7cm, rounded corners, font=\scriptsize, inner sep=2pt},
+	  old/.style={box, fill=gray!12},
+	  new/.style={box, fill=green!15},
+	  arrow/.style={->, >=latex, thick, draw=black!55},
+	  foot/.style={font=\scriptsize\itshape, text=black!70, align=center}]
+	  \node[title] at (4.5, 5.5) {Traditional intake};
+	  \draw[dashed, rounded corners, draw=gray!45] (-0.2, 3.55) rectangle (9.2, 5.85);
+	  \node[old] (q) at (0.4, 4.7) {Patient\\arrives};
+	  \node[old] (wait) at (2.9, 4.7) {Long\\queue};
+	  \node[old] (nurse) at (5.4, 4.7) {Colour\\assigned late};
+	  \node[old] (unclear) at (7.9, 4.7) {Destination\\unclear};
+	  \draw[arrow] (q) -- (wait);
+	  \draw[arrow] (wait) -- (nurse);
+	  \draw[arrow] (nurse) -- (unclear);
+	  \node[foot] at (4.5, 3.85) {Wait: minutes to hours \citep{Mitchell2023,kathsats}};
+	  \node[title] at (4.5, 2.85) {Chatbot-assisted intake (anticipated)};
+	  \draw[dashed, rounded corners, draw=green!45!black] (-0.2, 0.55) rectangle (9.2, 3.15);
+	  \node[new] (c) at (1.3, 1.9) {Complaint\\entered};
+	  \node[new] (bot) at (4.5, 1.9) {Classify\\(\(\approx\)100\,ms)};
+	  \node[new] (card) at (7.7, 1.9) {Colour +\\pathway card};
+	  \draw[arrow] (c) -- (bot);
+	  \draw[arrow] (bot) -- (card);
+	  \node[foot] at (4.5, 0.9) {Earlier urgency signal; nurse TEWS in parallel \citep{stewart2023nlp,satsmanual}};
+	\end{tikzpicture}}
+	\end{center}
+	\vspace{0.1em}
+	\begin{itemize}\setlength\itemsep{0.3em}
+		\item Clearer next steps for urgent vs routine streams; staff remain in control \citep{Sundstrom2014,Nurchis2025}.
+	\end{itemize}
+\end{frame}

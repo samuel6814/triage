@@ -1,0 +1,37 @@
+% Shared preamble for speaker explanation notes
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\newcommand{\examplehospital}{KNUST University Hospital}
+\newcommand{\runningcomplaint}{\textit{``I have a headache and feel feverish. My body aches and I feel weak.''}}
+
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\newtcolorbox{whybox}[1][Why this slide]{
+  colback=green!5!white,
+  colframe=green!50!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+
+\newtcolorbox{saybox}[1][What to say]{
+  colback=blue!3!white,
+  colframe=blue!40!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+
+\newtcolorbox{intuitbox}[1][Intuition]{
+  colback=yellow!8!white,
+  colframe=orange!60!black,
+  fonttitle=\bfseries,
+  title=#1
+}

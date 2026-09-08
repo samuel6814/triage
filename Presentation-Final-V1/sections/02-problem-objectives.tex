@@ -1,0 +1,40 @@
+%====================================================
+\section{Problem Statement and Objectives}
+
+\begin{frame}{Problem Statement}
+	\begin{block}{Lost urgency}
+		\begin{itemize}
+			\item Orange / Red patients can lose time-critical priority when moving to imaging, labs, or wards.
+			\item No digital record preserves colour and countdown timer.
+		\end{itemize}
+	\end{block}
+	\begin{block}{Green congestion}
+		\begin{itemize}
+			\item Non-urgent patients lack automated guidance to outpatient or self-care routes.
+			\item They block beds and staff needed for life-saving care.
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Research Gap}
+	\begin{itemize}
+		\item Formal mathematics from patient text to SATS colour and local pathway routing for Ghanaian hospital intake remains under-specified \citep{stewart2023nlp,gligorijevic2018deep}.
+		\item Most published NLP triage systems target high-income corpora; local department routing is rarely formalised.
+		\item TEWS covers vitals, but the \emph{text-first} moment at arrival lacks an examinable pipeline.
+	\end{itemize}
+	\begin{alertblock}{This thesis fills the gap}
+		English chief complaint \(X \to\) acuity probabilities \(\hat{\mathbf{y}} \to\) colour \(C_{\mathrm{NLP}} \to\) pathway card \(P(C)\) at \examplehospital{}.
+	\end{alertblock}
+\end{frame}
+
+\begin{frame}{Objectives of the Study}
+	\begin{block}{General objective}
+		Develop a hospital chatbot that classifies unstructured English chief complaints into SATS colours and clinical pathways at intake.
+	\end{block}
+	\begin{enumerate}
+		\item \textbf{Automate triage classification} from a single chief complaint.
+		\item \textbf{Guide clinical pathways} (urgent vs routine streams).
+		\item \textbf{Integrate with SATS} and \examplehospital{} routing.
+		\item \textbf{Support refinement} via visit-informed pathway design.
+	\end{enumerate}
+\end{frame}

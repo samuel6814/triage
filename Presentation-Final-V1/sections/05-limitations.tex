@@ -1,0 +1,12 @@
+%====================================================
+\section{Limitations}
+
+\begin{frame}{Limitations}
+	\begin{itemize}
+		\item \textbf{Language:} The chatbot reads English chief complaints only. Local phrases in other languages are outside the current model.
+		\item \textbf{Where the model was trained:} Fine-tuning used the Triagegeist benchmark (\(80{,}000\) labelled English complaints), not records collected from our hospital visit. Local examples were used for demos and pathway design, not for training.
+		\item \textbf{Real-world timing not measured yet:} Faster intake and clearer routing are expected benefits. We have not yet timed patients on site to prove waiting-time reduction.
+		\item \textbf{Numbers are from a held-out test set:} Very high accuracy shows the model matches nurse labels well on similar English complaints. New or unusual wording may need staff review.
+		\item \textbf{Still a decision-support tool:} Colour and pathway cards assist staff; clinicians remain responsible for final triage decisions.
+	\end{itemize}
+\end{frame}

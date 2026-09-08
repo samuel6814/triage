@@ -1,26 +1,100 @@
 \chapter{LITERATURE REVIEW}
 \label{ch:lit}
 
+\section{Introduction}
+
+This chapter situates the project in published work on hospital overcrowding, SATS and TEWS practice, clinical pathways, Transformer language models, and natural language processing (NLP) for triage. The review is organised thematically rather than as an annotated bibliography: each section synthesises what is known, what remains contested, and what implication follows for a Ghanaian hospital chatbot. The chapter closes with an explicit research gap that Chapter~\ref{ch:method} addresses for the text path.
+
 \section{Hospital overcrowding and triage delay}
 
-Overcrowding in low- and middle-income country (LMIC) hospitals affects outpatient departments, emergency intake, and inpatient wards simultaneously \citep{kathsats}. Delayed triage lengthens time-to-provider, increases left-without-being-seen rates, and correlates with poor outcomes for time-sensitive conditions. The South African Triage Scale (SATS) provides a five-colour framework (Red, Orange, Yellow, Green, Blue) with maximum waiting times \(T_{\max}\) and destination rules \citep{satsmanual}. Implementation at Komfo Anokye Teaching Hospital (KATH) demonstrated that standardised colour coding can structure flow even when staffing is constrained, provided urgency information travels with the patient.
+Overcrowding in low- and middle-income country (LMIC) hospitals affects outpatient departments, emergency intake, and inpatient wards simultaneously \citep{kathsats,Mitchell2023}. Delayed triage lengthens time-to-provider, increases left-without-being-seen rates, and correlates with poor outcomes for time-sensitive conditions. Waiting time interacts with colour assignment: when reassessment is weak, deterioration after the first desk can go unnoticed \citep{Nurchis2025}.
 
-A persistent gap is the \emph{text-first} moment of arrival: many patients can describe symptoms before any vital sign is measured. Paper triage forms capture chief complaints as unstructured prose; converting that prose into the same colour logic used for vitals remains inconsistently formalised in Ghanaian hospital practice.
+A structural driver is competition for acute capacity by non-urgent patients: the Green Tag Burden \citep{Yilmaz2021}. In LMICs, understaffing and limited diagnostics intensify that competition. Digital diversion of Green patients to outpatient, minors, or specialty streams is therefore a flow-management requirement for colour-coded pathways, not merely a convenience feature \citep{Sundstrom2014}.
+
+\textbf{Implication for this project.} Any chatbot that assigns SATS colours must also attach destinations and timers; otherwise colour remains a label that dies at the desk (acuity discontinuity in Chapter~\ref{ch:intro}).
+
+\section{SATS in LMIC and Ghanaian practice}
+
+The South African Triage Scale (SATS) provides a five-colour framework (Red, Orange, Yellow, Green, Blue) with maximum waiting times \(T_{\max}\) and destination rules \citep{satsmanual}. Implementation at Komfo Anokye Teaching Hospital (KATH) and related Ghanaian settings demonstrated that standardised colour coding can structure flow even when staffing is constrained, provided urgency information travels with the patient \citep{Rominski2014,kathsats}.
+
+SATS combines physiological early warning (TEWS) with clinical discriminators that can escalate colour when high-risk symptoms are present even if vitals are only mildly abnormal (for example central chest pain). Colour codes therefore already exist in hospital policy. The research gap is not inventing colours, but (i)~assigning them from free-text complaints before full vitals, and (ii)~binding colours to pathway protocols so acuity does not disappear after intake.
+
+Teaching hospitals such as \examplehospital{} apply similar colour logic across clinical departments, not only in a single emergency bay. That multi-department setting motivates pathway cards that name outpatient urgent streams, surgery, obstetrics, pediatrics, and support units rather than a single undifferentiated ``ED'' destination.
 
 \section{TEWS and vital-sign triage}
 
-The Triage Early Warning Score (TEWS) aggregates six SATS parameters (heart rate (HR), respiratory rate (RR), mobility, temperature, Alert, Voice, Pain, Unresponsive (AVPU) consciousness, and trauma flag) into a single integer \(T\) \citep{satsmanual}. Nurses use \(T\) at triage to assign a colour band: Red for \(T > 7\), Orange for \(5 \leq T \leq 6\), Yellow for \(3 \leq T \leq 4\), Green for \(T \leq 2\). TEWS is deterministic and objective; it does not read language. Subjective symptoms such as ``worst headache of my life'' or ``feverish and weak'' may appear in the complaint before corresponding vitals exist. Chapter~\ref{ch:method} presents TEWS mathematics as the hospital standard parallel to the text model.
+The Triage Early Warning Score (TEWS) aggregates six SATS parameters (mobility, respiratory rate (RR), heart rate (HR), temperature, Alert--Voice--Pain--Unresponsive (AVPU) consciousness, and trauma flag) into a single integer \(T\) \citep{satsmanual}. Nurses use \(T\) at triage to assign a colour band: Red for \(T > 7\), Orange for \(5 \leq T \leq 6\), Yellow for \(3 \leq T \leq 4\), Green for \(T \leq 2\). TEWS is deterministic and objective; it does not read language.
+
+Subjective symptoms such as ``worst headache of my life'' or ``feverish and weak'' may appear in the complaint before corresponding vitals exist. Chapter~\ref{ch:method} therefore presents TEWS mathematics as the hospital standard \emph{parallel} to the text model: when vitals are available, nurses compute \(T\); when they are not, the BioBERT path supplies an initial colour for routing assist. This thesis does not claim that Softmax replaces TEWS.
+
+\section{Clinical pathways as operational roadmaps}
+
+Clinical pathways are step-by-step care roadmaps: destination, diagnostics, time targets, and escalation \citep{Sundstrom2014}. In SATS terms, colour without a pathway is incomplete: Red must mean immediate resuscitation access; Orange must mean a short countdown; Green must mean diversion away from acute beds when clinically appropriate \citep{satsmanual,Yilmaz2021}.
+
+Pathway literature supports treating colour as operational, not decorative. Under-triage (assigning too low an urgency) is a recognised quality trigger in emergency medicine \citep{Berkowitz2019}; over-triage wastes scarce acute capacity. A chatbot that emits pathway cards \(P(C)\) must therefore be evaluated not only on label accuracy but on whether routing rules are protocol-faithful and nurse-overridable.
 
 \section{Attention, BERT, and BioBERT}
 
-Sequential language models read text in one direction, limiting context for ambiguous clinical phrases. \citet{vaswani2017attention} introduced scaled dot-product self-attention, allowing each token to attend to all others in parallel. \citet{devlin2019bert} built BERT (Bidirectional Encoder Representations from Transformers) on this idea: masked language modelling (MLM) pre-training yields contextual embeddings \(E(t_i) = E_{\mathrm{word}} + E_{\mathrm{pos}} + E_{\mathrm{seg}}\) used across downstream tasks.
+Sequential recurrent language models read text predominantly in one direction, limiting context for ambiguous clinical phrases. \citet{vaswani2017attention} introduced scaled dot-product self-attention, allowing each token to attend to all others in parallel within a fixed window. That property matters for triage language, where negation and severity modifiers (``no pain'', ``severe headache'') must reshape neighbouring words.
 
-\citet{lee2020biobert} continued pre-training on PubMed and PMC abstracts to produce Biomedical BERT (BioBERT), a domain-specific encoder whose embedding space places ``headache'', ``feverish'', and ``malaria'' nearer clinically related terms. Fine-tuning BioBERT on nurse-labeled chief complaints yields a supervised classifier from text to acuity levels.
+\citet{devlin2019bert} built BERT (Bidirectional Encoder Representations from Transformers) on this idea: masked language modelling (MLM) pre-training yields contextual embeddings
+\[
+  E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(s)
+\]
+used across downstream tasks. BERT is an encoder stack: it produces contextual vectors for classification and tagging rather than open-ended generation.
+
+\citet{lee2020biobert} continued pre-training on PubMed and PubMed Central text to produce Biomedical BERT (BioBERT), a domain-specific encoder whose embedding space places clinical terms nearer related concepts. Fine-tuning BioBERT on nurse-labeled chief complaints yields a supervised classifier from text to acuity levels. Classification with a fixed five-class label set reduces open-ended generative hallucination risk compared with unconstrained large language models that invent diagnoses in free prose \citep{stewart2023nlp}.
 
 \section{NLP for emergency and hospital triage}
 
-\citet{stewart2023nlp} reviewed natural language processing (NLP) at emergency triage: chief-complaint classification, syndromic surveillance, and decision support remain active research areas with heterogeneous datasets. \citet{gligorijevic2018deep} showed that deep attention models can stratify emergency department patients from unstructured text. Most published systems target high-income corpora; formal mathematics from patient text to SATS colour for Ghanaian hospital intake, with pathway routing aligned to local implementation, is under-specified in the literature.
+\citet{stewart2023nlp} reviewed NLP at emergency triage: chief-complaint classification, syndromic surveillance, and decision support remain active research areas with heterogeneous datasets and uneven prospective validation. \citet{gligorijevic2018deep} showed that deep attention models can stratify emergency department patients from unstructured text. Class imbalance is a recurring theme: rare life-threatening presentations (Level~1 / Red) are under-represented relative to routine Yellow and Green cases, so accuracy alone can hide unsafe under-triage \citep{Berkowitz2019,chawla2002smote}.
+
+Most published systems target high-income corpora or electronic health record notes written by clinicians. Formal mathematics from \emph{patient} free text to SATS colour for Ghanaian hospital intake, with pathway routing aligned to local department structure, is under-specified in the literature. Synthetic benchmarks such as Triagegeist \citep{triagegeist2025} make large-scale supervised fine-tuning possible, but they do not substitute for prospective local validation.
+
+\section{Conversational agents and digital triage tools}
+
+Symptom-assessment applications and ED prediction chatbots show that conversational NLP can support triage-like advice before the nurse desk \citep{stewart2023nlp}. Validation studies emphasise safety, under-triage monitoring, nurse override, and comparison with conventional triage. Consumer tools often return free-form advice that is not mapped to hospital colour protocols or local destinations.
+
+Our chatbot is deliberately constrained: it outputs acuity probabilities, a SATS colour, and a pathway card aligned to SATS and \examplehospital{} routing---not free-form diagnosis essays. A clinical relevance gate rejects non-medical chat so that BioBERT is not run on greetings or sports conversation. That constrained design follows the safety emphasis in the triage NLP review literature.
+
+\section{Synthesis: what prior work supplies and what it leaves open}
+
+Table~\ref{tab:lit-synthesis} summarises the strands reviewed above.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{3.2cm}|p{5.5cm}|p{4.5cm}|}
+\hline
+\textbf{Strand} & \textbf{What exists} & \textbf{Open for this project} \\
+\hline
+Overcrowding / Green burden & Evidence that delay and non-urgent congestion harm flow \citep{Mitchell2023,Yilmaz2021} & Digital colour + diversion rules at Ghanaian intake \\
+SATS / TEWS & Colour bands and vital-score algebra \citep{satsmanual,Rominski2014} & Text-first colour before vitals; TEWS kept parallel \\
+Pathways & Operational roadmaps and diversion models \citep{Sundstrom2014} & Explicit \(P(C)\) tables for seventeen departments \\
+Transformers / BioBERT & Contextual encoders for biomedical text \citep{vaswani2017attention,devlin2019bert,lee2020biobert} & Examinable pipeline \(X\to\hat y\to C\to P(C)\) \\
+Triage NLP & ED text classifiers and reviews \citep{stewart2023nlp,gligorijevic2018deep} & SATS-aligned, pathway-bound chatbot for LMIC intake \\
+\hline
+\end{tabular}
+\caption{Literature synthesis: available foundations versus the gap this project fills.}
+\label{tab:lit-synthesis}
+\end{table}
 
 \section{Research gap}
 
-Existing work separates vital-sign scores (TEWS), manual SATS colour assignment, and NLP classifiers trained abroad. There is no unified, examinable mathematical account of how a free-text complaint at KATH-style intake becomes a SATS colour and pathway card using BioBERT, while TEWS remains documented as the nurse-facing vital standard. Chapter~\ref{ch:method} fills that gap for the text path; later chapters will report evaluation.
+Existing work separates vital-sign scores (TEWS), manual SATS colour assignment, and NLP classifiers trained largely abroad. There is no unified, examinable mathematical account of how a free-text English chief complaint at KATH-style or teaching-hospital intake becomes a SATS colour and pathway card using BioBERT, while TEWS remains documented as the nurse-facing vital standard and nurses retain override.
+
+In short, prior art provides colours, scores, and growing NLP evidence; it does not provide the integrated text path
+\[
+  X \xrightarrow{\tau} H^{(0)} \xrightarrow{\mathrm{BioBERT}} \hat{\mathbf{y}} \xrightarrow{f_{\mathrm{SATS}}} C_{\mathrm{NLP}} \xrightarrow{} P(C_{\mathrm{NLP}})
+\]
+with clinical gating, Softmax framed as a Categorical distribution over mutually exclusive acuity levels, and department routing tables matched to \examplehospital{}.
+
+Three concrete absences define the gap this thesis fills:
+
+\begin{enumerate}
+\item \textbf{Examinable mathematics.} Published triage NLP papers often report accuracy without deriving tokenisation, attention Softmax, and classification Softmax in one consistent notation suitable for a mathematics project defence.
+\item \textbf{Pathway binding.} Many systems stop at a predicted label; few attach SATS-aligned \(T_{\max}\), destination, and escalation for a named Ghanaian teaching-hospital department map.
+\item \textbf{Parallel TEWS documentation.} Text classifiers are sometimes presented as if vitals were obsolete; this project keeps TEWS explicit as the nurse vital-sign standard while the chatbot covers the text-first moment.
+\end{enumerate}
+
+Chapter~\ref{ch:method} fills that gap for the text path; Chapter~\ref{ch:results} reports evaluation.

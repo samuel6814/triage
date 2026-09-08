@@ -1,0 +1,30 @@
+\documentclass[11pt,a4paper]{article}
+
+\input{preamble}
+
+\title{Solved Walkthrough:\\From Chief Complaint to SATS Colour\\[0.35em]
+\large One complaint, every pipeline step}
+\author{Quaigraine Samuel \and Twum Samuel\\
+\small Department of Mathematics, KNUST\\
+Supervisor: Professor Peter Amoako-Yirenkyi}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We solve one English chief complaint all the way to a SATS colour and pathway card.
+Token IDs and the final Softmax \(\to\) Yellow example follow the thesis.
+Embedding and attention arithmetic use \textbf{small illustrative numbers}
+(true BioBERT uses 768 dimensions and learned weights we do not recompute here).
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\input{sections/01-setup-gate}
+\input{sections/02-tokens-embed}
+\input{sections/03-attention-layers}
+\input{sections/04-softmax-colour-path}
+
+\end{document}

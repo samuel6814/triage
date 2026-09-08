@@ -1,0 +1,153 @@
+%====================================================
+% Mathematics frames continue under Methodology (no new \section)
+
+\begin{frame}{Tokenisation and \texttt{[CLS]}}
+	\begin{itemize}
+		\item WordPiece splits English complaint \(X\) into subword tokens (max length \(M \leq 128\)).
+		\item Special tokens: \texttt{[CLS]} at position \(0\), \texttt{[SEP]} at the end, \texttt{<PAD>} as needed.
+		\item \textbf{Why:} a fixed-length token sequence is the only input BioBERT can read.
+	\end{itemize}
+	\begin{block}{Summary vector}
+		After \(L=12\) encoder layers, the first row is the complaint summary:
+		\[
+		  h_{\mathrm{[CLS]}} \in \mathbb{R}^{768}.
+		\]
+		Classification reads this vector only, not every token separately.
+	\end{block}
+\end{frame}
+
+\begin{frame}{Worked Example: Token IDs}
+	{\scriptsize Complaint (opening clause in table): \textit{``I have a headache and feel feverish.''}; then pad to \(M=128\).}
+	\vspace{0.1em}
+	\begin{center}
+	\scriptsize
+	\begin{tabular}{|c|l|l|r|}
+	\hline
+	\(i\) & Raw & Token & ID \\
+	\hline
+	0 & n/a & \texttt{[CLS]} & 101 \\
+	1 & I & i & 1045 \\
+	2 & have & have & 2031 \\
+	3 & a & a & 1037 \\
+	4--5 & headache & head+\texttt{\#\#ache} & 7994, 8772 \\
+	6 & and & and & 1998 \\
+	7 & feel & feel & 2514 \\
+	8--9 & feverish & fever+\texttt{\#\#ish} & 9643, 6804 \\
+	10 & . & . & 1012 \\
+	11 & n/a & \texttt{[SEP]} & 102 \\
+	12--127 & n/a & \texttt{<PAD>} & 0 \\
+	\hline
+	\end{tabular}
+	\end{center}
+	\vspace{0.05em}
+	\begin{itemize}\scriptsize
+		\item \texttt{\#\#} = continuation of a word (not a new word), so ``headache'' uses two positions.
+		\item \texttt{[CLS]} starts the sequence (later the 768-d summary); \texttt{[SEP]} ends real text; \texttt{<PAD>} fills to 128.
+		\item BioBERT only sees this list of IDs, never the raw English string.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Input Embeddings \(H^{(0)}\)}
+	\begin{block}{Three embeddings summed}
+		For token \(t_i\) at position \(i\) (segment \(s=0\)):
+		\[
+		  E(t_i)_d = E_{\mathrm{word}}(t_i)_d + E_{\mathrm{pos}}(i)_d + E_{\mathrm{seg}}(0)_d,
+		  \quad d=1,\ldots,768.
+		\]
+	\end{block}
+	\begin{itemize}
+		\item Stack rows to form the input matrix \(H^{(0)} \in \mathbb{R}^{M \times 768}\).
+		\item BioBERT embedding space groups related clinical terms after PubMed pre-training \citep{lee2020biobert}.
+		\item \textbf{Why:} meaning + order + segment identity enter the model before attention runs.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Attention in One Minute}
+	\begin{block}{What attention does}
+		Each word decides how much to \emph{listen} to every other word
+		(e.g.\ ``no'' should weaken ``pain''; ``severe'' should strengthen ``headache'').
+	\end{block}
+	\begin{itemize}
+		\item \(Q\): what am I looking for?
+		\item \(K\): what do I offer as a match?
+		\item \(V\): what content do I pass if chosen?
+		\item Twelve heads of size \(64\): \(12 \times 64 = 768\) (full BioBERT width).
+	\end{itemize}
+	\begin{exampleblock}{Next slide}
+		The formula is the same idea in math: score matches, scale, softmax weights, mix values.
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Self-Attention (Encoder Layers)}
+	\begin{block}{Scaled dot-product attention}
+		\[
+		  \mathrm{Attention}(Q,K,V)
+		  = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V,
+		  \qquad d_k = 64.
+		\]
+	\end{block}
+	\begin{itemize}
+		\item \(Q=HW_Q\), \(K=HW_K\), \(V=HW_V\) from the current hidden matrix \(H\).
+		\item Twelve heads in parallel; outputs concatenated and projected back to 768-d.
+		\item Stack \(L=12\) identical encoder layers with residual connections \citep{vaswani2017attention}.
+		\item \textbf{Why:} each symptom token can weigh every other token (e.g.\ negation + pain).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Softmax Classification}
+	\begin{block}{Five-class head}
+		\[
+		\begin{aligned}
+		  \mathbf{z} &= W h_{\mathrm{[CLS]}} + \mathbf{b}, \\
+		  \hat{y}_c &= \frac{\exp(z_c)}{\sum_{j=1}^{5}\exp(z_j)}.
+		\end{aligned}
+		\]
+		Each \(\hat{y}_c\) is the model's belief that the complaint is acuity level \(c\)
+		(levels \(1\)--\(5\)); the five beliefs add up to \(1\).
+	\end{block}
+	\begin{itemize}
+		\item \textbf{Chosen level \(\hat{c}\):} pick the level with the \emph{largest} probability
+		(e.g.\ if Yellow has \(0.72\), choose Yellow).
+		\item \(W \in \mathbb{R}^{5 \times 768}\), \(\mathbf{b} \in \mathbb{R}^{5}\).
+		\item \textbf{Why:} turns the 768-d summary into five acuity scores that sum to one.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Colour Map \(f_{\mathrm{SATS}}\) and Pathway \(P(C)\)}
+	\begin{block}{Acuity \(\to\) SATS colour}
+		\[
+		  f_{\mathrm{SATS}}(\hat{c}) =
+		  \begin{cases}
+		    \mathrm{Red} & \hat{c}=1 \\
+		    \mathrm{Orange} & \hat{c}=2 \\
+		    \mathrm{Yellow} & \hat{c}=3 \\
+		    \mathrm{Green} & \hat{c}\in\{4,5\}
+		  \end{cases}
+		\]
+	\end{block}
+	\begin{exampleblock}{Pathway card}
+		\(P(C) = \bigl(T_{\max},\;\mathrm{destination},\;\mathrm{actions},\;\mathrm{escalation}\bigr)\)
+		aligned to \examplehospital{} protocols.\\
+		\textbf{Why:} routing uses colours and destinations, not raw acuity integers.
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Clinical Gate and End-to-End Chain}
+	\begin{block}{Relevance gate}
+		\[
+		  g(X) = \mathrm{clip}\!\Bigl(\sum_j s_j(X) - p(X),\, 0,\, 1\Bigr),
+		  \qquad \text{proceed iff } g(X) \geq 0.35.
+		\]
+		Symptom lexicon scores \(s_j\); greeting / non-clinical penalty \(p(X)\).
+	\end{block}
+	\begin{alertblock}{Full path}
+		\[
+		  X \xrightarrow{g} \tau(X) \to H^{(0)}
+		  \xrightarrow{12} h_{\mathrm{[CLS]}}
+		  \to \hat{\mathbf{y}}
+		  \xrightarrow{f_{\mathrm{SATS}}} C_{\mathrm{NLP}}
+		  \to P(C_{\mathrm{NLP}}).
+		\]
+		Skip BioBERT on greetings; one chain from text to pathway card.
+	\end{alertblock}
+\end{frame}

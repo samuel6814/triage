@@ -1,0 +1,42 @@
+% Preamble for the solved walkthrough
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+\newcommand{\examplehospital}{KNUST University Hospital}
+\newcommand{\runningcomplaint}{\textit{``I have a headache and feel feverish. My body aches and I feel weak.''}}
+
+\definecolor{triageYellow}{RGB}{255,200,0}
+
+\newtcolorbox{saybox}[1][Say this]{
+  colback=blue!3!white,
+  colframe=blue!40!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+
+\newtcolorbox{stepbox}[1][What just happened]{
+  colback=green!5!white,
+  colframe=green!50!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+
+\newtcolorbox{notebox}[1][Note]{
+  colback=yellow!8!white,
+  colframe=orange!60!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+
+\newtcolorbox{resultbox}[1][Result for this complaint]{
+  colback=triageYellow!15,
+  colframe=orange!70!black,
+  fonttitle=\bfseries,
+  title=#1
+}

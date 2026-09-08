@@ -1,0 +1,47 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+
+\input{preamble}
+
+%----------------------------------------------------
+\title[Hospital Chatbot (BERT Pathways)]%
+{Hospital Chatbot for Color-Coded Clinical Pathways\\[0.25em]
+{\normalsize Using Bidirectional Encoder Representations from Transformers (BERT)}}
+
+\author[Quaigraine \& Twum]%
+    {{\scriptsize by}\\
+	\bcol[green!40!black]{Quaigraine Samuel \quad and \quad Twum Samuel}\\
+	\bigskip
+	{\small Supervisor: Professor Peter Amoako-Yirenkyi}}
+
+\institute[KNUST-Maths]%
+{Department of Mathematics\\
+	Kwame Nkrumah University of Science and Technology}
+
+\logo{\includegraphics[scale=0.1]{KNUSTlogo}}
+\date{\scriptsize September 2026}
+
+%====================================================
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+\begin{frame}{Outline of Presentation}
+	\tableofcontents
+\end{frame}
+
+\input{sections/01-introduction}
+\input{sections/02-problem-rqs}
+\input{sections/03-methodology}
+\input{sections/04-results}
+\input{sections/05-conclusion}
+\input{sections/06-references}
+
+% Build bibliography for \cite{} without showing a long reference dump
+\begin{frame}<beamer:0>[noframenumbering]
+	\bibliographystyle{apalike}
+	\bibliography{myref}
+\end{frame}
+
+\end{document}

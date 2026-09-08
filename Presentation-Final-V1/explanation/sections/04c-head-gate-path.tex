@@ -1,0 +1,227 @@
+\subsection{Softmax classification head (slide 19)}
+\label{sec:expl-softmax}
+
+\begin{intuitbox}
+We need five scores---one per acuity level---that behave like probabilities.
+Then we pick the level with the largest score. That is the entire decision rule.
+\end{intuitbox}
+
+\begin{whybox}
+Connects the 768-d summary to a clinical class. Say ``largest probability'', not bare \(\arg\max\).
+\end{whybox}
+
+Linear map to five logits, then softmax:
+\begin{align}
+  \mathbf{z} &= W h_{\mathrm{[CLS]}} + \mathbf{b},
+  \qquad W\in\mathbb{R}^{5\times 768},\; \mathbf{b}\in\mathbb{R}^{5},
+  \label{eq:logits}\\
+  \hat{y}_c &= \frac{\exp(z_c)}{\sum_{j=1}^{5}\exp(z_j)},
+  \qquad c=1,\ldots,5.
+  \label{eq:softmax}
+\end{align}
+By construction \(\hat{y}_c \ge 0\) and \(\sum_{c=1}^{5}\hat{y}_c = 1\).
+\(\hat{y}_c\) is the model's belief that the complaint is acuity level \(c\).
+
+\paragraph{Chosen level.}
+\begin{equation}
+  \hat{c} = \text{the index \(c\) that maximises \(\hat{y}_c\)}.
+\end{equation}
+
+\paragraph{Worked numerical example.}
+Illustrative logits for levels \(1\)--\(5\):
+\begin{align*}
+  \mathbf{z} &= [-1.2,\,-0.5,\,1.8,\,0.3,\,-0.9], \\
+  \exp(\mathbf{z}) &\propto [0.30,\,0.61,\,6.05,\,1.35,\,0.41], \\
+  \sum_{c} \exp(z_c) &= 8.72, \\
+  \hat{\mathbf{y}} &\approx [0.03,\,0.07,\,0.69,\,0.15,\,0.05], \\
+  \hat{c} &= 3 \quad\text{(then Yellow via \(f_{\mathrm{SATS}}\))}.
+\end{align*}
+Deployment logs may round a dominant Yellow near \(72\%\); the mathematics is the same: pick the largest \(\hat{y}_c\).
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{9cm}@{}}
+\toprule
+Symbol & Meaning \\
+\midrule
+\(h_{\mathrm{[CLS]}}\) & 768-d summary from the final encoder layer \\
+\(W,\mathbf{b}\) & Learned classification weights and bias \\
+\(z_c\) & Logit (pre-softmax score) for level \(c\) \\
+\(\hat{y}_c\) & Probability of level \(c\) \\
+\(\hat{c}\) & Predicted level = index of largest \(\hat{y}_c\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{saybox}
+``The head turns the summary into five probabilities that add to one. We choose the level with the highest probability.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\subsection{Why Stage~3 fine-tuning (loss and one gradient step)}
+\label{sec:expl-loss}
+
+\begin{intuitbox}
+PubMed pre-training teaches medical language. It does \emph{not} teach five-class SATS acuity on short chief complaints.
+Stage~3 fine-tuning on the \(80{,}000\) Triagegeist pairs teaches that mapping.
+\end{intuitbox}
+
+\paragraph{Stage 1 in one sentence.}
+Masked language modelling on PubMed/PMC teaches \(P(t_i \mid \text{context})\) over biomedical text.
+No triage colours yet.
+
+\paragraph{Stage 3 objective (what we need for the talk).}
+Given nurse label \(c^\star\) and predicted distribution \(\hat{\mathbf{y}}\), minimise cross-entropy:
+\begin{equation}
+  \mathcal{L} = -\sum_{c=1}^{5} \mathbf{1}[c=c^\star]\,\log \hat{y}_c = -\log \hat{y}_{c^\star}.
+  \label{eq:CE}
+\end{equation}
+Wrong confident predictions produce large loss.
+
+\paragraph{Backpropagation sketch.}
+Gradients flow from the loss through softmax and the linear head into BioBERT:
+\begin{equation}
+  \frac{\partial \mathcal{L}}{\partial W}
+  = \frac{\partial \mathcal{L}}{\partial \hat{\mathbf{y}}}
+  \cdot \frac{\partial \hat{\mathbf{y}}}{\partial \mathbf{z}}
+  \cdot \frac{\partial \mathbf{z}}{\partial W}.
+\end{equation}
+In words: (i)~how wrong the probabilities are; (ii)~how softmax transmits that error; (iii)~how logits depend on \(W\).
+
+\paragraph{Gradient descent update.}
+\begin{equation}
+  W_{\mathrm{new}} = W_{\mathrm{old}} - \alpha \frac{\partial \mathcal{L}}{\partial W},
+\end{equation}
+with a small learning rate (thesis order \(\alpha = 2\times 10^{-5}\)) so PubMed knowledge is preserved while the head and encoder adapt to urgency labels.
+
+\begin{saybox}
+``We fine-tune on eighty thousand labelled complaints with cross-entropy. That is what turns BioBERT language knowledge into five acuity probabilities.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\subsection{Colour map \(f_{\mathrm{SATS}}\) and pathway \(P(C)\) (slide 20)}
+\label{sec:expl-fsats}
+
+\begin{intuitbox}
+Training labels are integers \(1\)--\(5\). The hospital speaks colours, timers, and destinations.
+A fixed deterministic map bridges the two languages; the pathway card finishes the product.
+\end{intuitbox}
+
+\begin{equation}
+  f_{\mathrm{SATS}}(\hat{c}) =
+  \begin{cases}
+    \mathrm{Red} & \hat{c}=1 \\
+    \mathrm{Orange} & \hat{c}=2 \\
+    \mathrm{Yellow} & \hat{c}=3 \\
+    \mathrm{Green} & \hat{c}\in\{4,5\}
+  \end{cases}
+  = C_{\mathrm{NLP}}.
+  \label{eq:fsats}
+\end{equation}
+Levels \(4\) and \(5\) both map to Green (routine stream). Blue is a dignity protocol, not an NLP output class here.
+
+\paragraph{Pathway card.}
+\begin{equation}
+  P(C) = \bigl(T_{\max},\;\mathrm{destination},\;\mathrm{actions},\;\mathrm{escalation}\bigr),
+\end{equation}
+aligned to \examplehospital{} protocol:
+\begin{itemize}
+  \item \(T_{\max}\): maximum waiting time for that colour;
+  \item destination: primary clinical stream;
+  \item actions: support steps (nursing, diagnostics, HIT, \ldots);
+  \item escalation: what happens if the timer expires or the patient worsens.
+\end{itemize}
+
+\paragraph{Protocol sketch (clinical destinations).}
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}llll@{}}
+\toprule
+Colour & \(T_{\max}\) & Destination (summary) & Escalation \\
+\midrule
+Red & 0 min & Resuscitation / Surgery & Immediate senior alert \\
+Orange & 10 min & Acute medical / surgical streams & Head nurse if unclaimed \\
+Yellow & 60 min & Outpatient urgent / Pediatrics & Re-assess at timer \\
+Green & \(<4\) h & Routine OPD / Dental / Eye / PPH & Return if worse \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Scenario examples (tie to the gate).}
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lp{9cm}@{}}
+\toprule
+Scenario & Example phrase \\
+\midrule
+Gate reject & ``Hello, how are you?'' (no clinical content) \\
+Red & ``Crushing chest pain, cannot breathe, sweating heavily'' \\
+Orange & ``Severe abdominal pain in pregnancy, bleeding'' \\
+Yellow & \runningcomplaint{} \\
+Green & ``Routine dental pain for two weeks, no fever'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{saybox}
+``Level three becomes Yellow; Yellow becomes a card with about sixty minutes and an urgent destination. That is \(f_{\mathrm{SATS}}\) then \(P(C)\).''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\subsection{Clinical gate and end-to-end chain (slide 21)}
+\label{sec:expl-gate}
+
+\begin{intuitbox}
+Do not waste BioBERT on ``hello'' or sports chat.
+A cheap rule-based gate asks whether the text looks clinical enough.
+\end{intuitbox}
+
+\begin{whybox}
+Closes the mathematical story and matches the first box on the pipeline diagram.
+\end{whybox}
+
+\paragraph{Relevance score.}
+Symptom lexicon hits contribute non-negative scores \(s_j(X)\).
+A greeting / non-clinical pattern contributes penalty \(p(X)\) (prototype uses \(p(X)=0.5\) when matched).
+\begin{equation}
+  g(X) = \mathrm{clip}\!\Bigl(\sum_j s_j(X) - p(X),\, 0,\, 1\Bigr).
+  \label{eq:gate}
+\end{equation}
+Proceed to BioBERT iff \(g(X)\ge 0.35\); otherwise re-prompt for a real chief complaint and assign no colour.
+The threshold \(0.35\) rejects obvious non-medical input while accepting short valid complaints such as ``chest pain''.
+
+\paragraph{Worked gate examples.}
+Clinical running complaint with hits ``headache'' (\(s_1=0.30\)) and ``feverish'' (\(s_2=0.25\)), no greeting penalty:
+\begin{align*}
+  \sum_j s_j &= 0.55, \qquad g(X)=\mathrm{clip}(0.55,0,1)=0.55 \ge 0.35
+\end{align*}
+\(\Rightarrow\) classification proceeds.
+
+Greeting ``Hello, how are you?'' with no symptoms and \(p(X)=0.5\):
+\begin{align*}
+  g(X)=\mathrm{clip}(0-0.5,0,1)=0 < 0.35
+\end{align*}
+\(\Rightarrow\) stop; request clinical text.
+
+\paragraph{Full chain (memorise).}
+\begin{equation}
+  X \xrightarrow{g} \tau(X) \to H^{(0)}
+  \xrightarrow{12} h_{\mathrm{[CLS]}}
+  \to \hat{\mathbf{y}}
+  \xrightarrow{f_{\mathrm{SATS}}} C_{\mathrm{NLP}}
+  \to P(C_{\mathrm{NLP}}).
+  \label{eq:e2e}
+\end{equation}
+If \(g(X)<0.35\), the chain stops after the gate.
+
+\begin{enumerate}
+  \item Gate: compute \(g(X)\); stop if below \(0.35\).
+  \item Tokenise and embed \(\to H^{(0)}\).
+  \item Twelve encoder layers \(\to h_{\mathrm{[CLS]}}\).
+  \item Softmax head \(\to \hat{\mathbf{y}}\); choose largest component \(\hat{c}\).
+  \item Map \(\hat{c}\to C_{\mathrm{NLP}}\) and attach \(P(C_{\mathrm{NLP}})\).
+\end{enumerate}
+
+\begin{saybox}
+``If the gate says yes, we tokenise, embed, run twelve layers, softmax, map to a colour, and emit a pathway card. That single chain is the mathematical contribution of the thesis.''
+\end{saybox}

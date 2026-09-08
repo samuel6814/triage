@@ -1,0 +1,152 @@
+\section{Step 5 --- Softmax classification (thesis numbers)}
+\label{sec:softmax}
+
+The five-class head:
+\[
+  \mathbf{z} = W h_{\mathrm{[CLS]}} + \mathbf{b},
+  \qquad
+  \hat{y}_c = \frac{\exp(z_c)}{\sum_{j=1}^{5}\exp(z_j)}.
+\]
+
+\subsection*{Illustrative logits (from the thesis example)}
+
+After the linear map, suppose
+\[
+  \mathbf{z} = [-1.2,\,-0.5,\,1.8,\,0.3,\,-0.9].
+\]
+
+Compute exponentials:
+
+\begin{center}
+\begin{tabular}{@{}crr@{}}
+\toprule
+Level \(c\) & \(z_c\) & \(\exp(z_c)\) (approx.) \\
+\midrule
+1 (Red) & \(-1.2\) & \(0.301\) \\
+2 (Orange) & \(-0.5\) & \(0.607\) \\
+3 (Yellow) & \(1.8\) & \(6.050\) \\
+4 & \(0.3\) & \(1.350\) \\
+5 & \(-0.9\) & \(0.407\) \\
+\midrule
+Sum & & \(8.715\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Probabilities}
+
+\[
+\begin{aligned}
+  \hat{y}_1 &= 0.301/8.715 \approx 0.035, \\
+  \hat{y}_2 &= 0.607/8.715 \approx 0.070, \\
+  \hat{y}_3 &= 6.050/8.715 \approx 0.694, \\
+  \hat{y}_4 &= 1.350/8.715 \approx 0.155, \\
+  \hat{y}_5 &= 0.407/8.715 \approx 0.047.
+\end{aligned}
+\]
+
+Check: \(0.035+0.070+0.694+0.155+0.047 \approx 1.00\).
+
+\subsection*{Chosen level}
+
+Largest probability is \(\hat{y}_3 \approx 0.69\) (about \(72\%\) in rounded deployment talk).
+
+\[
+  \hat{c} = 3.
+\]
+
+\begin{resultbox}
+For this complaint we take \textbf{acuity level 3}.
+\end{resultbox}
+
+\begin{saybox}
+``Softmax gives five beliefs that sum to one; we pick the largest---here level 3.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\section{Step 6 --- Colour map \(f_{\mathrm{SATS}}\)}
+\label{sec:colour}
+
+\[
+  f_{\mathrm{SATS}}(\hat{c}) =
+  \begin{cases}
+    \mathrm{Red} & \hat{c}=1 \\
+    \mathrm{Orange} & \hat{c}=2 \\
+    \mathrm{Yellow} & \hat{c}=3 \\
+    \mathrm{Green} & \hat{c}\in\{4,5\}
+  \end{cases}
+\]
+
+With \(\hat{c}=3\):
+\[
+  C_{\mathrm{NLP}} = f_{\mathrm{SATS}}(3) = \mathbf{Yellow}.
+\]
+
+\begin{resultbox}
+\textbf{Colour for our complaint: Yellow.}
+\end{resultbox}
+
+\begin{stepbox}
+Integer level \(\to\) hospital colour language.
+\end{stepbox}
+
+\begin{saybox}
+``Level three maps to Yellow under \(f_{\mathrm{SATS}}.\)''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\section{Step 7 --- Pathway card \(P(C)\)}
+\label{sec:path}
+
+\[
+  P(C) = \bigl(T_{\max},\;\mathrm{destination},\;\mathrm{actions},\;\mathrm{escalation}\bigr).
+\]
+
+For \textbf{Yellow} at \examplehospital{}:
+
+\begin{center}
+\begin{tabular}{@{}lp{9cm}@{}}
+\toprule
+Field & Value \\
+\midrule
+\(T_{\max}\) & \(\approx 60\) minutes \\
+Destination & Urgent waiting / OPD urgent (Pediatrics if applicable) \\
+Actions & Nursing vitals/TEWS in parallel, timer, diagnostics as needed \\
+Escalation & Re-assess if timer expires or patient worsens \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{resultbox}
+\textbf{Pathway:} Yellow card --- be seen within about an hour in the urgent stream;
+nurse still measures TEWS and may override.
+\end{resultbox}
+
+\begin{saybox}
+``Yellow is not only a colour; it is a card with timer, destination, and escalation.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\section{Step 8 --- Full solution recap}
+\label{sec:recap}
+
+\begin{resultbox}[Solved: \runningcomplaint{}]
+\begin{enumerate}[leftmargin=*,itemsep=0.35em]
+  \item Gate: \(g(X)=0.75 \ge 0.35\) \(\to\) proceed.
+  \item Tokenise: WordPiece IDs with \texttt{[CLS]}/\texttt{[SEP]}/pad to \(128\).
+  \item Embed: word+pos+seg \(\to H^{(0)}\) (768-d in the real model).
+  \item BioBERT: 12 layers of attention+FFN \(\to h_{\mathrm{[CLS]}}\).
+  \item Softmax: \(\hat{\mathbf{y}}\approx(0.03,0.07,0.69,0.16,0.05)\), \(\hat{c}=3\).
+  \item Colour: \(C_{\mathrm{NLP}}=\mathrm{Yellow}\).
+  \item Pathway: \(P(\mathrm{Yellow})\) with \(\approx 60\)\,min urgent stream at \examplehospital{}.
+\end{enumerate}
+\[
+  X \xrightarrow{g} \cdots \to \hat{c}=3
+  \xrightarrow{f_{\mathrm{SATS}}} \mathrm{Yellow}
+  \to P(\mathrm{Yellow}).
+\]
+\end{resultbox}
+
+\begin{saybox}[Closing line for the viva]
+``For this headache-and-fever complaint, the solved pipeline yields Yellow with an urgent pathway card, while the nurse keeps TEWS and override.''
+\end{saybox}

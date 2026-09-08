@@ -1,0 +1,194 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage[hidelinks]{hyperref}
+
+\onehalfspacing
+\setlist[description]{style=nextline,leftmargin=1.4em,font=\normalfont\bfseries}
+\setlist[enumerate]{leftmargin=1.6em}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{1.4em}{0.5em}
+
+\newcommand{\say}[1]{\begin{quote}\itshape #1\end{quote}}
+\newcommand{\terms}{\subsection*{Words and phrases}}
+
+\title{Presentation write-up\\[0.35em]
+\large Hospital Chatbot for Color-Coded Clinical Pathways\\
+Using Bidirectional Encoder Representations from Transformers (BERT)}
+\author{Quaigraine Samuel \and Twum Samuel\\[0.6em]
+\small Supervisor: Professor Peter Amoako-Yirenkyi\\
+Department of Mathematics\\
+Kwame Nkrumah University of Science and Technology}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+\noindent
+This note is the spoken script for the defence presentation. Under each slide, technical words and phrases are explained in plain English.
+
+\section{Slide 1: Title (0:00--0:30)}
+
+\say{Good morning, Mr.\ Chairman, members of the panel, and fellow students. My name is Samuel Quaigraine, and together with my research partner, Samuel Twum, we present our thesis: \emph{Hospital Chatbot for Color-Coded Clinical Pathways Using BERT}. This research was conducted under the supervision of Professor Peter Amoako-Yirenkyi. Today, we will demonstrate a mathematical pipeline that instantly translates a patient's unstructured text into actionable hospital routing.}
+
+\terms
+\begin{description}
+\item[BERT] Bidirectional Encoder Representations from Transformers. A language model that reads a sentence in both directions so each word is understood from the words around it.
+\item[Pipeline] A fixed sequence of steps. Here: complaint text goes in, and a colour plus a next-step card comes out.
+\item[Unstructured text] Free English written as a patient would speak it, not a filled form or a list of codes.
+\item[Hospital routing] Sending the patient to the right place, with a sense of how soon they should be seen.
+\end{description}
+
+\section{Slide 2: Outline (0:30--0:45)}
+
+\say{Our presentation covers the clinical problem of flow management, our NLP methodology, the core mathematics of BioBERT, our holdout evaluation results, and the anticipated impact on hospital intake.}
+
+\terms
+\begin{description}
+\item[Flow management] How patients move through the hospital: who is seen first, and where they go next.
+\item[NLP] Natural language processing. The mathematics and software that turn written language into numbers a model can use.
+\item[BioBERT] A BERT model that was further trained on biomedical text, such as medical journal articles, so it handles clinical words better.
+\item[Holdout evaluation] Testing the model on complaints it was not trained on, so the scores are not just a memory of the training set.
+\end{description}
+
+\section{Slides 3 and 4: Problem statement (0:45--1:45)}
+
+\say{Hospitals in Ghana face severe overcrowding. However, this is not just an issue of ``too many people''. It is a flow management failure. Currently, when a patient arrives, their South African Triage Scale (SATS) urgency colour often does not travel with them to diagnostics or wards. This leads to acuity discontinuity, leaving destinations unclear and allowing non-urgent cases to congest acute streams. Crucially, there is a text-first gap. Patients arrive describing symptoms in words, but nurses cannot compute the standard Triage Early Warning Score (TEWS) until physical vitals are measured minutes or hours later.}
+
+\terms
+\begin{description}
+\item[SATS] South African Triage Scale. A hospital colour system that says how urgent a patient is and, in principle, where they should go.
+\item[Urgency colour] The SATS band: Red (immediate), Orange (very urgent), Yellow (urgent), or Green (less urgent).
+\item[Acuity discontinuity] The colour is assigned at the first desk, then stops guiding the patient. Urgency is ``lost'' as they move on.
+\item[TEWS] Triage Early Warning Score. A nurse score built from measured signs such as heart rate and breathing rate. It needs those measurements; it does not read words.
+\item[Text-first gap] The time when the patient can already describe symptoms, but vitals have not yet been taken, so TEWS cannot be computed.
+\item[Acute stream] The part of the hospital reserved for patients who need to be seen quickly, not routine clinic queues.
+\end{description}
+
+\section{Slides 5 and 6: Research questions and objectives (1:45--2:30)}
+
+\say{This raises our core research questions. Can a model accurately map patient text to an urgency level (1--5)? Can a chatbot provide colour and pathway guidance before vitals are even taken? And can the system safely reject non-medical input? To answer this, our objective was to build and deploy a BioBERT classifier that predicts urgency from a single English chief complaint, protected by a clinical gate that blocks greetings or nonsense.}
+
+\terms
+\begin{description}
+\item[Research question] The specific question the project sets out to answer, not a general hope.
+\item[Urgency level (1--5)] A numbered scale of how soon the patient should be seen. Level~1 is the most urgent.
+\item[Chief complaint] The main reason the patient has come, in their own words. Example: a headache with fever and weakness.
+\item[Classifier] A model that chooses one class from a fixed list. Here, one of five urgency levels.
+\item[Clinical gate] A simple check before the deep model runs. If the message is not medical, the system asks for a real complaint and does not assign a colour.
+\end{description}
+
+\section{Slide 7: NLP pipeline overview (2:30--3:15)}
+
+\say{This is the architecture of our solution. First, a patient's raw complaint text hits our clinical gate. This rule-based function calculates a score, and if \(g(X)\) is strictly less than 0.35, the system rejects the input to save compute and ensure safety. Valid text then moves through tokenisation and embedding into a 768-dimensional space. It passes through 12 layers of BioBERT, feeds into a 5-class Softmax head, and finally maps to a SATS colour (Red, Orange, Yellow, or Green) with an actionable pathway card.}
+
+\terms
+\begin{description}
+\item[\(g(X)\)] A number between 0 and 1 that says how clinical the message \(X\) looks. Proceed only if \(g(X)\) is at least 0.35.
+\item[Tokenisation] Splitting the sentence into small pieces (tokens) the model can look up.
+\item[Embedding] Turning each token into a list of numbers that stand for its meaning.
+\item[768-dimensional space] Each token is a list of 768 numbers. That width is fixed by the BioBERT design.
+\item[Softmax] A formula that turns five raw scores into five probabilities that add up to 1.
+\item[Pathway card] The practical output: colour, where to go, and how soon, not only a number.
+\end{description}
+
+\section{Slide 8: Tokenisation and embeddings (3:15--4:15)}
+
+\say{Let us look at the mathematics of how English becomes a matrix. Using the WordPiece algorithm, we split the complaint into subword tokens, strictly capped at a sequence length of 128. We inject special tokens, most importantly the [CLS] token at position zero. To move into continuous space, every token is mapped to a 768-dimensional vector. We calculate this via element-wise addition of three learned embeddings: the word's meaning (\(E_{\mathrm{word}}\)), its position in the sentence (\(E_{\mathrm{pos}}\)), and a segment marker (\(E_{\mathrm{seg}}\)). Stacking these row by row yields our initial input matrix, \(H^{(0)}\). As the matrix passes through the 12 encoder layers, that [CLS] token absorbs the context of the entire complaint, becoming our final 768-dimensional summary vector.}
+
+\terms
+\begin{description}
+\item[WordPiece algorithm] A fixed dictionary method that keeps common words whole and splits rare or long words into pieces (for example ``head'' and ``\#\#ache'').
+\item[Subword token] One piece after that split. The model counts pieces, not always whole words.
+\item[Sequence length 128] At most 128 tokens enter one pass, including special markers and padding. Longer text is cut or shortened first.
+\item[{[CLS]}] A special first token. After the encoder, its vector is used as a summary of the whole complaint.
+\item[Continuous space] Numbers on a smooth scale, not discrete word IDs alone. Similar meanings sit nearer each other in this number space.
+\item[Embedding] A learned list of numbers for one token.
+\item[Element-wise addition] Add the three lists number by number: first with first, second with second, and so on.
+\item[\(E_{\mathrm{word}}\)] The part that encodes what the piece means.
+\item[\(E_{\mathrm{pos}}\)] The part that encodes where the piece sits in the sentence, so order is not lost.
+\item[\(E_{\mathrm{seg}}\)] A marker for sentence A or B. For one complaint we always use the same marker, so the pre-trained model still fits.
+\item[Input matrix \(H^{(0)}\)] The starting table: one row per token, 768 columns of features.
+\item[Encoder layer] One block that mixes information across tokens. BioBERT stacks 12 of them.
+\item[Summary vector] The final [CLS] row: 768 numbers that stand for the whole complaint.
+\end{description}
+
+\section{Slide 9: Self-attention (4:15--5:15)}
+
+\say{The engine driving this contextual understanding is scaled dot-product attention. The model projects our hidden states into three matrices: Queries (what a token is looking for), Keys (what it represents), and Values (its actual content). We take the dot product of the Queries and Keys (\(QK^{\top}\)) to mathematically score the alignment between every single word in the complaint. Because we use 12 parallel attention heads, each operating in a smaller 64-dimensional space (\(d_k = 64\)), we scale the score down by the square root of 64 for numerical stability. Finally, Softmax converts these scores into weights that sum to 1, which we multiply by the Value matrix. This mechanism ensures the mathematical representation of a word like ``fever'' is directly modified by surrounding words like ``mild'' or ``severe''.}
+
+\terms
+\begin{description}
+\item[Scaled dot-product attention] A way for every token to look at every other token, then mix their content by how well they match.
+\item[Query] What this token is looking for in the rest of the sentence.
+\item[Key] What each token offers as a match.
+\item[Value] The content that gets passed along once a match is found.
+\item[Dot product \(QK^{\top}\)] A score of how well a query lines up with a key. Higher means ``pay more attention here''.
+\item[Attention head] One parallel attention calculation. Twelve heads run at once; each sees a slice of the features.
+\item[\(d_k = 64\)] The width of one head. Twelve heads times 64 equals the full 768.
+\item[Numerical stability] Dividing by \(\sqrt{64}\) keeps the scores from becoming so large that Softmax collapses to 0 or 1 too early.
+\item[Softmax weights] Attention shares that are non-negative and add to 1, like a weighted average over the other tokens.
+\end{description}
+
+\section{Slide 10: Softmax and colour map (5:15--6:00)}
+
+\say{At the end of the 12 layers, our [CLS] summary vector enters the classification head. We perform a linear transformation (\(z = Wh + b\)) to generate five raw logits. Because our five SATS levels are mutually exclusive, we apply the Softmax function to translate these logits into a clean probability distribution that sums to 1. We take the argmax, the level with the highest probability, and pass it through a fixed, deterministic mapping function (\(f_{\mathrm{SATS}}\)) to assign the final hospital colour.}
+
+\terms
+\begin{description}
+\item[Classification head] The last small layer that turns the 768 summary numbers into five urgency scores.
+\item[Linear transformation] \(z = Wh + b\): multiply the summary by a learned weight matrix and add a bias. A straight scoring step, not another attention block.
+\item[Logit] A raw score before it becomes a probability. It can be any real number, positive or negative.
+\item[Mutually exclusive] The patient is assigned one urgency level at this moment, not two colours at once.
+\item[Softmax] Turns the five logits into five probabilities that add to 1.
+\item[Argmax] ``Pick the largest.'' The predicted level is the one with the highest probability.
+\item[\(f_{\mathrm{SATS}}\)] A fixed rule, not a learned guess: level 1 to Red, 2 to Orange, 3 to Yellow, and 4 or 5 to Green.
+\end{description}
+
+\section{Slide 11: Results (6:00--6:45)}
+
+\say{We evaluated this pipeline on a stratified holdout set of 8{,}000 synthetic English complaints. The model achieved a 99.92\% accuracy and a Macro-F1 score of 0.9977. The Macro-F1 is critical here: it proves the model did not just learn the majority class, but balanced precision and recall across all five levels. Crucially, for clinical safety, our Level~1 (Red) recall was 98.14\%. Furthermore, our mean inference latency is roughly 102 milliseconds per complaint. This confirms the system is fast enough for real-time intake assistance.}
+
+\terms
+\begin{description}
+\item[Stratified holdout] The 8{,}000 test complaints keep the same mix of urgency levels as the full set, and they were not used to train the model.
+\item[Accuracy] The share of test complaints where the predicted level matches the recorded label.
+\item[Precision] Of the cases the model called a given level, how many truly were that level.
+\item[Recall] Of the cases that truly were a given level, how many the model found. Red recall asks: of the true Red cases, how many did we catch?
+\item[Macro-F1] An average of a precision--recall score computed separately for each of the five levels, so a rare level counts as much as a common one.
+\item[Majority class] The most common level in the data. A lazy model that always predicts that level can look accurate and still miss urgent cases.
+\item[Inference latency] How long one prediction takes after the text is submitted. About 102 milliseconds is a tenth of a second.
+\end{description}
+
+\section{Slide 12: Impact on hospital intake (6:45--7:30)}
+
+\say{This speed fundamentally changes hospital workflow. In traditional intake, a patient arrives and waits in a long queue for minutes or hours just to have a colour assigned, leaving their destination unclear. With our chatbot-assisted intake, the text is classified in 100 milliseconds. The patient receives an immediate urgency signal and a pathway card indicating exactly where they should go. This allows urgent cases to be fast-tracked while nurses complete the TEWS vital checks in parallel.}
+
+\terms
+\begin{description}
+\item[Pathway card] A short instruction with the colour, the destination, and a waiting-time target.
+\item[Fast-track] Urgent cases are directed onward without waiting behind routine queues for a first colour.
+\item[In parallel] The chatbot does not replace the nurse. TEWS and vitals still happen; they can start while the text colour is already known.
+\item[Anticipated impact] Expected benefit from the design and the measured speed. We have not yet timed a live queue at the hospital.
+\end{description}
+
+\section{Slides 13 and 14: Conclusion and limitations (7:30--8:00)}
+
+\say{In conclusion, our fine-tuned BioBERT model successfully maps English chief complaints to SATS colours in milliseconds. We acknowledge the limitations of our study. The chatbot currently only processes English. Furthermore, our evaluation rests on a held-out dataset; prospective live time-studies are required to measure actual queue reduction. Ultimately, this is a decision-support tool. Clinicians retain authority and make the final triage decision.}
+
+\terms
+\begin{description}
+\item[Fine-tuned] The BioBERT model was further trained on labelled chief complaints so it predicts urgency, not only medical language in general.
+\item[Held-out dataset] The 8{,}000 complaints kept aside for testing. Scores are agreement with labels on that practice set, not a live hospital trial.
+\item[Prospective time study] A future study that follows real patients and measures waiting time, rather than only scoring old text.
+\item[Decision-support tool] The chatbot suggests a colour and a pathway. It does not discharge, treat, or replace clinical judgment.
+\item[Clinician authority] Nurses and doctors may override the suggestion. The final triage decision remains theirs.
+\end{description}
+
+\end{document}

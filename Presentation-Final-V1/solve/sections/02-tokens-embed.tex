@@ -1,0 +1,99 @@
+\section{Step 2 --- Tokenisation}
+\label{sec:tokens}
+
+BioBERT needs integer IDs, not English letters.
+
+\[
+  X \xrightarrow{\tau} (t_0,\ldots,t_{M-1}), \qquad M \le 128.
+\]
+
+\subsection*{Opening clause (thesis table)}
+
+We show the first sentence in detail (as on the Beamer worked-example slide). The second sentence (``My body aches\ldots'') is tokenised the same way, then we pad to length \(128\).
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}cllc@{}}
+\toprule
+\(i\) & Raw & Token & ID \\
+\midrule
+0 & n/a & \texttt{[CLS]} & 101 \\
+1 & I & i & 1045 \\
+2 & have & have & 2031 \\
+3 & a & a & 1037 \\
+4--5 & headache & head + \texttt{\#\#ache} & 7994, 8772 \\
+6 & and & and & 1998 \\
+7 & feel & feel & 2514 \\
+8--9 & feverish & fever + \texttt{\#\#ish} & 9643, 6804 \\
+10 & . & . & 1012 \\
+11 & n/a & \texttt{[SEP]} & 102 \\
+12--127 & n/a & \texttt{<PAD>} & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+  \item \texttt{\#\#} = continuation of a word: ``headache'' uses \emph{two} positions.
+  \item \texttt{[CLS]} will become the summary vector after 12 layers.
+  \item \texttt{[SEP]} ends real text; \texttt{<PAD>} fills the rest (masked in attention).
+\end{itemize}
+
+\begin{stepbox}
+English string \(\to\) list of IDs. BioBERT will never see the raw sentence again.
+\end{stepbox}
+
+\begin{saybox}
+``We WordPiece-split the complaint, wrap with \texttt{[CLS]}/\texttt{[SEP]}, and pad to 128 IDs.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\section{Step 3 --- Embeddings (768-d in the real model)}
+\label{sec:embed}
+
+Each ID becomes a vector by looking up and adding three embeddings:
+
+\[
+  E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(0).
+\]
+
+In BioBERT each of those is length \textbf{768}. Below we use a \textbf{3-dimensional toy} so you can add by hand.
+
+\subsection*{Toy: token ``head'' at position \(i=4\)}
+
+\begin{align*}
+  E_{\mathrm{word}} &= [0.31,\,-0.18,\,0.52], \\
+  E_{\mathrm{pos}}(4) &= [0.05,\,0.02,\,-0.01], \\
+  E_{\mathrm{seg}}(0) &= [0.00,\,0.00,\,0.00], \\
+  E(t_4) &= [0.36,\,-0.16,\,0.51].
+\end{align*}
+
+\subsection*{Toy: token ``fever'' at position \(i=8\)}
+
+\begin{align*}
+  E_{\mathrm{word}} &= [0.40,\,0.10,\,-0.20], \\
+  E_{\mathrm{pos}}(8) &= [0.08,\,-0.01,\,0.03], \\
+  E_{\mathrm{seg}}(0) &= [0.00,\,0.00,\,0.00], \\
+  E(t_8) &= [0.48,\,0.09,\,-0.17].
+\end{align*}
+
+\subsection*{Stack into \(H^{(0)}\)}
+
+Every position gets such a vector. Stack as rows:
+
+\[
+  H^{(0)} \in \mathbb{R}^{M \times 768}
+  \quad\text{(real model; our toy would be \(M\times 3\))}.
+\]
+
+\begin{notebox}
+The actual floats come from BioBERT's learned tables (PubMed/PMC + fine-tuning).
+We do not invent 768 real values here; the toy only shows the \emph{addition rule}.
+\end{notebox}
+
+\begin{stepbox}
+IDs \(\to\) continuous vectors \(\to\) matrix \(H^{(0)}\) ready for the encoder.
+\end{stepbox}
+
+\begin{saybox}
+``Word + position + segment, each 768 long; stack into \(H^{(0)}\).''
+\end{saybox}

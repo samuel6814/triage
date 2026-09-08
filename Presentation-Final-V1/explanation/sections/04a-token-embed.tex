@@ -1,0 +1,189 @@
+\section{Mathematics of the pipeline (slides 16--21)}
+\label{sec:math}
+
+This chapter is the mathematical core of the talk. Every slide equation is expanded from first principles:
+definitions, intermediate steps, a worked example on \runningcomplaint{}, and why the design exists.
+Non-math slides were covered earlier; here we stay inside the BioBERT triage chain.
+
+%----------------------------------------------------------------------
+\subsection{Tokenisation (slide 16, part 1)}
+\label{sec:expl-token}
+
+\begin{intuitbox}
+Neural networks do not read English paragraphs. They read fixed-length lists of integer IDs.
+Tokenisation is the map from raw complaint text \(X\) to that list.
+\end{intuitbox}
+
+\begin{whybox}
+Without tokenisation there is no BioBERT input. This answers: how does text become numbers?
+\end{whybox}
+
+\begin{definition}[Tokenisation map]
+\[
+  X \xrightarrow{\tau} (t_0,t_1,\ldots,t_{M-1}), \qquad M \leq 128.
+\]
+Each \(t_i\) is a subword token (or a special token) with an integer ID in the vocabulary
+\(\mathcal{V}\), \(|\mathcal{V}|\approx 28{,}996\).
+\end{definition}
+
+\paragraph{Why \(M\leq 128\)?}
+BioBERT base was trained with this maximum length. Shorter complaints are padded with \texttt{<PAD>};
+longer ones are truncated. Fixed length lets the hospital batch many requests through identical matrix shapes.
+
+\paragraph{WordPiece algorithm.}
+WordPiece keeps common clinical words whole (``fever'', ``pain'') and splits rare or misspelled forms
+into pieces, e.g.\ ``headache'' \(\to\) \texttt{head} + \texttt{\#\#ache}.
+Each piece occupies its own position, so \(M\) counts \emph{subword tokens}, not raw English words.
+That keeps \(\mathcal{V}\) finite while still representing novel spellings at intake.
+
+\paragraph{Three special tokens.}
+\begin{center}
+\small
+\begin{tabular}{@{}clp{8.5cm}@{}}
+\toprule
+Token & ID & Purpose \\
+\midrule
+\texttt{[CLS]} & 101 & Classification summary; always at position \(0\) \\
+\texttt{[SEP]} & 102 & End-of-sentence boundary before padding \\
+\texttt{<PAD>} & 0 & Fill to length \(128\); attention mask zeros these positions \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Worked example (running complaint).}
+For \runningcomplaint{} (simplified tokenisation as in the thesis):
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}cllc@{}}
+\toprule
+\(i\) & Raw & Token & ID \\
+\midrule
+0 & n/a & \texttt{[CLS]} & 101 \\
+1 & I & i & 1045 \\
+2 & have & have & 2031 \\
+3 & a & a & 1037 \\
+4--5 & headache & head + \texttt{\#\#ache} & 7994, 8772 \\
+6 & and & and & 1998 \\
+7 & feel & feel & 2514 \\
+8--9 & feverish & fever + \texttt{\#\#ish} & 9643, 6804 \\
+10 & . & . & 1012 \\
+11 & n/a & \texttt{[SEP]} & 102 \\
+12--127 & n/a & \texttt{<PAD>} & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Notice: ``headache'' and ``feverish'' each cost \emph{two} positions. That is why we say \(M\) counts subwords.
+
+\begin{saybox}
+``We split the English complaint with WordPiece, insert \texttt{[CLS]} and \texttt{[SEP]}, and pad to 128 IDs. That list is the only thing BioBERT can read.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\subsection{The \texttt{[CLS]} summary vector (slide 16, part 2)}
+\label{sec:expl-cls}
+
+\begin{intuitbox}
+Sequence classification needs one fixed-length vector for the whole complaint.
+Averaging every token would weight ``I'' and ``and'' the same as ``feverish''.
+BERT instead uses an artificial summary token \texttt{[CLS]} at position \(0\).
+\end{intuitbox}
+
+After \(L=12\) encoder layers, every token row has been updated by attending to every other token.
+The row at position \(0\) is
+\begin{equation}
+  h_{\mathrm{[CLS]}} = H^{(L)}_{0,:} \in \mathbb{R}^{768}.
+  \label{eq:hcls}
+\end{equation}
+The five-class head reads \emph{only} this vector. \texttt{[SEP]} marks where real text ends so padding is not treated as symptoms; \texttt{[SEP]} itself is not used for acuity prediction.
+
+\begin{remark}
+Self-attention updates the \texttt{[CLS]} row at every layer, so by layer 12 it encodes information from all symptom tokens. That is why one 768-vector can represent the full clinical wording of \(X\).
+\end{remark}
+
+\begin{saybox}
+``After twelve layers we take the first row---\texttt{[CLS]}---as a 768-number summary of the whole sentence.''
+\end{saybox}
+
+%----------------------------------------------------------------------
+\subsection{Embedding lookup and the three-sum (slide 17)}
+\label{sec:expl-embed}
+
+\begin{intuitbox}
+A token ID is only an index into a dictionary of meaning vectors.
+We also tell the model \emph{where} the token sits and which segment it belongs to.
+\end{intuitbox}
+
+\begin{whybox}
+Explains how discrete IDs become continuous vectors before attention starts.
+\end{whybox}
+
+\paragraph{Word embedding.}
+The matrix \(E_{\mathrm{word}} \in \mathbb{R}^{V \times 768}\) maps each ID to a dense vector:
+\begin{equation}
+  \mathbf{e}_i = E_{\mathrm{word}}[\mathrm{id}(t_i)] \in \mathbb{R}^{768}.
+\end{equation}
+After PubMed/PMC pre-training, BioBERT places clinically related terms nearer in this space than a general English model would \citep{lee2020biobert}.
+
+\paragraph{Position and segment.}
+\begin{equation}
+  E_{\mathrm{pos}}(i) \in \mathbb{R}^{768}, \qquad E_{\mathrm{seg}}(s) \in \mathbb{R}^{768}, \quad s=0
+\end{equation}
+(for a single chief complaint, segment is always \(0\)).
+
+\paragraph{Full input vector (element-wise sum).}
+\begin{equation}
+  E(t_i)_d
+  = E_{\mathrm{word}}(t_i)_d + E_{\mathrm{pos}}(i)_d + E_{\mathrm{seg}}(0)_d,
+  \qquad d=1,\ldots,768.
+  \label{eq:embed-sum}
+\end{equation}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{9.5cm}@{}}
+\toprule
+Symbol & Meaning \\
+\midrule
+\(E_{\mathrm{word}}(t_i)\) & Meaning of the token (dictionary lookup) \\
+\(E_{\mathrm{pos}}(i)\) & Learned vector for position \(i\) (order matters) \\
+\(E_{\mathrm{seg}}(0)\) & Segment id (here always the single-complaint segment) \\
+\(E(t_i)\) & Final 768-d input for that position \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Tiny numerical sketch (first three dimensions only).}
+For token ``head'' at position \(i=4\), suppose (illustrative numbers):
+\begin{align*}
+  E_{\mathrm{word}} &= [0.31,\,-0.18,\,0.52], \\
+  E_{\mathrm{pos}}(4) &= [0.05,\,0.02,\,-0.01], \\
+  E_{\mathrm{seg}}(0) &= [0.00,\,0.00,\,0.00], \\
+  E(t_4) &= [0.36,\,-0.16,\,0.51].
+\end{align*}
+The same addition repeats for dimensions \(d=4,\ldots,768\).
+
+\paragraph{Stacking into \(H^{(0)}\).}
+Place each \(E(t_i)\) as row \(i\) of the input matrix:
+\begin{equation}
+  H^{(0)} \in \mathbb{R}^{M \times 768}.
+  \label{eq:H0}
+\end{equation}
+This is the starting hidden state for encoder layer \(1\).
+
+\paragraph{Why these dimensions?}
+\begin{itemize}
+  \item \(M\leq 128\): sequence length (how many tokens).
+  \item \(768\): hidden width of BioBERT base (how rich each token representation is).
+  \item So \(H^{(0)}\) has at most \(128\times 768 = 98{,}304\) entries per complaint---a fixed tensor shape for batched inference.
+\end{itemize}
+
+\begin{remark}
+The embedding table is like a dictionary: each token ID points to 768 numbers encoding meaning.
+Adding position tells the model where the word appears; adding segment (zero here) reserves the mechanism used in other BERT tasks with two sentences.
+\end{remark}
+
+\begin{saybox}
+``Each token becomes 768 numbers: word meaning plus position plus segment. Stack the rows into \(H^{(0)}\) and feed the encoder.''
+\end{saybox}

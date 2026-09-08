@@ -1,0 +1,225 @@
+%Remove extra space in equation mode
+%\setlength{\abovedisplayskip}{0pt}\setlength{\belowdisplayskip}{0pt}
+
+%\setcounter{tocdepth}{1} % Suppresss subsection in TOC
+%**************************************************************************
+%\newcommand{\tcol}[2][blue]{\textcolor{#1}{{#2}}}
+
+% reduce the size of frametitle
+%\setbeamerfont{frametitle}{size=\normalsize}
+
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\renewcommand{\S}{\mathbb{S}}
+\newcommand{\tensor}[2]{ {#1}^{ \otimes {#2} } }
+\newcommand{\overeq}[1]{\stackrel{{#1}}{=}}
+\newcommand{\pd}[1]{\partial #1}
+\newcommand{\norm}[1]{\left\vert {#1}\right\vert }
+\newcommand{\parent}[1]{\left(#1\right)}
+\newcommand{\Brace}[1]{\left[#1\right]}
+\newcommand{\Leftb}[1]
+{
+	\left\{\begin{array}{lcl}
+		#1
+	\end{array}
+	\right.
+}
+
+\newcommand{\set}[1]{\left\{ {#1} \right\}} %{ \Big\{{#1}\Big\} }
+\newcommand{\vect}[1]{\overrightarrow{#1}}
+\newcommand{\mb}[1]{#1}  
+\newcommand{\mbb}[1]{\mathbb{#1}}
+\newcommand{\mf}[1]{\mathbf{#1}} 
+\newcommand{\mc}[1]{\mathcal{#1}}
+\newcommand{\abs}[1]{\left\vert  {#1} \right\vert}
+\newcommand{\defset}[2]{\left\{\ {#1} \ \vert \ {#2} \right\}}
+\newcommand{\inp}[1]{\langle {#1}\rangle }
+
+\newcommand{\Sum}[2]{\displaystyle{\sum_{#1}^{#2}}}
+\newcommand{\+}{\star}
+\newcommand{\bvec}[1][r]{\mathbf{#1}}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\eqvo}{\Longleftrightarrow}
+\newcommand{\Vect}[1]{\overrightarrow{#1}}
+\newcommand{\dg}[1]{{#1}^{\circ}}
+\newcommand{\fdef}[5][f]{
+	\begin{matrix}
+		{#1} :& {#2} & \to & {#3}\\
+		& {#4} & \mapsto& {#5}
+	\end{matrix}
+}
+
+\newcommand{\fdeff}[5][f]{
+	\begin{tabular}{rlll}
+		{#1} :& {#2} & $\to$ & {#3}\\
+		& {#4} & $\mapsto$& {#5}
+	\end{tabular}
+}
+
+\newcommand{\Limf}[3][x]{\displaystyle \lim_{{#1} \to {#3}}{#2}({#1})}
+\newcommand{\Lim}[2][x]{\displaystyle \lim_{{#1} \to {#2}} }
+
+
+
+
+
+%**************************************************************************
+\graphicspath{{Pics/}}
+%\apptocmd{\frame}{}{\justifying}{} % Allow optional argument after frame
+\setlength\abovecaptionskip{-5pt} %%Removing space
+\usefonttheme[onlymath]{serif} % Maths font
+\renewcommand{\raggedright}{\leftskip=0pt \rightskip=0pt plus 0cm} % justifying the beamer
+
+\setbeamercovered{invisible} % dynamic, transparent
+\setbeamertemplate{caption}[numbered]
+\mode<presentation>
+\AtBeginSection[]
+{
+	\begin{frame}<beamer>
+		\frametitle{Outline of Presentation}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+
+
+%**THEME AND COLORS **************************************
+\usetheme{EastLansing}  %topways
+\setbeamercolor{title}{bg=green!40!black, fg=white} % title block on first slide
+\setbeamercolor{section in toc}{fg=black,bg=white}
+\setbeamercolor*{palette primary}{fg=black,bg=yellow!50!green} %right-hand side of bottom
+\setbeamercolor*{palette secondary}{fg=yellow,bg=black} %center side of bottom
+\setbeamercolor*{palette tertiary}{bg=green!50!black,fg=white} %left-hand side of bottom
+\setbeamercolor*{palette quaternary}{fg=yellow,bg=green!50!black}
+
+
+%\setbeamercolor*{titlelike}{parent=palette primary}
+\setbeamercolor{titlelike}{parent=palette primary,fg=yellow}
+\setbeamercolor{frametitle}{bg=black}
+\setbeamercolor{frametitle right}{bg=red}
+
+\setbeamercolor*{separation line}{}
+\setbeamercolor*{fine separation line}{}
+
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{items}[ball]
+\setbeamercolor{structure}{fg=green!50!black}
+\setbeamercolor{block title}{use=structure,fg=white,bg=structure.fg!75!black}
+\setbeamercolor{block title alerted}{use=alerted text,fg=white,bg=yellow!50!green}
+\setbeamercolor{block title example}{use=example text,fg=white,bg=yellow!50!green} %example text.fg!75!black
+%
+\setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!10!bg}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title alerted.bg!10!bg}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=yellow!10!white}
+
+
+%**************************************************************************%Make pause work in align math mode
+\makeatletter
+\let\save@measuring@true\measuring@true
+\def\measuring@true{%
+	\save@measuring@true
+	\def\beamer@sortzero##1{\beamer@ifnextcharospec{\beamer@sortzeroread{##1}}{}}%
+	\def\beamer@sortzeroread##1<##2>{}%
+	\def\beamer@finalnospec{}%
+}
+\makeatother
+
+
+
+%**************************************************************************Packages
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}  \usepackage[T1]{fontenc} 
+\tolerance=1 \emergencystretch=\maxdimen \hyphenpenalty=10000 \hbadness=10000 \sloppy
+\usepackage{makeidx,enumerate,epsfig, epstopdf, tabularx, placeins, color,ragged2e,hyperref,pgfpages}
+\usepackage{array} 
+\usepackage{float} 
+\usepackage{cancel}
+\usepackage{fancybox}
+\usepackage{xfrac}
+\usepackage{bigints,cleveref}
+\usepackage{mathtools} % More maths, e.g. \mathclap.
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx, caption, subcaption}
+\usepackage{tensor}
+\usepackage{bm}
+\usepackage{bbold}
+\usepackage{dsfont}
+\usepackage{relsize}
+\usepackage{pgfplots}
+\usepackage{mathrsfs}
+\usepackage{physics}
+\usepackage{tabu}
+\usepackage{textcomp}
+\usepackage[table]{colortbl}
+\usepackage{multicol,natbib}
+\usepackage{venndiagram}
+\usepackage{wasysym}
+\usepackage{multirow}
+\usepackage{soul}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{eso-pic}%background
+\usepackage{wallpaper}
+\usepackage{amscd}
+\usepackage{fourier, pifont}
+\usepackage {pgf, tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows,shapes,shadows,lindenmayersystems, patterns}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{listings,theorems, breakable, fitting}%all,,many, listings,theorems, vignette, raster, breakable, fitting,detach titl
+\urlstyle{same}
+
+
+
+%**********************************************************************
+%%    homebrew commands -- to save typing
+\newcommand\etc{\textsl{etc}}
+\newcommand\eg{\textsl{eg.}\ }
+\newcommand\etal{\textsl{et al.}}
+\newcommand\Quote[1]{\lq\textsl{#1}\rq}
+\newcommand\fr[2]{{\textstyle\frac{#1}{#2}}}
+\newcommand\miktex{\textsl{MikTeX}}
+\newcommand\comp{\textsl{The Companion}}
+\newcommand\nss{\textsl{Not so Short}}
+
+
+
+%**********************************************************************
+%%---Environment for theorems, corollary, lemma, proposition, definitions,rmarks, examples and proofs---
+\newtheorem{theo}{Theorem}[section]
+\newtheorem{cor}{Corollary}[section]
+\newtheorem{deff}{Definition}[section]
+\newtheorem{lem}{Lemma}[section]
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{proper}{Property}[section]
+\newtheorem{rem}{Remark}[section]
+\newtheorem{expl}{Application}[section]
+%\newtheorem{proof}{Proof}[section]
+\newtheorem{act}{Discovery}[section]
+\newtheorem{exo}{Exercise}[section]
+\newtheorem{Qst}{Question}[section]
+\newtheorem{Ass}{Assertion}[section]
+\newtheorem{Nb}{Notation}[section]
+\newtheorem{Sol}{Solution}[section]
+\newtheorem{egs}{Example}[subsection]
+\theoremstyle{exercise} \newtheorem*{exercise}{Exercise} 
+
+
+
+%**********************************************************************
+\setbeamercolor{coul1} {bg=red, fg=blue}
+\setbeamercolor{coul2}{bg=white!60, fg=magenta}
+\setbeamercolor{coul3} {bg=olive!30, fg=blue}
+\definecolor{gris1}{gray}{0.85}
+\newcommand{\bloc}[2]{
+	\hspace*{-0.5cm}
+	\begin{beamerboxesrounded}[width=11.5cm,lower=coul2,upper=coul3,shadow=false]{#1}
+		#2
+	\end{beamerboxesrounded}
+}
