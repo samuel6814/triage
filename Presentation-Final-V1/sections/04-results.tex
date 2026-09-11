@@ -20,8 +20,8 @@
 	\end{center}
 	\medskip
 	\begin{itemize}
-		\item Strong agreement with nurse acuity labels on held-out English complaints (RQ1).
-		\item Fast enough for prototype intake assistance (RQ2).
+		\item Strong agreement with nurse acuity labels on held-out English complaints.
+		\item Fast enough for prototype intake assistance.
 	\end{itemize}
 \end{frame}
 
@@ -38,7 +38,6 @@
 	  arrow/.style={->, >=latex, thick, draw=black!55},
 	  foot/.style={font=\scriptsize\itshape, text=black!70, align=center}]
 	  \node[title] at (4.5, 5.5) {Traditional intake};
-	  \draw[dashed, rounded corners, draw=gray!45] (-0.2, 3.55) rectangle (9.2, 5.85);
 	  \node[old] (q) at (0.4, 4.7) {Patient\\arrives};
 	  \node[old] (wait) at (2.9, 4.7) {Long\\queue};
 	  \node[old] (nurse) at (5.4, 4.7) {Colour\\assigned late};
@@ -48,9 +47,8 @@
 	  \draw[arrow] (nurse) -- (unclear);
 	  \node[foot] at (4.5, 3.85) {Wait: minutes to hours \citep{Mitchell2023,kathsats}};
 	  \node[title] at (4.5, 2.85) {Chatbot-assisted intake (anticipated)};
-	  \draw[dashed, rounded corners, draw=green!45!black] (-0.2, 0.55) rectangle (9.2, 3.15);
 	  \node[new] (c) at (1.3, 1.9) {Complaint\\entered};
-	  \node[new] (bot) at (4.5, 1.9) {Classify\\(\(\approx\)100\,ms)};
+	  \node[new] (bot) at (4.5, 1.9) {Classify\\(\(\approx\)102\,ms)};
 	  \node[new] (card) at (7.7, 1.9) {Colour +\\pathway card};
 	  \draw[arrow] (c) -- (bot);
 	  \draw[arrow] (bot) -- (card);

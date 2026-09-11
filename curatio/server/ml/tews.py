@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
+# Adult SATS / TEWS: seven parameters including systolic blood pressure (SBP).
 VITAL_KEYS = (
     "heart_rate_bpm",
     "respiratory_rate",
+    "systolic_bp_mmhg",
     "mobility",
     "temperature_c",
     "avpu",
@@ -35,27 +37,46 @@ class TewsValidationError(ValueError):
 
 
 def score_heart_rate(hr: float) -> int:
-    """f1 — HR breakpoints from equations.js TEWS_HR."""
+    """f1 — adult SATS TEWS heart-rate bands (beats/min)."""
     if hr >= 130:
         return 3
     if 111 <= hr <= 129:
         return 2
-    if 51 <= hr <= 100:
-        return 0
     if hr <= 40:
         return 2
-    return 1  # borderline (e.g. 101–110 or 41–50)
+    if 101 <= hr <= 110:
+        return 1
+    if 41 <= hr <= 50:
+        return 1
+    if 51 <= hr <= 100:
+        return 0
+    return 1  # unused if bands cover the validated range
 
 
 def score_respiratory_rate(rr: float) -> int:
-    """f2 — RR breakpoints from equations.js TEWS_RR."""
+    """f2 — adult SATS TEWS respiratory-rate bands (breaths/min)."""
     if rr >= 30:
+        return 3
+    if rr <= 8:
         return 3
     if 21 <= rr <= 29:
         return 2
     if 9 <= rr <= 14:
+        return 1
+    if 15 <= rr <= 20:
         return 0
     return 1
+
+
+def score_sbp(sbp: float) -> int:
+    """f3 — adult SATS systolic blood pressure (mmHg)."""
+    if sbp > 170:
+        return 2
+    if 101 <= sbp <= 170:
+        return 0
+    if 90 <= sbp <= 100:
+        return 1
+    return 3  # < 90
 
 
 def score_mobility(value: str) -> int:
@@ -68,7 +89,7 @@ def score_mobility(value: str) -> int:
 
 
 def score_temperature(temp_c: float) -> int:
-    """f4 — adult SATS-style temperature bands."""
+    """f5 — adult SATS-style temperature bands."""
     if 35.0 <= temp_c <= 38.4:
         return 0
     if (38.5 <= temp_c <= 38.9) or (34.0 <= temp_c <= 34.9):
@@ -93,8 +114,8 @@ def score_trauma(value: bool) -> int:
 
 
 def colour_from_tews(total: int) -> str:
-    """C_TEWS(T) bands."""
-    if total > 7:
+    """C_TEWS(T) bands — Red when T >= 7 (adult SATS)."""
+    if total >= 7:
         return "Red"
     if 5 <= total <= 6:
         return "Orange"
@@ -157,6 +178,13 @@ def compute_tews(vitals: dict[str, Any] | None) -> dict[str, Any]:
         breakdown.append({"vital": "respiratory_rate", "value": rr, "points": pts})
         total += pts
 
+    if "systolic_bp_mmhg" in observed:
+        sbp = float(observed["systolic_bp_mmhg"])
+        _validate_numeric("systolic_bp_mmhg", sbp, 40, 300)
+        pts = score_sbp(sbp)
+        breakdown.append({"vital": "systolic_bp_mmhg", "value": sbp, "points": pts})
+        total += pts
+
     if "mobility" in observed:
         pts = score_mobility(observed["mobility"])
         breakdown.append(
@@ -189,7 +217,7 @@ def compute_tews(vitals: dict[str, Any] | None) -> dict[str, Any]:
         breakdown.append({"vital": "trauma", "value": trauma, "points": pts})
         total += pts
 
-    incomplete = len(breakdown) < 6
+    incomplete = len(breakdown) < 7
     return {
         "tews_total": total,
         "tews_breakdown": breakdown,

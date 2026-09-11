@@ -73,3 +73,4 @@ fine-tuned-biobert/triage_predictions_results.csv
 # Personal / ad-hoc notes at repo root
 /Exam Preparation Notes.pdf
 /triage_smote_augmented.ipynb - Colab.pdf
+fine-tuned-biobert/external_data/

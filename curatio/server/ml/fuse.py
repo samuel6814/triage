@@ -71,7 +71,7 @@ def fuse(
     )
 
     fused_colour = fusion_out["fused_colour"]
-    pathway = lookup_pathway(fused_colour)
+    pathway = lookup_pathway(fused_colour, complaint=text)
 
     return {
         **nlp,

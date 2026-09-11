@@ -1,0 +1,7 @@
+{
+  "n_rows": 80000,
+  "n_unique_normalized_text": 4949,
+  "duplicate_rate": 0.9381375,
+  "texts_with_count_ge_5": 4184,
+  "note": "High duplication helps explain inflated in-distribution accuracy; not a published test metric."
+}

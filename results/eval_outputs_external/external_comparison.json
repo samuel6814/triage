@@ -1,0 +1,439 @@
+{
+  "datasets": {
+    "nhamcs": {
+      "source": "NHAMCS 2018-22 (processed)",
+      "path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/external_data/nhamcs/nhamcs_data_2018_22.csv",
+      "n_raw": 58124,
+      "n_retained": 12000,
+      "preprocess": [
+        "drop empty/NaN/whitespace chief_complaint_text",
+        "keep target_triage_acuity in {1..5}",
+        "no abbreviation expansion",
+        "tokenize truncate/pad M=128"
+      ],
+      "sampling": "stratified subsample N=12000, seed=42",
+      "support": {
+        "N_L1": 175,
+        "N_L2": 1775,
+        "N_L3": 6104,
+        "N_L4": 3451,
+        "N_L5": 495
+      }
+    },
+    "mimic_demo": {
+      "source": "MIMIC-IV-ED (demo)",
+      "path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/external_data/mimic_iv_ed/triage_demo.csv",
+      "n_raw": 222,
+      "n_retained": 207,
+      "kind": "demo",
+      "preprocess": [
+        "drop empty/NaN/whitespace chiefcomplaint",
+        "keep acuity in {1..5}",
+        "no abbreviation expansion (CP/SOB left as written)",
+        "tokenize truncate/pad M=128"
+      ],
+      "support": {
+        "N_L1": 18,
+        "N_L2": 97,
+        "N_L3": 90,
+        "N_L4": 2,
+        "N_L5": 0
+      }
+    }
+  },
+  "models": {},
+  "results": [
+    {
+      "accuracy": 0.476,
+      "macro_f1": 0.28821206109741115,
+      "mean_confidence": 0.9865530096739531,
+      "support": {
+        "N_L1": 175,
+        "N_L2": 1775,
+        "N_L3": 6104,
+        "N_L4": 3451,
+        "N_L5": 495
+      },
+      "precision_L1": 0.8235294117647058,
+      "recall_L1": 0.08,
+      "f1_L1": 0.14583333333333334,
+      "support_L1": 175,
+      "precision_L2": 0.19945105215004574,
+      "recall_L2": 0.12281690140845071,
+      "f1_L2": 0.15202231520223153,
+      "support_L2": 1775,
+      "precision_L3": 0.5620256657927418,
+      "recall_L3": 0.6672673656618611,
+      "f1_L3": 0.6101415624297806,
+      "support_L3": 6104,
+      "precision_L4": 0.3978305482263266,
+      "recall_L4": 0.3932193567082005,
+      "f1_L4": 0.39551151267851936,
+      "support_L4": 3451,
+      "precision_L5": 0.21551724137931033,
+      "recall_L5": 0.10101010101010101,
+      "f1_L5": 0.1375515818431912,
+      "support_L5": 495,
+      "under_triage_rate": 0.28391666666666665,
+      "over_triage_rate": 0.24008333333333334,
+      "colour_accuracy": 0.4995,
+      "critical_under_triage_red_to_nonred": 0.92,
+      "critical_under_triage_orange_to_yellow_green": 0.8771830985915493,
+      "n_true_red": 175,
+      "n_true_orange": 1775,
+      "latency_ms": {
+        "p50": 94.00124252344,
+        "p95": 124.0301756359365,
+        "mean_per_sample": 94.88537554247031
+      },
+      "n_eval": 12000,
+      "model_path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_biobert_triage",
+      "model_name": "Baseline",
+      "dataset": "nhamcs",
+      "confusion_matrix": [
+        [
+          14,
+          36,
+          94,
+          27,
+          4
+        ],
+        [
+          0,
+          218,
+          1226,
+          305,
+          26
+        ],
+        [
+          2,
+          437,
+          4073,
+          1537,
+          55
+        ],
+        [
+          0,
+          357,
+          1640,
+          1357,
+          97
+        ],
+        [
+          1,
+          45,
+          214,
+          185,
+          50
+        ]
+      ],
+      "dataset_meta": {
+        "source": "NHAMCS 2018-22 (processed)",
+        "path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/external_data/nhamcs/nhamcs_data_2018_22.csv",
+        "n_raw": 58124,
+        "n_retained": 12000,
+        "preprocess": [
+          "drop empty/NaN/whitespace chief_complaint_text",
+          "keep target_triage_acuity in {1..5}",
+          "no abbreviation expansion",
+          "tokenize truncate/pad M=128"
+        ],
+        "sampling": "stratified subsample N=12000, seed=42"
+      }
+    },
+    {
+      "accuracy": 0.3045,
+      "macro_f1": 0.2146313371239695,
+      "mean_confidence": 0.9569831581066052,
+      "support": {
+        "N_L1": 175,
+        "N_L2": 1775,
+        "N_L3": 6104,
+        "N_L4": 3451,
+        "N_L5": 495
+      },
+      "precision_L1": 0.059654631083202514,
+      "recall_L1": 0.21714285714285714,
+      "f1_L1": 0.09359605911330049,
+      "support_L1": 175,
+      "precision_L2": 0.16195190947666196,
+      "recall_L2": 0.2580281690140845,
+      "f1_L2": 0.19900065174885945,
+      "support_L2": 1775,
+      "precision_L3": 0.5889227642276422,
+      "recall_L3": 0.18987549148099606,
+      "f1_L3": 0.2871655104063429,
+      "support_L3": 6104,
+      "precision_L4": 0.31731391585760516,
+      "recall_L4": 0.568241089539264,
+      "f1_L4": 0.4072266638978299,
+      "support_L4": 3451,
+      "precision_L5": 0.09819121447028424,
+      "recall_L5": 0.07676767676767676,
+      "f1_L5": 0.08616780045351474,
+      "support_L5": 495,
+      "under_triage_rate": 0.3903333333333333,
+      "over_triage_rate": 0.30516666666666664,
+      "colour_accuracy": 0.34225,
+      "critical_under_triage_red_to_nonred": 0.7828571428571428,
+      "critical_under_triage_orange_to_yellow_green": 0.6676056338028169,
+      "n_true_red": 175,
+      "n_true_orange": 1775,
+      "latency_ms": {
+        "p50": 96.18096438281043,
+        "p95": 123.7254424671832,
+        "mean_per_sample": 96.53447019830456
+      },
+      "n_eval": 12000,
+      "model_path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/fine_tuned_biobert_triage_smote",
+      "model_name": "Oversample",
+      "dataset": "nhamcs",
+      "confusion_matrix": [
+        [
+          38,
+          54,
+          23,
+          55,
+          5
+        ],
+        [
+          132,
+          458,
+          319,
+          833,
+          33
+        ],
+        [
+          261,
+          1495,
+          1159,
+          3051,
+          138
+        ],
+        [
+          174,
+          741,
+          402,
+          1961,
+          173
+        ],
+        [
+          32,
+          80,
+          65,
+          280,
+          38
+        ]
+      ],
+      "dataset_meta": {
+        "source": "NHAMCS 2018-22 (processed)",
+        "path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/external_data/nhamcs/nhamcs_data_2018_22.csv",
+        "n_raw": 58124,
+        "n_retained": 12000,
+        "preprocess": [
+          "drop empty/NaN/whitespace chief_complaint_text",
+          "keep target_triage_acuity in {1..5}",
+          "no abbreviation expansion",
+          "tokenize truncate/pad M=128"
+        ],
+        "sampling": "stratified subsample N=12000, seed=42"
+      }
+    },
+    {
+      "accuracy": 0.30434782608695654,
+      "macro_f1": 0.1747954642315673,
+      "mean_confidence": 0.9655081071139534,
+      "support": {
+        "N_L1": 18,
+        "N_L2": 97,
+        "N_L3": 90,
+        "N_L4": 2,
+        "N_L5": 0
+      },
+      "precision_L1": 0.4,
+      "recall_L1": 0.1111111111111111,
+      "f1_L1": 0.17391304347826086,
+      "support_L1": 18,
+      "precision_L2": 0.4666666666666667,
+      "recall_L2": 0.14432989690721648,
+      "f1_L2": 0.2204724409448819,
+      "support_L2": 97,
+      "precision_L3": 0.44339622641509435,
+      "recall_L3": 0.5222222222222223,
+      "f1_L3": 0.47959183673469385,
+      "support_L3": 90,
+      "precision_L4": 0.0,
+      "recall_L4": 0.0,
+      "f1_L4": 0.0,
+      "support_L4": 2,
+      "precision_L5": 0.0,
+      "recall_L5": 0.0,
+      "f1_L5": 0.0,
+      "support_L5": 0,
+      "under_triage_rate": 0.6376811594202898,
+      "over_triage_rate": 0.057971014492753624,
+      "colour_accuracy": 0.30434782608695654,
+      "critical_under_triage_red_to_nonred": 0.8888888888888888,
+      "critical_under_triage_orange_to_yellow_green": 0.845360824742268,
+      "n_true_red": 18,
+      "n_true_orange": 97,
+      "latency_ms": {
+        "p50": 28.757874796866645,
+        "p95": 32.710384298438555,
+        "mean_per_sample": 29.211493680468454
+      },
+      "n_eval": 207,
+      "model_path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/fine_tuned_biobert_triage-20260602T132911Z-3-001/fine_tuned_biobert_triage",
+      "model_name": "Baseline",
+      "dataset": "mimic_demo",
+      "confusion_matrix": [
+        [
+          2,
+          8,
+          3,
+          3,
+          2
+        ],
+        [
+          1,
+          14,
+          55,
+          19,
+          8
+        ],
+        [
+          1,
+          8,
+          47,
+          24,
+          10
+        ],
+        [
+          1,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "dataset_meta": {
+        "source": "MIMIC-IV-ED (demo)",
+        "path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/external_data/mimic_iv_ed/triage_demo.csv",
+        "n_raw": 222,
+        "n_retained": 207,
+        "kind": "demo",
+        "preprocess": [
+          "drop empty/NaN/whitespace chiefcomplaint",
+          "keep acuity in {1..5}",
+          "no abbreviation expansion (CP/SOB left as written)",
+          "tokenize truncate/pad M=128"
+        ]
+      }
+    },
+    {
+      "accuracy": 0.21256038647342995,
+      "macro_f1": 0.17808932905582392,
+      "mean_confidence": 0.9673059994471822,
+      "support": {
+        "N_L1": 18,
+        "N_L2": 97,
+        "N_L3": 90,
+        "N_L4": 2,
+        "N_L5": 0
+      },
+      "precision_L1": 0.2647058823529412,
+      "recall_L1": 0.5,
+      "f1_L1": 0.34615384615384615,
+      "support_L1": 18,
+      "precision_L2": 0.45714285714285713,
+      "recall_L2": 0.16494845360824742,
+      "f1_L2": 0.24242424242424243,
+      "support_L2": 97,
+      "precision_L3": 0.47368421052631576,
+      "recall_L3": 0.2,
+      "f1_L3": 0.28125,
+      "support_L3": 90,
+      "precision_L4": 0.010526315789473684,
+      "recall_L4": 0.5,
+      "f1_L4": 0.020618556701030927,
+      "support_L4": 2,
+      "precision_L5": 0.0,
+      "recall_L5": 0.0,
+      "f1_L5": 0.0,
+      "support_L5": 0,
+      "under_triage_rate": 0.6086956521739131,
+      "over_triage_rate": 0.178743961352657,
+      "colour_accuracy": 0.21256038647342995,
+      "critical_under_triage_red_to_nonred": 0.5,
+      "critical_under_triage_orange_to_yellow_green": 0.6494845360824743,
+      "n_true_red": 18,
+      "n_true_orange": 97,
+      "latency_ms": {
+        "p50": 31.197859359366475,
+        "p95": 39.45994410534297,
+        "mean_per_sample": 31.192758820040467
+      },
+      "n_eval": 207,
+      "model_path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/fine_tuned_biobert_triage_smote",
+      "model_name": "Oversample",
+      "dataset": "mimic_demo",
+      "confusion_matrix": [
+        [
+          9,
+          7,
+          1,
+          1,
+          0
+        ],
+        [
+          18,
+          16,
+          19,
+          41,
+          3
+        ],
+        [
+          6,
+          12,
+          18,
+          52,
+          2
+        ],
+        [
+          1,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "dataset_meta": {
+        "source": "MIMIC-IV-ED (demo)",
+        "path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/external_data/mimic_iv_ed/triage_demo.csv",
+        "n_raw": 222,
+        "n_retained": 207,
+        "kind": "demo",
+        "preprocess": [
+          "drop empty/NaN/whitespace chiefcomplaint",
+          "keep acuity in {1..5}",
+          "no abbreviation expansion (CP/SOB left as written)",
+          "tokenize truncate/pad M=128"
+        ]
+      }
+    }
+  ]
+}

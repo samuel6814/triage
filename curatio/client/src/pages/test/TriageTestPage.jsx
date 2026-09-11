@@ -608,7 +608,7 @@ const TriageTestPage = () => {
   const [explain, setExplain] = useState(null);
   const [resultTab, setResultTab] = useState('result');
   const [useGate, setUseGate] = useState(true);
-  const [useOpenMed, setUseOpenMed] = useState(true);
+  const [useOpenMed, setUseOpenMed] = useState(false);
   const [showVoice, setShowVoice] = useState(false);
   const [sideResult, setSideResult] = useState(null);
   const [sideLoading, setSideLoading] = useState(null);
@@ -1264,12 +1264,9 @@ const TriageTestPage = () => {
               </PathwayBlock>
             )}
 
-            {(result.calibration_warning || result.confidence >= 0.999) && (
-              <Flag $warn>
-                Model is highly confident — treat as a text-only signal and verify with TEWS/vitals before
-                clinical decisions.
-              </Flag>
-            )}
+            <Flag>
+              This is decision support only. Seek clarification from a health professional.
+            </Flag>
 
             {!isFused && (
               <Flag $warn={result.bayesian_candidate}>
@@ -1285,16 +1282,6 @@ const TriageTestPage = () => {
               </Flag>
             )}
 
-            {(result.entities_status === 'error' || result.entities?.entities_status === 'error') && (
-              <Flag $warn>
-                OpenMed NER error: {result.entities_error || result.entities?.entities_error || 'unknown'}
-              </Flag>
-            )}
-            {(result.entities_status === 'disabled' || result.entities?.entities_status === 'disabled') && (
-              <Flag>
-                OpenMed NER disabled for this request.
-              </Flag>
-            )}
 
             <ProbTable style={{ marginTop: '1.5rem' }}>
               <thead>

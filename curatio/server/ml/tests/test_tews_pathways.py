@@ -18,6 +18,7 @@ from tews import (  # noqa: E402
     compute_tews,
     score_heart_rate,
     score_respiratory_rate,
+    score_sbp,
 )
 
 
@@ -32,7 +33,33 @@ def test_hr_rr_partial_yellow():
 
 
 def test_tews_red_band():
+    assert colour_from_tews(7) == "Red"
     assert colour_from_tews(8) == "Red"
+    assert colour_from_tews(6) == "Orange"
+
+
+def test_sbp_adult_sats_bands():
+    assert score_sbp(180) == 2
+    assert score_sbp(120) == 0
+    assert score_sbp(95) == 1
+    assert score_sbp(80) == 3
+
+
+def test_hr_adult_sats_bands():
+    assert score_heart_rate(130) == 3
+    assert score_heart_rate(125) == 2
+    assert score_heart_rate(35) == 2
+    assert score_heart_rate(105) == 1
+    assert score_heart_rate(45) == 1
+    assert score_heart_rate(78) == 0
+
+
+def test_rr_adult_sats_bands():
+    assert score_respiratory_rate(30) == 3
+    assert score_respiratory_rate(6) == 3
+    assert score_respiratory_rate(26) == 2
+    assert score_respiratory_rate(12) == 1
+    assert score_respiratory_rate(18) == 0
 
 
 def test_empty_vitals():
@@ -46,7 +73,8 @@ def test_full_green_vitals():
     result = compute_tews(
         {
             "heart_rate_bpm": 78,
-            "respiratory_rate": 12,
+            "respiratory_rate": 16,
+            "systolic_bp_mmhg": 120,
             "temperature_c": 36.8,
             "avpu": "alert",
             "mobility": "normal",
@@ -54,7 +82,7 @@ def test_full_green_vitals():
         }
     )
     assert result["tews_incomplete"] is False
-    assert result["tews_total"] <= 2
+    assert result["tews_total"] == 0
     assert result["c_tews"] == "Green"
 
 
@@ -72,3 +100,17 @@ def test_pathway_orange_tmax():
 def test_pathway_unknown():
     with pytest.raises(ValueError):
         lookup_pathway("Purple")
+
+
+def test_child_marker_overrides_destination():
+    from pathways import has_child_markers
+
+    assert has_child_markers("my child has fever") is True
+    assert has_child_markers("chest pain and weakness") is False
+    adult = lookup_pathway("Yellow")
+    assert adult["destination"] != "Pediatrics"
+    assert adult["child_markers_matched"] is False
+    peds = lookup_pathway("Yellow", complaint="My daughter has fever and cough")
+    assert peds["destination"] == "Pediatrics"
+    assert peds["child_markers_matched"] is True
+    assert peds["t_max_minutes"] == 60

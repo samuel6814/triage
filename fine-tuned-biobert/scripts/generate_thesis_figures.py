@@ -10,11 +10,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-plt.rcParams.update({"font.size": 11, "axes.titlesize": 13, "axes.labelsize": 12})
+plt.rcParams.update({"font.size": 12, "axes.titlesize": 14, "axes.labelsize": 13})
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent
 COMPARISON_JSON = PROJECT / "results" / "eval_outputs" / "comparison.json"
+EXTERNAL_COMPARISON_JSON = (
+    PROJECT / "results" / "eval_outputs_external" / "external_comparison.json"
+)
 EVAL_DIR = PROJECT / "results" / "eval_outputs"
 OUT_DIR = PROJECT / "final_thesis_v1" / "figures" / "ch4"
 
@@ -29,32 +32,112 @@ def _save(fig: plt.Figure, name: str) -> None:
     print(f"Wrote {path}")
 
 
-def plot_pre_finetune_capability(finetuned_acc: float) -> None:
-    """BioBERT section: accuracy before vs after Stage 3 fine-tuning."""
-    labels = [
-        "Uniform random",
-        "Random head\n(encoder only)",
-        "Majority-class bound",
-        "Fine-tuned BioBERT",
+def _pick_external_result(results: list[dict], dataset: str, model_name: str) -> dict:
+    for row in results:
+        if row.get("dataset") == dataset and row.get("model_name") == model_name:
+            return row
+    raise KeyError(f"No result for dataset={dataset!r}, model_name={model_name!r}")
+
+
+def plot_external_metrics_compare(results: list[dict]) -> None:
+    """Headline external metrics: NHAMCS/MIMIC × baseline/oversample."""
+    series = [
+        ("NHAMCS baseline", "nhamcs", "Baseline", "#15803d"),
+        ("NHAMCS oversample", "nhamcs", "Oversample", "#0d9488"),
+        ("MIMIC demo baseline", "mimic_demo", "Baseline", "#1d4ed8"),
+        ("MIMIC demo oversample", "mimic_demo", "Oversample", "#7c3aed"),
     ]
-    values = [0.20, 0.20, 0.3615, finetuned_acc]
-    colors = ["#94a3b8", "#64748b", "#f59e0b", "#15803d"]
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    bars = ax.bar(labels, values, color=colors, edgecolor="white", linewidth=0.8)
-    ax.set_ylabel("Expected / holdout accuracy")
-    ax.set_ylim(0, 1.08)
-    ax.set_title("Triage accuracy: pre-fine-tune bounds vs fine-tuned BioBERT")
-    for bar, val in zip(bars, values):
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            bar.get_height() + 0.02,
-            f"{val:.1%}",
-            ha="center",
-            va="bottom",
-            fontsize=11,
-            fontweight="bold",
-        )
-    _save(fig, "pre_finetune_capability.pdf")
+    metric_keys = [
+        ("Accuracy", "accuracy"),
+        ("Macro-F1", "macro_f1"),
+        ("Colour accuracy", "colour_accuracy"),
+        ("L1 recall", "recall_L1"),
+    ]
+    rows = [
+        (_pick_external_result(results, ds, model), label, color)
+        for label, ds, model, color in series
+    ]
+
+    x = np.arange(len(metric_keys))
+    n = len(rows)
+    width = 0.18
+    offsets = (np.arange(n) - (n - 1) / 2) * width
+
+    fig, ax = plt.subplots(figsize=(10, 5.2))
+    for offset, (row, label, color) in zip(offsets, rows):
+        vals = [float(row[key]) for _, key in metric_keys]
+        bars = ax.bar(x + offset, vals, width, label=label, color=color, alpha=0.9)
+        for bar, val in zip(bars, vals):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + 0.015,
+                f"{val:.2f}",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+                rotation=90,
+            )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([name for name, _ in metric_keys])
+    ax.set_ylabel("Score")
+    ax.set_ylim(0, 1.15)
+    ax.set_title(
+        "External evaluation: NHAMCS and MIMIC-IV-ED demo "
+        "(baseline vs stratified oversampling)"
+    )
+    ax.legend(loc="upper right", fontsize=11, ncol=2)
+    ax.axhline(1.0, color="gray", linestyle="--", linewidth=0.7, alpha=0.4)
+    _save(fig, "external_metrics_compare.pdf")
+
+
+def plot_external_under_over_triage(results: list[dict]) -> None:
+    """Under-triage and over-triage rates: NHAMCS/MIMIC × baseline/oversample."""
+    series = [
+        ("NHAMCS baseline", "nhamcs", "Baseline", "#15803d"),
+        ("NHAMCS oversample", "nhamcs", "Oversample", "#0d9488"),
+        ("MIMIC demo baseline", "mimic_demo", "Baseline", "#1d4ed8"),
+        ("MIMIC demo oversample", "mimic_demo", "Oversample", "#7c3aed"),
+    ]
+    metric_keys = [
+        ("Under-triage", "under_triage_rate"),
+        ("Over-triage", "over_triage_rate"),
+    ]
+    rows = [
+        (_pick_external_result(results, ds, model), label, color)
+        for label, ds, model, color in series
+    ]
+
+    x = np.arange(len(metric_keys))
+    n = len(rows)
+    width = 0.18
+    offsets = (np.arange(n) - (n - 1) / 2) * width
+
+    fig, ax = plt.subplots(figsize=(9, 5.2))
+    for offset, (row, label, color) in zip(offsets, rows):
+        vals = [float(row[key]) for _, key in metric_keys]
+        bars = ax.bar(x + offset, vals, width, label=label, color=color, alpha=0.9)
+        for bar, val in zip(bars, vals):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + 0.015,
+                f"{val:.2f}",
+                ha="center",
+                va="bottom",
+                fontsize=9,
+                rotation=90,
+            )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([name for name, _ in metric_keys])
+    ax.set_ylabel("Rate")
+    ax.set_ylim(0, 0.85)
+    ax.set_title(
+        "Under-triage and over-triage on NHAMCS and MIMIC-IV-ED demo "
+        "(baseline vs stratified oversampling)"
+    )
+    ax.legend(loc="upper right", fontsize=11, ncol=2)
+    _save(fig, "external_under_over_triage.pdf")
 
 
 def plot_model_specs() -> None:
@@ -178,18 +261,23 @@ def convert_png_to_pdf(stem: str) -> None:
 def main() -> None:
     if not COMPARISON_JSON.exists():
         raise FileNotFoundError(f"Missing {COMPARISON_JSON}")
+    if not EXTERNAL_COMPARISON_JSON.exists():
+        raise FileNotFoundError(f"Missing {EXTERNAL_COMPARISON_JSON}")
 
     with open(COMPARISON_JSON, encoding="utf-8") as f:
         data = json.load(f)
+    with open(EXTERNAL_COMPARISON_JSON, encoding="utf-8") as f:
+        external = json.load(f)
 
     baseline = data["baseline"]
     smote = data["smote"]
 
-    # BioBERT model analysis figures (Section 4.1)
-    plot_pre_finetune_capability(baseline["accuracy"])
+    # BioBERT / results figures used in the thesis
+    plot_external_metrics_compare(external["results"])
+    plot_external_under_over_triage(external["results"])
     plot_model_specs()
 
-    # Fine-tuned model analysis figures (Section 4.2)
+    # Optional holdout artifacts (not included in thesis headline figures)
     plot_per_class_f1(baseline, smote)
     plot_metrics_compare(baseline, smote)
     plot_recall_by_class(baseline, smote)

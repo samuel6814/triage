@@ -9,18 +9,17 @@ export const VOICE_PIPELINE = String.raw`X = g_{\mathrm{trans}}\!\bigl(g_{\mathr
 export const TEWS_SUM = String.raw`T = f_{\mathrm{TEWS}}(\mathbf{v}) = \sum_{k=1}^{6} w_k \, f_k(v_k), \quad w_k = 1`;
 
 export const TEWS_HR = String.raw`f_1(v_1) = \begin{cases}
-  3 & \text{if } \mathrm{HR} \geq 130 \\
-  2 & \text{if } 111 \leq \mathrm{HR} \leq 129 \\
-  0 & \text{if } 51 \leq \mathrm{HR} \leq 100 \\
-  2 & \text{if } \mathrm{HR} \leq 40 \\
-  1 & \text{otherwise (borderline)}
+  3 & v_1 \ge 130 \\
+  2 & 111 \le v_1 \le 129 \text{ or } v_1 \le 40 \\
+  1 & 101 \le v_1 \le 110 \text{ or } 41 \le v_1 \le 50 \\
+  0 & 51 \le v_1 \le 100
 \end{cases}`;
 
 export const TEWS_RR = String.raw`f_2(v_2) = \begin{cases}
-  3 & \text{if } \mathrm{RR} \geq 30 \\
-  2 & \text{if } 21 \leq \mathrm{RR} \leq 29 \\
-  0 & \text{if } 9 \leq \mathrm{RR} \leq 14 \\
-  1 & \text{otherwise}
+  3 & v_2 \ge 30 \text{ or } v_2 \le 8 \\
+  2 & 21 \le v_2 \le 29 \\
+  1 & 9 \le v_2 \le 14 \\
+  0 & 15 \le v_2 \le 20
 \end{cases}`;
 
 export const TEWS_COLOUR_MAP = String.raw`C_{\mathrm{TEWS}}(T) = \begin{cases}

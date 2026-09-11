@@ -9,7 +9,7 @@ cd final_thesis_v1
 make
 ```
 
-Output: `My_thesis_template.pdf`
+Output: `Hospital Chatbot for Color-Coded Clinical Pathways Using BERT.pdf`
 
 ## Structure
 

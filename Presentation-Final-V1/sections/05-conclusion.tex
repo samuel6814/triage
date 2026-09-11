@@ -2,13 +2,9 @@
 \section{Conclusion}
 
 \begin{frame}{Conclusion}
-	\footnotesize
-	\begin{itemize}\setlength\itemsep{0.4em}
-		\item A fine-tuned BioBERT model maps English chief complaints to urgency levels 1--5, with 99.92\% holdout accuracy and 98.14\% Level~1 (Red) recall \citep{lee2020biobert,triagegeist2025}.
-		\item The chatbot returns a SATS colour and a pathway card from text in about 100\,ms, before vitals are taken; nurses keep TEWS and override \citep{satsmanual,stewart2023nlp}.
-		\item A clinical gate blocks non-medical messages before the model runs \citep{stewart2023nlp}.
-		\item The tool supports intake flow; clinicians make the final triage decision \citep{satsmanual}.
-	\end{itemize}
-	\vspace{0.35em}
-	\textbf{Limitations.} The chatbot only reads English. Test scores come from a held-out practice dataset, not from a live hospital time study. Staff should check unusual wording. Clinicians make the final triage decision.
+	\begin{enumerate}\setlength\itemsep{0.7em}
+		\item A BioBERT classifier predicts urgency from one English chief complaint (99.92\% holdout accuracy) \citep{lee2020biobert,triagegeist2025}.
+		\item The chatbot returns a SATS colour and a pathway from text at intake, before vitals \citep{satsmanual,stewart2023nlp}.
+		\item A clinical gate gives no colour to non-clinical chat \citep{stewart2023nlp}.
+	\end{enumerate}
 \end{frame}

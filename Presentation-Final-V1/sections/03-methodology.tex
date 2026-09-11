@@ -1,82 +1,103 @@
 %====================================================
 \section{Methodology}
 
-\begin{frame}{Methodology: NLP Pipeline Overview}
-	\begin{center}
-	\resizebox{0.98\textwidth}{!}{%
-	\begin{tikzpicture}[node distance=0.35cm and 0.22cm]
-	  \node[pipe] (raw) {Chief\\complaint $X$};
-	  \node[pipe, right=of raw] (gate) {Clinical\\gate};
-	  \node[pipe, right=of gate] (tok) {Tokenize};
-	  \node[pipe, right=of tok] (emb) {Embed\\768-d};
-	  \node[pipe, right=of emb] (bb) {BioBERT\\12 layers};
-	  \node[pipe, right=of bb] (sm) {Softmax\\5 classes};
-	  \node[pipe, right=of sm, fill=triageYellow!25] (sats) {SATS\\colour};
-	  \foreach \a/\b in {raw/gate, gate/tok, tok/emb, emb/bb, bb/sm, sm/sats}
-	    \draw[flowarr] (\a) -- (\b);
-	\end{tikzpicture}}
-	\end{center}
-	\begin{block}{Clinical gate}
-		\[
-		  g(X) = \mathrm{clip}\!\Bigl(\sum_j s_j(X) - p(X),\, 0,\, 1\Bigr),
-		  \qquad \text{proceed iff } g(X) \geq 0.35.
-		\]
-		Rejects non-clinical text (e.g.\ greetings) before BioBERT runs.
-	\end{block}
-	\begin{itemize}
-		\item Softmax yields five acuity probabilities \(\hat{\mathbf{y}}\) that sum to \(1\).
-		\item The model picks the urgency level with the highest probability, converts it to a SATS colour (Red, Orange, Yellow, or Green), and attaches a pathway card (where to go and how soon).
-	\end{itemize}
-\end{frame}
-
-\begin{frame}{Tokenisation, Embeddings, and \texttt{[CLS]}}
-	\begin{itemize}
-		\item WordPiece splits \(X\) into subword tokens (max length \(M \leq 128\)); special tokens \texttt{[CLS]}, \texttt{[SEP]}, \texttt{<PAD>}.
-		\item Each token gets a 768-d vector by summing word + position + segment embeddings:
-		\[
+\begin{frame}{Methodology: Predict urgency from text}
+	\footnotesize
+	\setlength{\abovedisplayskip}{4pt}
+	\setlength{\belowdisplayskip}{4pt}
+	\begin{itemize}\setlength\itemsep{0.25em}
+		\item \textbf{Tokenisation.} Split the English chief complaint into tokens (small pieces of the sentence), and place a special \texttt{[CLS]} token first.
+		\item Each token becomes a vector by adding meaning, position, and a segment marker \citep{lee2020biobert}:
+		\begin{equation}
 		  E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(0).
-		\]
-		\item Stack rows \(\to\) input matrix \(H^{(0)} \in \mathbb{R}^{M \times 768}\).
-		\item After \(L=12\) encoder layers, classification reads the summary
-		\[
-		  h_{\mathrm{[CLS]}} \in \mathbb{R}^{768}.
-		\]
-	\end{itemize}
-\end{frame}
-
-\begin{frame}{Self-Attention}
-	\begin{block}{Scaled dot-product attention}
-		\[
+		  \tag{1}
+		\end{equation}
+		\item Attention is a weighted sum. Each token builds \(Q\) (what it looks for), \(K\) (the label it shows), and \(V\) (the meaning it passes on) \citep{vaswani2017attention}:
+		\begin{equation}
 		  \mathrm{Attention}(Q,K,V)
 		  = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V,
-		  \qquad d_k = 64.
-		\]
-	\end{block}
+		  \quad d_k=64.
+		  \tag{2}
+		\end{equation}
+		\(d_k\) is the length of each Key vector.
+		The \texttt{[CLS]} vector at the end is the sentence summary used next.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Methodology: Colour and pathway at intake}
+	\footnotesize
+	\setlength{\abovedisplayskip}{4pt}
+	\setlength{\belowdisplayskip}{4pt}
+	\begin{itemize}\setlength\itemsep{0.25em}
+		\item The \texttt{[CLS]} summary is scored into five logits \(\mathbf{z}\), the raw scores before softmax, one per urgency level:
+		\begin{equation}
+		  \mathbf{z} = W h_{\mathrm{[CLS]}} + \mathbf{b}.
+		  \tag{3}
+		\end{equation}
+		\(\mathbf{z}\) is not a probability. A larger \(z_c\) means that urgency level looks stronger.
+		\item Softmax turns those scores into five probabilities that add to 1. The largest probability is the urgency level, because the patient gets one colour:
+		\begin{equation}
+		  \hat{y}_c = \frac{\exp(z_c)}{\sum_{j=1}^{5}\exp(z_j)}.
+		  \tag{4}
+		\end{equation}
+		\item A fixed map names the colour: \(1\to\)Red, \(2\to\)Orange, \(3\to\)Yellow, \(4\) or \(5\to\)Green \citep{satsmanual}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Colour and pathway}
 	\begin{center}
-	\resizebox{0.85\textwidth}{!}{%
-	\begin{tikzpicture}[node distance=0.4cm and 0.5cm,
-	  box/.style={draw=green!60!black, rounded corners, fill=green!8, align=center, font=\small, inner sep=4pt}]
-	  \node[box] (q) {Q: what am I looking for?};
-	  \node[box, right=of q] (k) {K: what do I match?};
-	  \node[box, right=of k] (v) {V: what content to pass?};
-	  \node[box, below=1.0cm of k] (s) {Score \(\to\) scale \(\to\) Softmax weights \(\to\) mix \(V\)};
-	  \draw[flowarr] (q) -- (s);
-	  \draw[flowarr] (k) -- (s);
-	  \draw[flowarr] (v) -- (s);
-	\end{tikzpicture}}
+	\begin{tikzpicture}[
+		col/.style={draw, rounded corners, minimum width=2.4cm, minimum height=0.85cm, align=center, font=\small\bfseries},
+		dest/.style={draw=black!40, rounded corners, fill=gray!6, minimum width=7.2cm, minimum height=0.85cm, align=center, font=\small},
+		arr/.style={->, >=latex, thick, draw=black!55}
+	]
+		\node[col, draw=triageRed!80!black, fill=triageRed!35] (red) at (0,0) {Red};
+		\node[dest, right=0.7cm of red] (redp) {Resuscitation bay, immediate};
+		\draw[arr] (red) -- (redp);
+
+		\node[col, draw=triageOrange!80!black, fill=triageOrange!35] (ora) at (0,-1.35) {Orange};
+		\node[dest, right=0.7cm of ora] (orap) {Acute / high-dependency bed, within 10 minutes};
+		\draw[arr] (ora) -- (orap);
+
+		\node[col, draw=triageYellow!80!black, fill=triageYellow!40] (yel) at (0,-2.7) {Yellow};
+		\node[dest, right=0.7cm of yel] (yelp) {ED waiting / urgent stream, within 60 minutes};
+		\draw[arr] (yel) -- (yelp);
+
+		\node[col, draw=triageGreen!80!black, fill=triageGreen!30] (grn) at (0,-4.05) {Green};
+		\node[dest, right=0.7cm of grn] (grnp) {OPD / Minors / Polyclinic, within 4 hours};
+		\draw[arr] (grn) -- (grnp);
+	\end{tikzpicture}
+	\end{center}
+	\vspace{0.2em}
+	{\footnotesize Levels 4 and 5 both map to Green.}
+\end{frame}
+
+\begin{frame}{Methodology: No colour for non-clinical chat}
+	\footnotesize
+	\setlength{\abovedisplayskip}{6pt}
+	\setlength{\belowdisplayskip}{6pt}
+	Before BioBERT runs, a gate scores how clinical the message is.
+	\begin{itemize}\setlength\itemsep{0.4em}
+		\item Symptom words raise the score. Non-clinical chat lowers it:
+		\begin{equation}
+		  g(X) = \mathrm{clip}\!\Bigl(\sum_j s_j(X) - p(X),\, 0,\, 1\Bigr).
+		  \tag{5}
+		\end{equation}
+		\(s_j(X)\) is the score for symptom word \(j\). \(p(X)\) is the penalty if the message is non-clinical chat. \(\mathrm{clip}\) keeps the result between 0 and 1: below 0 becomes 0, above 1 becomes 1.
+		\item A colour is given only if \(g(X)\geq 0.35\). Otherwise the system asks for a real complaint and stores no colour. This keeps non-clinical chat out of the classifier \citep{stewart2023nlp}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Chatbot response: input}
+	\begin{center}
+		\includegraphics[width=0.92\textwidth,height=0.74\textheight,keepaspectratio]{chatbot-input.png}\\[0.2em]
+		{\footnotesize Chief complaint entered}
 	\end{center}
 \end{frame}
 
-\begin{frame}{Softmax and Colour Map}
-	\begin{block}{Five-class head}
-		\[
-		  \mathbf{z} = W h_{\mathrm{[CLS]}} + \mathbf{b},
-		  \qquad
-		  \hat{y}_c = \frac{\exp(z_c)}{\sum_{j=1}^{5}\exp(z_j)}.
-		\]
-		Pick \(\hat{c}\) with the largest \(\hat{y}_c\); then \(f_{\mathrm{SATS}}\): \(1\to\)Red, \(2\to\)Orange, \(3\to\)Yellow, \(4{,}5\to\)Green.
-	\end{block}
-	\begin{alertblock}{End-to-end}
-		\(X \xrightarrow{g} \tau(X) \to H^{(0)} \xrightarrow{12} h_{\mathrm{[CLS]}} \to \hat{\mathbf{y}} \xrightarrow{f_{\mathrm{SATS}}} C_{\mathrm{NLP}} \to P(C)\).
-	\end{alertblock}
+\begin{frame}{Chatbot response: result}
+	\begin{center}
+		\includegraphics[width=0.92\textwidth,height=0.74\textheight,keepaspectratio]{chatbot-result.png}\\[0.2em]
+		{\footnotesize Colour and pathway returned}
+	\end{center}
 \end{frame}

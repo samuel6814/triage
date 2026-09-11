@@ -19,7 +19,7 @@ class MedicalGateTests(unittest.TestCase):
     self.assertEqual(gate.rejection_category, "non_clinical_topic")
     self.assertIn("kofi", gate.message or "")
     self.assertTrue(gate.guidance)
-    self.assertLess(gate.clinical_relevance_score, 0.35)
+    self.assertLess(gate.clinical_relevance_score, 0.30)
 
   def test_shopping_rejected(self):
     gate = evaluate("I need to buy rice at Kejetia tomorrow", None)
@@ -35,13 +35,13 @@ class MedicalGateTests(unittest.TestCase):
     text = "I come for family planning visit at OPD, no pain"
     gate = evaluate(text, None)
     self.assertTrue(gate.is_medical)
-    self.assertGreaterEqual(gate.clinical_relevance_score, 0.35)
+    self.assertGreaterEqual(gate.clinical_relevance_score, 0.30)
 
   def test_chest_pain_passes(self):
     text = "chest pain and fever since this morning"
     gate = evaluate(text, None)
     self.assertTrue(gate.is_medical)
-    self.assertGreater(gate.clinical_relevance_score, 0.35)
+    self.assertGreater(gate.clinical_relevance_score, 0.30)
 
   def test_messages_differ_by_category(self):
     a = build_rejection_message("play football", "non_clinical_topic", {}, 0.1)

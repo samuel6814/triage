@@ -1,29 +1,36 @@
 \section{Methodological overview}
 \label{sec:overview}
 
-The hospital chatbot draws on two complementary ideas from clinical practice; this thesis develops the text-based path in full and documents the Triage Early Warning Score (TEWS) as the parallel vital-sign standard.
+The hospital chatbot draws on two complementary ideas from clinical practice; this project develops the text-based path in full and documents the Triage Early Warning Score (TEWS) as the parallel vital-sign standard.
+
+The chapter addresses the three specific objectives from Chapter~\ref{ch:intro} in order:
+\begin{enumerate}
+\item Build a BioBERT Softmax classifier that turns one English chief complaint into urgency probabilities over levels \(1\)--\(5\). The chapter specifies tokenisation, embeddings, twelve encoder layers with self-attention, the classification head, and Stage~3 fine-tuning so the mathematics from text to acuity is transparent end to end.
+\item Deploy colour and pathway guidance from text at intake before vitals are taken. After the Softmax chooses a level, the fixed map \(f_{\mathrm{SATS}}\) names the SATS colour and the pathway card \(P(C)\) states destination, maximum waiting time \(T_{\max}\), actions, and escalation, while TEWS remains the nurse vital-sign path in parallel.
+\item Add a clinical relevance gate so non-clinical chat receives no colour. Before BioBERT runs, the gate scores how clinical the message is and withholds colour from greetings and other non-medical text.
+\end{enumerate}
 
 First, \textbf{clinical pathways} encode hospital protocols: symptoms and context map to an urgency colour and a destination (resuscitation bay, acute bed, urgent waiting, outpatient stream). Pathways are the product the chatbot shows to patients and staff after classification.
 
-Second, TEWS is the nurse-facing vital-sign score used at SATS triage desks. When heart rate (HR), respiratory rate (RR), mobility, temperature, Alert, Voice, Pain, Unresponsive (AVPU) consciousness, and trauma status are measured, TEWS produces a deterministic integer \(T\) and colour band \(C_{\mathrm{TEWS}}(T)\). TEWS is explained fully in Section~\ref{sec:tews} because it is the objective hospital standard; the chatbot's primary engine for \emph{free-text chief complaints} at intake is a deep attention model (Biomedical BERT, BioBERT), not a weighted sum of vitals.
+Second, TEWS is the nurse-facing vital-sign score used at SATS triage desks. When heart rate (HR), respiratory rate (RR), systolic blood pressure (SBP), mobility, temperature, Alert, Voice, Pain, Unresponsive (AVPU) consciousness, and trauma status are measured, TEWS produces a deterministic integer \(T\) and colour band \(C_{\mathrm{TEWS}}(T)\). TEWS is explained fully in Section~\ref{sec:tews} because it is the objective hospital standard; the chatbot's primary engine for \emph{free-text chief complaints} at intake is a deep attention model (Biomedical BERT, BioBERT), not a weighted sum of vitals.
 
-When vitals are not yet available, the text model below supplies the intake colour. Nurses may later record vitals and apply TEWS independently; this thesis specifies the natural language processing (NLP) path only.
+When vitals are not yet available, the text model below supplies the intake colour. Nurses may later record vitals and apply TEWS independently; this project specifies the natural language processing (NLP) path only.
 
 \subsection{Chief complaints}
 \label{sec:chief-complaints}
 
-The \emph{chief complaint} is the primary reason the patient presents, expressed in their own words (or an attendant's) as unstructured free text at intake, before vitals, physical examination, or formal diagnosis. Nurses and triage staff traditionally record this as prose on paper or electronic forms; it captures symptom onset, severity, and context (for example, ``headache and feverish, body aches, feel weak''). It is not a diagnosis, not a TEWS vital-sign score, and not a full medical history: it is only the presenting problem text \(X\) that this thesis classifies.
+The \emph{chief complaint} is the primary reason the patient presents, expressed in their own words (or an attendant's) as unstructured free text at intake, before vitals, physical examination, or formal diagnosis. Nurses and triage staff traditionally record this as prose on paper or electronic forms; it captures symptom onset, severity, and context (for example, ``headache and feverish, body aches, feel weak''). It is not a diagnosis, not a TEWS vital-sign score, and not a full medical history: it is only the presenting problem text \(X\) that this project classifies.
 
 The chatbot accepts one \textbf{English} chief-complaint string per submission. The running example \runningcomplaint{} illustrates a typical Yellow-level presentation used throughout this chapter; pipeline symbol \(X\) appears in Table~\ref{tab:pipeline-io} and Figure~\ref{fig:nlp-pipeline}.
 
 \subsection{Training data provenance}
 \label{sec:data-provenance}
 
-Model training and holdout evaluation draw on two distinct data layers.
+Model training and external evaluation draw on distinct data layers.
 
-\textbf{Training and evaluation corpus.} Stage~3 fine-tuning uses the \emph{Triagegeist} synthetic emergency-department benchmark released by the Laitinen-Fredriksson Foundation on Kaggle \citep{triagegeist2025}. Structured intake records (\texttt{train.csv}, acuity labels) are inner-joined with free-text rows (\texttt{chief\_complaints.csv}) on \texttt{patient\_id}, yielding \(N = 80{,}000\) English \texttt{chief\_complaint\_raw} / \texttt{triage\_acuity} pairs. Vitals and demographics in the source files are excluded so the NLP path matches single-shot text input at intake (Section~\ref{sec:training}). Five-level competition labels map to SATS colours via \(f_{\mathrm{SATS}}\). A stratified 90/10 split (approximately 72{,}000 train / 8{,}000 holdout, seed~42) supplies all reported accuracy and recall figures in Chapter~\ref{ch:results}. This corpus was \textbf{not} collected at \examplehospital{}.
+\textbf{Training corpus (not published test).} Stage~3 fine-tuning uses the Triagegeist synthetic emergency-department benchmark released by the Laitinen-Fredriksson Foundation on Kaggle \citep{triagegeist2025}. Structured intake records (\texttt{train.csv}, acuity labels) are inner-joined with free-text rows (\texttt{chief\_complaints.csv}) on \texttt{patient\_id}, yielding \(N=80{,}000\) pairs of English free-text chief complaints with nurse-assigned ESI-style urgency levels \(1\)--\(5\). Vitals and demographics in the source files are excluded so the NLP path matches single-shot text input at intake (Section~\ref{sec:training}). Labels map to SATS colours only via the proposed heuristic \(f_{\mathrm{SATS}}\) (Section~\ref{sec:fsats}); the corpus is \textbf{not} SATS-labelled. This corpus was subjected to a stratified 90/10 split (seed~42), resulting in approximately \(72{,}000\) pairs for training and \(8{,}000\) pairs for internal validation. The \(72{,}000\)-pair training set was used exclusively to update the model weights during backpropagation. The \(8{,}000\)-pair validation set was isolated strictly to monitor validation loss and select the optimal training checkpoint. Crucially, neither of these Triagegeist subsets was used to evaluate the model's final clinical performance. To ensure a rigorous evaluation completely devoid of data leakage or synthetic memorization, all published accuracy, colour accuracy, and under/over-triage metrics in Chapter~\ref{ch:results} are evaluated entirely on separate, external real-world cohorts: the MIMIC-IV-ED open demo matching the v2.2 triage schema \citep{mimiciveddemo2023,mimicived2023} and NHAMCS 2018--22 \citep{nhamcs201822}. This corpus was \textbf{not} collected at \examplehospital{}.
 
-\textbf{KNUST-informed contextual examples.} Following a site visit to \examplehospital{}, the authors generated supplementary English chief complaints based on observations of intake workflow, SATS colour assignment, and department structure. These examples test the prototype chatbot, validate pathway routing (Section~\ref{sec:pathways}), and illustrate the pipeline (for example, \runningcomplaint{} in Table~\ref{tab:pathway-scenarios}); this supports qualitative analysis only. They are \textbf{not} merged into the 80{,}000-pair fine-tuning corpus. Prospective collection of nurse-labeled complaints at \examplehospital{} for model retraining remains future work (Chapter~\ref{ch:conclusion}).
+\textbf{KNUST-informed contextual examples.} Following an observational site visit to \examplehospital{}, the authors mapped existing clinical pathways and department structures through direct observation of intake workflows and stakeholder inquiries with hospital staff. Based on these established protocols, the authors generated supplementary English chief complaints to validate pathway routing and illustrate the pipeline (for example, \runningcomplaint{} in Table~\ref{tab:pathway-scenarios}); this supports qualitative analysis only. They are \textbf{not} merged into the 80{,}000-pair fine-tuning corpus.
 
 \subsection{BERT and bidirectional context}
 
@@ -60,28 +67,28 @@ Figure~\ref{fig:nlp-pipeline} previews the end-to-end natural language processin
 \end{figure}
 
 \begin{enumerate}
-\item \textbf{Chief complaint \(X\).} The patient or attendant submits one unstructured \textbf{English} text string describing symptoms and relevant history (Section~\ref{sec:chief-complaints}). Tokenisation begins in Section~\ref{sec:tokenisation}.
-\item \textbf{Clinical relevance gate.} A rule-based score \(g(X)\) filters greetings and non-medical text before BioBERT runs; see Section~\ref{sec:gate}.
-\item \textbf{Tokenize.} WordPiece splits \(X\) into subword tokens with special markers \texttt{[CLS]}, \texttt{[SEP]}, and \texttt{<PAD>}; see Section~\ref{sec:tokenisation}.
-\item \textbf{Embed (768-d).} Each token ID maps to a 768-dimensional vector; positional and segment embeddings are added to form the input matrix \(H^{(0)}\); see Sections~\ref{sec:embeddings} and~\ref{sec:h0}.
-\item \textbf{BioBERT (12 layers).} Twelve encoder layers apply multi-head self-attention and feed-forward transforms; see Sections~\ref{sec:encoder} and~\ref{sec:attention}.
-\item \textbf{Softmax (5 classes).} The \texttt{[CLS]} summary vector \(h_{\mathrm{[CLS]}}\) passes through a classification head yielding acuity probabilities \(\hat{\mathbf{y}}\); see Section~\ref{sec:classification}.
-\item \textbf{SATS colour and pathway.} The predicted level \(\hat{c}\) maps to colour \(C_{\mathrm{NLP}} = f_{\mathrm{SATS}}(\hat{c})\) and pathway card \(P(C_{\mathrm{NLP}})\); see Sections~\ref{sec:fsats} and~\ref{sec:pathways}.
+\item \textbf{Chief complaint \(X\).} The patient or attendant submits one unstructured English text string describing symptoms and relevant history. That string is the only clinical input to the NLP path at this stage: no vital signs, no diagnosis, and no full medical history are required before the model can propose a colour.
+\item \textbf{Clinical relevance gate.} A rule-based score \(g(X)\) decides whether the message is clinical enough to classify. Greetings and other non-medical chat are rejected here so BioBERT does not invent an urgency colour for text that is not a chief complaint.
+\item \textbf{Tokenize.} WordPiece splits \(X\) into subword tokens and inserts the special markers \texttt{[CLS]}, \texttt{[SEP]}, and \texttt{<PAD>}. The result is a fixed-length sequence of integer IDs that the embedding table can look up.
+\item \textbf{Embed (768-d).} Each token ID becomes a 768-dimensional vector. Positional and segment embeddings are added element-wise so the model knows both what each token means and where it sits in the complaint, forming the input matrix \(H^{(0)}\).
+\item \textbf{BioBERT (12 layers).} Twelve encoder layers apply multi-head self-attention and feed-forward transforms. Each layer lets every token look at the others, so symptom words and severity modifiers reshape one another before classification.
+\item \textbf{Softmax (5 classes).} The \texttt{[CLS]} summary vector \(h_{\mathrm{[CLS]}}\) passes through a linear head that produces five logits. Softmax turns those logits into acuity probabilities \(\hat{\mathbf{y}}\) that add to one; the largest probability is the predicted urgency level.
+\item \textbf{SATS colour and pathway.} The predicted level \(\hat{c}\) maps to colour \(C_{\mathrm{NLP}} = f_{\mathrm{SATS}}(\hat{c})\) through the fixed acuity-to-colour map, and the pathway card \(P(C_{\mathrm{NLP}})\) names destination, \(T_{\max}\), actions, and escalation for that colour.
 \end{enumerate}
 
-Each stage above is derived and exemplified in the referenced sections. Section~\ref{sec:e2e} restates the full path for the implemented prototype.
+Each stage above is derived and exemplified later in this chapter. The end-to-end summary restates the full path for the implemented prototype.
 
 \subsection{Safety and nurse authority}
 
-The chatbot is designed as a \textbf{Flow Management Engine assist}, not as an autonomous discharge or treatment authority. Three design choices enforce that posture throughout Chapter~\ref{ch:method}:
+The Flow Management Engine is engineered strictly as a clinical decision-support system; it is structurally constrained from acting as an autonomous diagnostic or discharge authority. To preserve the primacy of human clinical judgment, the architecture enforces three strict operational boundaries throughout the pipeline:
 
 \begin{enumerate}
-\item \textbf{Gate before model.} Non-clinical text never receives a colour (Section~\ref{sec:gate}).
-\item \textbf{Softmax as a distribution.} Output is \(\hat{\mathbf{y}}\), not a binary ``safe/unsafe'' certificate; low confidence and near ties escalate to nurses (Section~\ref{sec:classification}).
-\item \textbf{TEWS remains nurse-owned.} When vitals exist, TEWS and SATS discriminators govern bedside colour; the text path does not silently overwrite them (Section~\ref{sec:tews}).
+\item \textbf{Algorithmic Gating.} A mathematical relevance gate actively filters non-clinical text; non-medical inputs are systematically rejected prior to BioBERT classification.
+\item \textbf{Probabilistic Output Constraint.} The classification head outputs a Categorical distribution \(\hat{\mathbf{y}}\) rather than a binary safety certificate. Low-confidence classifications and near-ties explicitly mandate immediate escalation to human triage staff.
+\item \textbf{Preservation of Objective Scoring.} When physical vitals are acquired, TEWS and SATS discriminators govern bedside clinical colour. The NLP text-path operates as an antecedent routing assist and is programmed to never overwrite objective physiological data.
 \end{enumerate}
 
-Pathway cards therefore propose destinations and timers that nurses can accept, modify, or reject. That principle is repeated in the results discussion (Section~\ref{sec:discussion}) and in the research questions on Softmax confidence (RQ7).
+Pathway cards therefore propose destinations and timers that nurses can accept, modify, or reject. That principle is repeated in the results discussion (Section~\ref{sec:discussion}) and when Softmax confidence is low.
 
 Table~\ref{tab:pipeline-io} records the mathematical object entering and leaving each stage so the reader can follow how one complaint string becomes a colour and pathway card.
 
@@ -164,17 +171,17 @@ For the illustrative complaint in this chapter, the NLP model in Section~\ref{se
 \section{TEWS: Triage Early Warning Score}
 \label{sec:tews}
 
-TEWS is the deterministic score nurses compute from six vital parameters at SATS triage \citep{satsmanual}. It provides an objective colour band when measurements exist.
+TEWS is the deterministic score nurses compute from seven vital parameters at adult SATS (ASTS) triage \citep{satsmanual}. It provides an objective colour band when measurements exist. This project documents the adult score; paediatric TEWS tables differ and are out of scope without an age feature.
 
 \subsection{Definition}
 
-Let \(\mathbf{v} = (v_1, \ldots, v_6)\) denote HR, RR, mobility, temperature, AVPU consciousness, and trauma flag. Each parameter maps to points \(f_k(v_k) \in \{0,1,2,3\}\) via SATS lookup tables. TEWS aggregates these contributions into one integer so that nurses at different desks can compare patients on a common scale. Weights \(w_k = 1\):
+Let \(\mathbf{v} = (v_1, \ldots, v_7)\) denote heart rate (HR), respiratory rate (RR), systolic blood pressure (SBP), mobility, temperature, AVPU consciousness, and trauma flag. Each parameter maps to points \(f_k(v_k) \in \{0,1,2,3\}\) via SATS lookup tables. TEWS aggregates these contributions into one integer so that nurses at different desks can compare patients on a common scale. Weights \(w_k = 1\):
 \begin{equation}
-  T = \sum_{k=1}^{6} w_k \, f_k(v_k) = \sum_{k=1}^{6} f_k(v_k).
+  T = \sum_{k=1}^{7} w_k \, f_k(v_k) = \sum_{k=1}^{7} f_k(v_k).
   \label{eq:tews-sum}
 \end{equation}
 
-Summing six bounded terms yields a score \(T \in [0, 18]\) in principle, though typical values at triage are much lower. Because each \(f_k\) is defined from the SATS manual, the score is reproducible and auditable: two nurses who measure the same vitals obtain the same \(T\).
+Summing seven bounded terms yields a score \(T \in [0, 21]\) in principle, though typical values at triage are much lower. Because each \(f_k\) is defined from the SATS manual, the score is reproducible and auditable: two nurses who measure the same vitals obtain the same \(T\).
 
 \begin{table}[H]
 \centering
@@ -185,62 +192,73 @@ Summing six bounded terms yields a score \(T \in [0, 18]\) in principle, though 
 \hline
 1 & Heart rate (HR) & SATS manual, TEWS table & beats/min \\
 2 & Respiratory rate (RR) & SATS manual, TEWS table & breaths/min \\
-3 & Mobility & SATS manual & walking / assisted / immobile \\
-4 & Temperature & SATS manual & \(^\circ\)C \\
-5 & AVPU consciousness & SATS manual & alert / verbal / pain / unresponsive \\
-6 & Trauma & SATS manual & present / absent \\
+3 & Systolic blood pressure (SBP) & SATS manual, TEWS table & mmHg \\
+4 & Mobility & SATS manual & walking / assisted / immobile \\
+5 & Temperature & SATS manual & \(^\circ\)C \\
+6 & AVPU consciousness & SATS manual & alert / verbal / pain / unresponsive \\
+7 & Trauma & SATS manual & present / absent \\
 \hline
 \end{tabular}
-\caption{TEWS parameters and documentation source.}
+\caption{TEWS parameters and documentation source (adult SATS).}
 \label{tab:tews-params}
 \end{table}
 
 \begin{remark}
-Each vital sign contributes zero to three points. Elevated HR, abnormal RR, or reduced consciousness increase \(T\); normal values contribute zero.
+Each vital sign contributes zero to three points. Elevated HR, abnormal RR, low or very high SBP, or reduced consciousness increase \(T\); normal values contribute zero.
 \end{remark}
 
 \subsection{Piecewise scoring functions}
 
-The piecewise functions \(f_1\) and \(f_2\) encode tachycardia, bradycardia, and abnormal respiratory rate as higher point values, reflecting physiological stress seen at triage.
+The piecewise functions \(f_1\), \(f_2\), and \(f_3\) encode tachycardia, bradycardia, abnormal respiratory rate, and abnormal systolic pressure as higher point values, reflecting physiological stress seen at triage.
 
-Heart rate \(f_1\) (beats/min):
+Heart rate \(f_1\) (beats/min), where \(v_1\) is the measured heart rate:
 \begin{equation}
-  f_1(v_1) = \begin{cases}
-    3 & v_1 \geq 130 \\
-    2 & 111 \leq v_1 \leq 129 \text{ or } v_1 \leq 40 \\
-    0 & 51 \leq v_1 \leq 100 \\
-    1 & \text{otherwise}
+  f_1(v_{1}) = \begin{cases}
+    3 & v_{1} \geq 130 \\
+    2 & 111 \leq v_{1} \leq 129 \text{ or } v_{1} \leq 40 \\
+    1 & 101 \leq v_{1} \leq 110 \text{ or } 41 \leq v_{1} \leq 50 \\
+    0 & 51 \leq v_{1} \leq 100
   \end{cases}
 \end{equation}
 Elevated heart rate (tachycardia) or very low heart rate therefore increases \(T\) and may raise the TEWS colour band.
 
-Respiratory rate \(f_2\) (breaths/min):
+Respiratory rate \(f_2\) (breaths/min), where \(v_2\) is the measured respiratory rate:
 \begin{equation}
-  f_2(v_2) = \begin{cases}
-    3 & v_2 \geq 30 \\
-    2 & 21 \leq v_2 \leq 29 \\
-    0 & 9 \leq v_2 \leq 14 \\
-    1 & \text{otherwise}
+  f_2(v_{2}) = \begin{cases}
+    3 & v_{2} \geq 30 \text{ or } v_{2} \leq 8 \\
+    2 & 21 \leq v_{2} \leq 29 \\
+    1 & 9 \leq v_{2} \leq 14 \\
+    0 & 15 \leq v_{2} \leq 20
   \end{cases}
 \end{equation}
-Rapid breathing (tachypnoea) similarly adds points, capturing respiratory distress before full clinical assessment.
+Very high or very low respiratory rate adds points, capturing respiratory distress before full clinical assessment.
 
-Mobility \(f_3\): walking \(=0\); assisted \(=1\); immobile \(=2\)--\(3\) (SATS manual). Temperature \(f_4\): \(35.0\)--\(38.4\,^\circ\mathrm{C}\) \(=0\); borderline fever or hypothermia \(=1\); extreme values \(=2\)--\(3\). AVPU \(f_5\): alert \(=0\), verbal \(=1\), pain \(=2\), unresponsive \(=3\). Trauma \(f_6\): none \(=0\); major trauma \(=2\)--\(3\).
+Systolic blood pressure \(f_3\) (mmHg), where \(v_3\) is the measured SBP \citep{satsmanual}:
+\begin{equation}
+  f_3(v_{3}) = \begin{cases}
+    2 & v_{3} > 170 \\
+    0 & 101 \leq v_{3} \leq 170 \\
+    1 & 90 \leq v_{3} \leq 100 \\
+    3 & v_{3} < 90
+  \end{cases}
+\end{equation}
+Hypotension (\(v_3 < 90\)) contributes three points; marked hypertension (\(v_3 > 170\)) contributes two. The adult normal band \(101\)--\(170\)\,mmHg contributes zero.
+
+Mobility \(f_4\): walking \(=0\); assisted \(=1\); immobile \(=2\)--\(3\) (SATS manual). Temperature \(f_5\): \(35.0\)--\(38.4\,^\circ\mathrm{C}\) \(=0\); borderline fever or hypothermia \(=1\); extreme values \(=2\)--\(3\). AVPU \(f_6\): alert \(=0\), verbal \(=1\), pain \(=2\), unresponsive \(=3\). Trauma \(f_7\): none \(=0\); major trauma \(=2\)--\(3\).
 
 \subsection{Colour map}
 
 The mapping \(C_{\mathrm{TEWS}}(T)\) converts the integer score into the same colour vocabulary used at the SATS desk, so vital-sign triage aligns with hospital routing rules \citep{satsmanual}:
 \begin{equation}
   C_{\mathrm{TEWS}}(T) = \begin{cases}
-    \text{Red} & T > 7 \\
+    \text{Red} & T \geq 7 \\
     \text{Orange} & 5 \leq T \leq 6 \\
     \text{Yellow} & 3 \leq T \leq 4 \\
     \text{Green} & T \leq 2
   \end{cases}
   \label{eq:tews-colour}
 \end{equation}
-
-Thresholds in Equation~\eqref{eq:tews-colour} follow the standard SATS implementation: a single point difference can change the colour band, so nurses record each \(f_k\) carefully. The diagram below visualises these bands on the score axis.
+where \(T\) is the TEWS total from Equation~\eqref{eq:tews-sum} and \(C_{\mathrm{TEWS}}(T)\) is the vital-sign colour band. Thresholds follow the standard SATS implementation (TEWS \(7\) or more is Red): a single point difference can change the colour band, so nurses record each \(f_k\) carefully. The diagram below visualises these bands on the score axis.
 
 \begin{figure}[H]
 \centering
@@ -251,7 +269,7 @@ Thresholds in Equation~\eqref{eq:tews-colour} follow the standard SATS implement
   \node[draw, rounded corners=2pt, fill=triageGreen!75, minimum width=2.4cm, minimum height=0.85cm, font=\footnotesize, align=center] (g) at (1.2, 0.85) {$T \leq 2$\\Green};
   \node[draw, rounded corners=2pt, fill=triageYellow!75, minimum width=2.4cm, minimum height=0.85cm, font=\footnotesize, align=center] (y) at (4.0, 0.85) {$3$--$4$\\Yellow};
   \node[draw, rounded corners=2pt, fill=triageOrange!75, minimum width=2.4cm, minimum height=0.85cm, font=\footnotesize, align=center] (o) at (6.8, 0.85) {$5$--$6$\\Orange};
-  \node[draw, rounded corners=2pt, fill=triageRed!75, minimum width=2.6cm, minimum height=0.85cm, font=\footnotesize, align=center] (r) at (9.7, 0.85) {$T > 7$\\Red};
+  \node[draw, rounded corners=2pt, fill=triageRed!75, minimum width=2.6cm, minimum height=0.85cm, font=\footnotesize, align=center] (r) at (9.7, 0.85) {$T \geq 7$\\Red};
   % Axis
   \draw[thick, -Stealth] (0, 0) -- (11.2, 0);
   \foreach \x/\lab in {0/0, 2.4/2, 4.8/4, 7.2/6, 9.6/8, 11/9+}
@@ -267,11 +285,11 @@ Thresholds in Equation~\eqref{eq:tews-colour} follow the standard SATS implement
 TEWS and BioBERT Softmax share a colour vocabulary (Red, Orange, Yellow, Green) but differ in inputs and mathematics:
 
 \begin{itemize}
-\item TEWS is a \textbf{weighted sum of six vital features} \(T=\sum_k w_k f_k(v_k)\) with \(w_k=1\) in the standard adult score, then a piecewise colour map \(C_{\mathrm{TEWS}}(T)\).
+\item TEWS is a \textbf{weighted sum of seven vital features} \(T=\sum_k w_k f_k(v_k)\) with \(w_k=1\) in the standard adult score, then a piecewise colour map \(C_{\mathrm{TEWS}}(T)\).
 \item Softmax is a \textbf{Categorical distribution over five acuity levels} from complaint text, then the deterministic map \(f_{\mathrm{SATS}}\).
 \end{itemize}
 
-They are complementary, not competitors. At arrival, text may be the only signal; after nurse assessment, TEWS and clinical discriminators remain authoritative. This thesis therefore documents both, implements Softmax fully, and never treats TEWS absence as a chatbot limitation: nurses already compute TEWS when vitals exist.
+They are complementary, not competitors. At arrival, text may be the only signal; after nurse assessment, TEWS and clinical discriminators remain authoritative. This project therefore documents both, implements Softmax fully, and never treats TEWS absence as a chatbot limitation: nurses already compute TEWS when vitals exist.
 
 \begin{table}[H]
 \centering
@@ -280,7 +298,7 @@ They are complementary, not competitors. At arrival, text may be the only signal
 \hline
 \textbf{Aspect} & \textbf{TEWS} & \textbf{BioBERT Softmax} \\
 \hline
-Input & Six vitals / flags \(v_k\) & English chief complaint \(X\) \\
+Input & Seven vitals / flags \(v_k\) (incl.\ SBP) & English chief complaint \(X\) \\
 Core map & Integer sum \(T\) & Probabilities \(\hat{\mathbf{y}}\) \\
 Colour rule & \(C_{\mathrm{TEWS}}(T)\) bands & \(f_{\mathrm{SATS}}(\hat{c})\) \\
 When available & After measurement & At text submission \\
@@ -300,28 +318,30 @@ Authority & Nurse desk standard & Intake assist (overridable) \\
 \hline
 1 & HR & 125 bpm & 2 & 2 \\
 2 & RR & 26 breaths/min & 2 & 4 \\
-3 & Mobility & walking & 0 & 4 \\
-4 & Temperature & \(36.8\,^\circ\mathrm{C}\) & 0 & 4 \\
-5 & AVPU & alert & 0 & 4 \\
-6 & Trauma & absent & 0 & 4 \\
+3 & SBP & 120 mmHg & 0 & 4 \\
+4 & Mobility & walking & 0 & 4 \\
+5 & Temperature & \(36.8\,^\circ\mathrm{C}\) & 0 & 4 \\
+6 & AVPU & alert & 0 & 4 \\
+7 & Trauma & absent & 0 & 4 \\
 \hline
 \multicolumn{4}{r}{\textbf{Total \(T\):}} & \textbf{4} \\
 \hline
 \end{tabular}
-\caption{Term-by-term TEWS calculation for HR \(=125\) bpm, RR \(=26\) breaths/min, all other parameters normal.}
+\caption{Term-by-term TEWS calculation for HR \(=125\) bpm, RR \(=26\) breaths/min, SBP \(=120\)\,mmHg, all other parameters normal.}
 \label{tab:tews-worked}
 \end{table}
 
 \begin{example}
-Suppose vitals are HR \(=125\) bpm and RR \(=26\) breaths/min; mobility, temperature, AVPU, and trauma are normal or absent. Table~\ref{tab:tews-worked} lists each \(f_k\) contribution; summing gives
+Suppose vitals are HR \(=125\) bpm, RR \(=26\) breaths/min, and SBP \(=120\)\,mmHg; mobility, temperature, AVPU, and trauma are normal or absent. Table~\ref{tab:tews-worked} lists each \(f_k\) contribution; summing gives
 \begin{align*}
   f_1(125) &= 2 && \text{(HR band }111\text{--}129), \\
   f_2(26)  &= 2 && \text{(RR band }21\text{--}29), \\
-  f_k(\cdot) &= 0 && k=3,\ldots,6, \\
+  f_3(120) &= 0 && \text{(SBP band }101\text{--}170), \\
+  f_k(\cdot) &= 0 && k=4,\ldots,7, \\
   T &= 2+2 = 4, \\
   C_{\mathrm{TEWS}}(4) &= \text{Yellow} \quad \text{(Equation~\eqref{eq:tews-colour})}.
 \end{align*}
-If only these two vitals were measured, the score is partial but still auditable. At intake, before vitals exist, the BioBERT path in Section~\ref{sec:classification} supplies the text-based colour.
+If only these vitals were measured, the score is partial but still auditable. At intake, before vitals exist, the BioBERT path in Section~\ref{sec:classification} supplies the text-based colour.
 \end{example}
 
 \section{Neural networks, Transformers, and BERT}
@@ -346,10 +366,10 @@ TEWS ignores language. A patient may describe symptoms in free text before HR or
 
 \citet{vaswani2017attention} introduced scaled dot-product attention (Section~\ref{sec:attention}). \citet{devlin2019bert} stacked attention into deep encoders with MLM pre-training. The input representation preview is
 \begin{equation}
-  E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(t_i),
+  E(t_i) = E_{\mathrm{word}}(t_i) + E_{\mathrm{pos}}(i) + E_{\mathrm{seg}}(s),
   \label{eq:embedding-sum-preview}
 \end{equation}
-where \(E_{\mathrm{word}}\) identifies the token, \(E_{\mathrm{pos}}\) encodes position \(i\), and \(E_{\mathrm{seg}}\) marks sentence segment (always segment \(0\) for a single complaint). Full detail appears in Section~\ref{sec:embeddings}.
+where \(t_i\) is the token at position \(i\), \(E_{\mathrm{word}}(t_i)\) identifies that token, \(E_{\mathrm{pos}}(i)\) encodes position \(i\), and \(E_{\mathrm{seg}}(s)\) marks sentence segment \(s\) (always \(s=0\) for a single complaint). The three vectors have the same length and are added \textbf{element-wise}, not concatenated: meaning, order, and segment combine into one vector per token. Full detail appears in Section~\ref{sec:embeddings}.
 
 \begin{table}[H]
 \centering
@@ -360,7 +380,7 @@ where \(E_{\mathrm{word}}\) identifies the token, \(E_{\mathrm{pos}}\) encodes p
 \hline
 \(E_{\mathrm{word}}\) & Token identity: which word or subword? & ``headache'' vs ``feverish'' \\
 \(E_{\mathrm{pos}}(i)\) & Position in the sequence: order matters & ``head ache'' \(\neq\) ``ache head'' \\
-\(E_{\mathrm{seg}}\) & Sentence segment (A or B in paired inputs) & Always segment \(0\) for one complaint \\
+\(E_{\mathrm{seg}}(s)\) & Sentence segment \(s\) (A or B in paired inputs) & Always \(s=0\) for one complaint \\
 \hline
 \end{tabular}
 \caption{Breakdown of the three terms in Equation~\eqref{eq:embedding-sum-preview}.}

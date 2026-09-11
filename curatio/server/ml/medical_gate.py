@@ -16,7 +16,7 @@ RejectionCategory = Literal[
 ]
 SuggestedAction = Literal["enter_chief_complaint", "seek_clinical_advice", "emergency_services"]
 
-DEFAULT_THRESHOLD = float(os.getenv("CLINICAL_RELEVANCE_THRESHOLD", "0.35"))
+DEFAULT_THRESHOLD = float(os.getenv("CLINICAL_RELEVANCE_THRESHOLD", "0.30"))
 VAGUE_SCORE_MIN = 0.15
 
 # Non-clinical topics — sports, social, travel, school, shopping, greetings-only, etc.

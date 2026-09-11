@@ -1,0 +1,85 @@
+{
+  "accuracy": 0.3045,
+  "macro_f1": 0.2146313371239695,
+  "mean_confidence": 0.9569831581066052,
+  "support": {
+    "N_L1": 175,
+    "N_L2": 1775,
+    "N_L3": 6104,
+    "N_L4": 3451,
+    "N_L5": 495
+  },
+  "precision_L1": 0.059654631083202514,
+  "recall_L1": 0.21714285714285714,
+  "f1_L1": 0.09359605911330049,
+  "support_L1": 175,
+  "precision_L2": 0.16195190947666196,
+  "recall_L2": 0.2580281690140845,
+  "f1_L2": 0.19900065174885945,
+  "support_L2": 1775,
+  "precision_L3": 0.5889227642276422,
+  "recall_L3": 0.18987549148099606,
+  "f1_L3": 0.2871655104063429,
+  "support_L3": 6104,
+  "precision_L4": 0.31731391585760516,
+  "recall_L4": 0.568241089539264,
+  "f1_L4": 0.4072266638978299,
+  "support_L4": 3451,
+  "precision_L5": 0.09819121447028424,
+  "recall_L5": 0.07676767676767676,
+  "f1_L5": 0.08616780045351474,
+  "support_L5": 495,
+  "under_triage_rate": 0.3903333333333333,
+  "over_triage_rate": 0.30516666666666664,
+  "colour_accuracy": 0.34225,
+  "critical_under_triage_red_to_nonred": 0.7828571428571428,
+  "critical_under_triage_orange_to_yellow_green": 0.6676056338028169,
+  "n_true_red": 175,
+  "n_true_orange": 1775,
+  "latency_ms": {
+    "p50": 96.18096438281043,
+    "p95": 123.7254424671832,
+    "mean_per_sample": 96.53447019830456
+  },
+  "n_eval": 12000,
+  "model_path": "/home/bigsam/workspace2/FinalYearProject/fine-tuned-biobert/fine_tuned_biobert_triage_smote",
+  "model_name": "Oversample",
+  "dataset": "nhamcs",
+  "confusion_matrix": [
+    [
+      38,
+      54,
+      23,
+      55,
+      5
+    ],
+    [
+      132,
+      458,
+      319,
+      833,
+      33
+    ],
+    [
+      261,
+      1495,
+      1159,
+      3051,
+      138
+    ],
+    [
+      174,
+      741,
+      402,
+      1961,
+      173
+    ],
+    [
+      32,
+      80,
+      65,
+      280,
+      38
+    ]
+  ]
+}

@@ -1,31 +1,34 @@
 %====================================================
-\section{Problem, Questions, and Objectives}
+\section{Problem statement}
 
 \begin{frame}{Problem Statement}
 	\begin{alertblock}{Flow management failure}
 		Overcrowding is not only ``too many people'': it is a \textbf{broken routing system}.
-		Urgency colour does not travel with the patient, and destinations stay unclear after the first desk.
+		Urgency colour does not travel with the patient.
 	\end{alertblock}
 	\begin{itemize}
-		\item \textbf{No durable colour.} SATS colour assigned at intake often stops guiding beds, labs, and re-assessment timers.
-		\item \textbf{Unclear destinations.} Patients and staff lack immediate next-step routing (acute stream vs outpatient vs specialty).
+		\item \textbf{Colour left behind.} SATS colour assigned at intake often stops guiding the patient after the first desk.
 		\item \textbf{Green congestion.} Non-urgent cases occupy acute capacity and delay Red and Orange care.
 		\item \textbf{Text before vitals.} Patients arrive with words; TEWS cannot run until measurements exist.
 	\end{itemize}
 \end{frame}
 
+\section{Research Questions}
+
 \begin{frame}{Research Questions}
 	\begin{enumerate}
-		\item[\textbf{RQ1}] Can the model turn a patient's complaint text into the right urgency level (1--5)?
-		\item[\textbf{RQ2}] Can a chatbot give colour and pathway guidance from text before vitals are taken?
-		\item[\textbf{RQ3}] Can the system refuse non-medical messages before running the model?
+		\item Can the model turn a patient's complaint text into the right urgency level (1--5)?
+		\item Can a chatbot give colour and pathway guidance from text before vitals are taken?
+		\item Can the system refuse non-medical messages before running the model?
 	\end{enumerate}
 \end{frame}
+
+\section{Objectives}
 
 \begin{frame}{Objectives}
 	\begin{enumerate}
 		\item Build a BioBERT classifier that predicts urgency from one English chief complaint.
 		\item Deploy a chatbot that returns colour and pathway from text at intake.
-		\item Add a clinical gate so greetings and non-clinical chat get no colour.
+		\item Add a clinical gate so non-clinical chat gets no colour.
 	\end{enumerate}
 \end{frame}

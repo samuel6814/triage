@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 # Aligned with curatio/client/src/data/acuityLevels.js and triage-fusion/06-pathways.md
@@ -58,8 +59,34 @@ PATHWAYS: dict[str, dict[str, Any]] = {
     },
 }
 
+# Lexical child markers (thesis §pathways): deterministic, not BioBERT.
+CHILD_MARKERS: frozenset[str] = frozenset(
+    {"child", "son", "daughter", "baby", "infant", "toddler"}
+)
 
-def lookup_pathway(colour: str) -> dict[str, Any]:
+
+def has_child_markers(text: str | None) -> bool:
+    """True if normalised complaint contains any marker in M_child."""
+    if not text:
+        return False
+    lowered = str(text).lower()
+    return any(re.search(rf"\b{re.escape(m)}\b", lowered) for m in CHILD_MARKERS)
+
+
+def lookup_pathway(colour: str, complaint: str | None = None) -> dict[str, Any]:
     if colour not in PATHWAYS:
         raise ValueError(f"Unknown colour: {colour}")
-    return {"colour": colour, **PATHWAYS[colour]}
+    pathway = {"colour": colour, **PATHWAYS[colour]}
+    if has_child_markers(complaint):
+        pathway = {
+            **pathway,
+            "destination": "Pediatrics",
+            "child_markers_matched": True,
+            "detail": (
+                f"{pathway.get('detail', '')} "
+                "Lexical child-marker rule: destination overridden to Pediatrics."
+            ).strip(),
+        }
+    else:
+        pathway = {**pathway, "child_markers_matched": False}
+    return pathway

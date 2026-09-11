@@ -1,15 +1,13 @@
-\chapter{APPENDIX}
+\chapter{Software repository}
 \label{app:github}
-
-\section{Software repository}
 
 The implemented prototype and fine-tuned BioBERT artefacts are maintained at:
 
 \texttt{https://github.com/samuel6814/triage}
 
-No full source code is reproduced in this thesis; the mathematical specification in Chapter~\ref{ch:method} and the system architecture in Figure~\ref{fig:system-architecture} are the primary references.
+No full source code is reproduced in this project; the mathematical specification in Chapter~\ref{ch:method} and the system architecture in Figure~\ref{fig:system-architecture} are the primary references.
 
-\section{Prototype \texttt{/predict} response fields}
+\chapter{Prototype \texttt{/predict} response fields}
 
 A successful clinical submission returns a JSON object whose fields mirror the mathematics of Chapter~\ref{ch:method}. Table~\ref{tab:api-fields} lists the principal keys.
 
@@ -21,7 +19,7 @@ A successful clinical submission returns a JSON object whose fields mirror the m
 \textbf{Field} & \textbf{Meaning} \\
 \hline
 \texttt{gate\_score} & Clinical relevance \(g(X)\) in \([0,1]\) \\
-\texttt{gate\_passed} & True if \(g(X)\geq 0.35\) \\
+\texttt{gate\_passed} & True if \(g(X)\geq 0.30\) \\
 \texttt{probabilities} & Softmax vector \(\hat{\mathbf{y}}\) over levels 1--5 \\
 \texttt{predicted\_level} & \(\hat{c}=\arg\max_c\hat{y}_c\) \\
 \texttt{sats\_colour} & \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\) \\
@@ -35,21 +33,21 @@ A successful clinical submission returns a JSON object whose fields mirror the m
 
 Gate failures omit colour and pathway fields and instead return a prompt requesting a clinical chief complaint.
 
-\section{Stage~3 fine-tuning checklist}
+\chapter{Stage~3 fine-tuning checklist}
 
 For reproducibility, Stage~3 training used the following checklist (full values in Table~\ref{tab:hyperparams}):
 
 \begin{enumerate}
 \item Join Triagegeist \texttt{train.csv} and \texttt{chief\_complaints.csv} on \texttt{patient\_id}.
-\item Keep only English \texttt{chief\_complaint\_raw} and \texttt{triage\_acuity}; drop vitals and demographics.
+\item Keep only the English free-text chief complaint (why the patient came) and the nurse-assigned urgency level (\(1\)--\(5\)); drop vitals and demographics.
 \item Stratified 90/10 split with seed~42 (\(N_{\mathrm{train}}\approx 72{,}000\), \(N_{\mathrm{eval}}=8{,}000\)).
 \item Load BioBERT encoder; discard any prior two-class head; initialise \(W\in\mathbb{R}^{5\times 768}\), \(\mathbf{b}\in\mathbb{R}^{5}\).
 \item Train three epochs, batch size 16, learning rate \(2\times 10^{-5}\), weight decay 0.01, max length 128, FP16 enabled.
 \item Select the checkpoint with best validation cross-entropy (0.001812 at epoch 3 for the baseline run).
-\item Optional SMOTE branch: oversample minority urgent classes before the same training recipe; compare on the \emph{same} holdout split.
+\item Optional stratified-oversampling branch: augment and randomly oversample minority urgent classes on the training split before the same training recipe; compare on external MIMIC/NHAMCS sets (not a Triagegeist holdout headline).
 \end{enumerate}
 
-\section{Glossary of principal symbols}
+\chapter{Glossary of principal symbols}
 
 \begin{table}[H]
 \centering
