@@ -1,0 +1,57 @@
+{
+  "nhamcs": {
+    "majority": {
+      "accuracy": 0.5086666666666667,
+      "macro_f1": 0.13486522315510385,
+      "colour_accuracy": 0.5086666666666667,
+      "under_triage": 0.1625,
+      "over_triage": 0.3288333333333333,
+      "mae": 0.5471666666666667,
+      "recall_L1": 0.0,
+      "n": 12000
+    },
+    "majority_label": 3,
+    "tfidf_lr": {
+      "accuracy": 0.4583333333333333,
+      "macro_f1": 0.34647036251366925,
+      "colour_accuracy": 0.5186111111111111,
+      "under_triage": 0.2538888888888889,
+      "over_triage": 0.2877777777777778,
+      "mae": 0.7344444444444445,
+      "recall_L1": 0.28846153846153844,
+      "n": 3600,
+      "protocol": "train 70% / test 30% of NHAMCS N=12000 subsample (seed 42); same-domain lexical baseline"
+    }
+  },
+  "mimic_demo": {
+    "majority": {
+      "accuracy": 0.46859903381642515,
+      "macro_f1": 0.15953947368421054,
+      "colour_accuracy": 0.46859903381642515,
+      "under_triage": 0.08695652173913043,
+      "over_triage": 0.4444444444444444,
+      "mae": 0.5410628019323671,
+      "recall_L1": 0.0,
+      "n": 207
+    },
+    "majority_label": 2,
+    "tfidf_lr_train_nhamcs": {
+      "accuracy": 0.2608695652173913,
+      "macro_f1": 0.18242016806722688,
+      "colour_accuracy": 0.26570048309178745,
+      "under_triage": 0.6280193236714976,
+      "over_triage": 0.1111111111111111,
+      "mae": 1.5169082125603865,
+      "recall_L1": 0.1111111111111111,
+      "n": 207,
+      "protocol": "TF-IDF+LR trained on NHAMCS N=12000; evaluated on MIMIC demo"
+    }
+  },
+  "mae_biobert_from_cm": {
+    "nhamcs_baseline": 0.6272,
+    "nhamcs_oversample": 0.9335,
+    "mimic_demo_baseline": 1.0,
+    "mimic_demo_oversample": 1.0773,
+    "note": "MAE = mean |y_hat - y| from published confusion matrices"
+  }
+}

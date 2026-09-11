@@ -139,7 +139,7 @@ where \(t_i\) is the token at position \(i\) and \(\mathrm{id}(t_i)\) is its int
 \label{tab:embed-symbols}
 \end{table}
 
-The lookup \(\mathbf{e}_i\) is one term in the full input representation \(E(t_i) = E_{\mathrm{word}} + E_{\mathrm{pos}} + E_{\mathrm{seg}}\) from Equation~\eqref{eq:embedding-sum-preview}. After PubMed pre-training, BioBERT places clinically related terms nearer in this space than general-purpose embeddings would.
+The lookup \(\mathbf{e}_i\) is one term in the full input representation \(E(t_i) = E_{\mathrm{word}} + E_{\mathrm{pos}} + E_{\mathrm{seg}}\) from Equation~\eqref{eq:embedding-sum-preview}. After PubMed pre-training, BioBERT adapts these representations to biomedical language.
 
 \begin{figure}[H]
 \centering
@@ -414,7 +414,7 @@ In triage language: \(Q\) is what the current token looks for in the rest of the
   \draw[arrow] (softmax) -- (output);
   \draw[arrow] (value) |- (output);
 \end{tikzpicture}}
-\caption{Self-attention data flow within one encoder layer.}
+\caption{Self-attention data flow within one encoder layer (schematic architecture diagram; not extracted model weights).}
 \label{fig:self-attention}
 \end{figure}
 
@@ -496,7 +496,7 @@ By producing five probabilities that sum to one, Softmax parameterises a \textbf
 where \(X\) is the chief complaint and \(\hat{y}_c\) is the Softmax probability of acuity level \(c\).
 Informally, \(\hat{\mathbf{y}}\) behaves like a weighted five-sided die whose face probabilities are determined by the complaint text. Sampling from that die would draw a random acuity; hospital routing instead takes the mode \(\hat{c}=\arg\max_c\hat{y}_c\) (and may escalate to a nurse when the mode is not dominant).
 
-Stage~3 training maximises the probability of the nurse-assigned level under this Categorical model. Equivalently, it minimises the negative log-likelihood (NLL)
+Stage~3 training maximises the probability of the ESI-style label under this Categorical model. Equivalently, it minimises the negative log-likelihood (NLL)
 \begin{equation}
   \mathcal{L}_{\mathrm{NLL}} = -\log \hat{y}_{y} = -\log P(y\mid X),
 \end{equation}
@@ -558,7 +558,7 @@ Softmax probabilities are calibrated only to the extent that the training distri
 \section{Model training pipeline}
 \label{sec:training-pipeline}
 
-The deployed triage classifier is not trained from random initialisation. It is the product of three sequential stages: biomedical pre-training (Stage 1), encoder transfer from a prior triage checkpoint (Stage 2), and project fine-tuning on nurse-labeled chief complaints (Stage 3). Stages 1 and 2 supply medical language and partial triage adaptation; Stage 3 is the comprehensive retraining that maps free-text complaints to five acuity levels for this chatbot.
+The deployed triage classifier is not trained from random initialisation. It is the product of three sequential stages: biomedical pre-training (Stage 1), encoder transfer from a prior triage checkpoint (Stage 2), and project fine-tuning on synthetic Triagegeist chief-complaint / ESI-style label pairs (Stage 3). Stages 1 and 2 supply medical language and partial triage adaptation; Stage 3 is the comprehensive retraining that maps free-text complaints to five acuity levels for this chatbot.
 
 \begin{figure}[H]
 \centering
@@ -619,10 +619,10 @@ If the masked token should be ``headache'', the MLM contribution is
 
 A publicly available BioBERT triage checkpoint partially adapted the encoder to urgency-related text using a \textbf{two-class} classification head (\(W \in \mathbb{R}^{2 \times 768}\)). For this project, that 2-class head is \textbf{discarded} on load because our labels require five acuity levels. The loader uses \texttt{ignore\_mismatched\_sizes=True}: only encoder weights carry forward; the output layer is randomly reinitialised for five classes. Stage 2 therefore contributes triage-oriented encoder features without constraining the final colour mapping.
 
-\subsection{Stage 3: Fine-tuning on nurse-labeled chief complaints}
+\subsection{Stage 3: Fine-tuning on synthetic Triagegeist chief-complaint / ESI-style label pairs}
 \label{sec:training}
 
-Stage 3 is the comprehensive retraining performed for this project. Nurse-assigned acuity labels from the Triagegeist benchmark (Section~\ref{sec:data-provenance}) are inner-joined with chief-complaint text on patient identifier, yielding \(N = 80{,}000\) English text-label pairs \((X_i, y_i)\). Only the free-text English chief complaint (why the patient came) and the nurse-assigned urgency level (\(1\)--\(5\)) are used; vitals and demographics in the source records are excluded so the NLP path matches the single-shot text input at intake.
+Stage 3 is the comprehensive retraining performed for this project. ESI-style acuity labels from the synthetic Triagegeist benchmark (Section~\ref{sec:data-provenance}) are inner-joined with chief-complaint text on patient identifier, yielding \(N = 80{,}000\) English text-label pairs \((X_i, y_i)\). Only the free-text English chief complaint (why the patient came) and the ESI-style urgency label (\(1\)--\(5\)) are used; vitals and demographics in the source records are excluded so the NLP path matches the single-shot text input at intake.
 
 The data are split 90/10 into training and validation sets (\(\approx 72{,}000\) / \(\approx 8{,}000\) rows, \texttt{test\_size=0.1}, random seed 42). A new classification head \(W \in \mathbb{R}^{5 \times 768}\), \(\mathbf{b} \in \mathbb{R}^{5}\) is trained from scratch while encoder weights are updated with a small learning rate.
 
@@ -687,7 +687,7 @@ The objective is \textbf{cross-entropy loss}: for each training example, the mod
 \begin{equation}
   \mathcal{L}_{\mathrm{CE}} = -\log \hat{y}_{y},
 \end{equation}
-where \(y \in \{1,\ldots,5\}\) is the nurse-labeled acuity level and \(\hat{y}_{y}\) is the Softmax probability the model assigns to that correct level. Over the full training set the same symbol denotes the empirical risk
+where \(y \in \{1,\ldots,5\}\) is the ESI-style acuity label and \(\hat{y}_{y}\) is the Softmax probability the model assigns to that correct level. Over the full training set the same symbol denotes the empirical risk
 \begin{equation}
   \mathcal{L}_{\mathrm{CE}} = -\sum_{i=1}^{N} \log P(y_i \mid X_i;\, \theta), \quad N = 80{,}000,
 \end{equation}
@@ -714,7 +714,7 @@ In words: (i) \(\partial \mathcal{L}_{\mathrm{CE}}/\partial \hat{\mathbf{y}}\) m
 \begin{equation}
   W_{\mathrm{new}} = W_{\mathrm{old}} - \alpha \frac{\partial \mathcal{L}_{\mathrm{CE}}}{\partial W},
 \end{equation}
-where \(\alpha = 2 \times 10^{-5}\) is the learning rate, \(W_{\mathrm{old}}\) is the current weight matrix, and \(W_{\mathrm{new}}\) is the updated matrix. When the model confidently predicts the wrong colour, backpropagation increases the loss sharply and the subsequent weight update pushes similar complaints toward the nurse-labeled class on the next training pass.
+where \(\alpha = 2 \times 10^{-5}\) is the learning rate, \(W_{\mathrm{old}}\) is the current weight matrix, and \(W_{\mathrm{new}}\) is the updated matrix. When the model confidently predicts the wrong colour, backpropagation increases the loss sharply and the subsequent weight update pushes similar complaints toward the ESI-style class on the next training pass.
 
 \begin{remark}
 Pre-training (Stage 1) gives the model medical language; comprehensive fine-tuning (Stage 3) teaches triage decisions on short, informal chief-complaint phrasing. The learning rate is kept small so PubMed knowledge is preserved while the head and encoder adapt to urgency labels.
@@ -737,7 +737,9 @@ Chapter~\ref{ch:results} contrasts this checkpoint with the unrebalanced baselin
 \section{Mapping acuity to colour: \(f_{\mathrm{SATS}}\)}
 \label{sec:fsats}
 
-The Softmax head predicts Emergency Severity Index (ESI)--style acuity levels \(1\)--\(5\) learned from training and external evaluation labels (Triagegeist, MIMIC-IV-ED, NHAMCS). Those sources are \textbf{not} SATS-labelled: ESI is primarily resource-based, whereas SATS combines vital-sign TEWS with clinical discriminators. Hospital routing at \examplehospital{} nonetheless uses SATS colours, so this project defines a fixed deterministic operational heuristic \(f_{\mathrm{SATS}}\) that bridges the shared five-tier urgency curve to Ghanaian pathway colours:
+\subsection{ESI-to-SATS mapping assumption}
+
+The Softmax head predicts Emergency Severity Index (ESI)--style acuity levels \(1\)--\(5\) learned from synthetic Triagegeist training pairs and scored on external MIMIC-IV-ED and NHAMCS labels. Those sources are \textbf{not} SATS-labelled: ESI is primarily resource-based, whereas SATS combines vital-sign TEWS with clinical discriminators. No direct SATS colour labels are used for training. Hospital routing at \examplehospital{} nonetheless uses SATS colours, so this project defines a fixed deterministic operational heuristic \(f_{\mathrm{SATS}}\) that converts an ESI-style level into a SATS-aligned colour for text-first routing assist:
 \begin{equation}
   f_{\mathrm{SATS}}(\hat{c}) = C_{\mathrm{NLP}} = \begin{cases}
     \text{Red} & \hat{c} = 1 \\
@@ -746,9 +748,9 @@ The Softmax head predicts Emergency Severity Index (ESI)--style acuity levels \(
     \text{Green} & \hat{c} \in \{4, 5\}
   \end{cases}
 \end{equation}
-where \(\hat{c} = \arg\max_c \hat{y}_c\) is the predicted acuity level, \(f_{\mathrm{SATS}}\) is the fixed level-to-colour map, and \(C_{\mathrm{NLP}}\) is the resulting SATS colour from the text path.
+where \(\hat{c} = \arg\max_c \hat{y}_c\) is the predicted acuity level, \(f_{\mathrm{SATS}}\) is the fixed level-to-colour map, and \(C_{\mathrm{NLP}}\) is the resulting SATS-aligned colour from the text path.
 
-While ESI and SATS operate on fundamentally different clinical philosophies (resource allocation versus physiological discriminators), they share an isomorphic five-tier urgency curve. The heuristic \(f_{\mathrm{SATS}}\) leverages this shared architecture to bridge text-based acuity predictions to Ghanaian pathway colours, functioning strictly as an antecedent routing assist rather than a definitive clinical cross-walk, and not as a claim that the training or external datasets are SATS-labelled.
+Both systems contain five ordered urgency categories, allowing the construction of an ordinal heuristic mapping for this prototype. This structural similarity does \emph{not} imply clinical equivalence. The map \(f_{\mathrm{SATS}}\) is a proposed operational crosswalk for intake assistance, not a validated clinical translation, and requires adjudication against clinician-assigned SATS colours before operational claims beyond routing assist.
 
 \begin{table}[H]
 \centering
@@ -764,11 +766,11 @@ While ESI and SATS operate on fundamentally different clinical philosophies (res
 5 & Non-urgent & Green \\
 \hline
 \end{tabular}
-\caption{Proposed ESI-style acuity \(\rightarrow\) SATS colour heuristic for text-first routing.}
+\caption{Proposed ESI-style acuity \(\rightarrow\) SATS colour heuristic for text-first routing (not a clinical equivalence table).}
 \label{tab:fsats-esi}
 \end{table}
 
-Levels 4 and 5 both map to Green because both are non-urgent in the five-level schema. Blue is reserved for dignity protocol on arrival and is not produced by this five-class head.
+Levels 4 and 5 both map to Green because both are non-urgent in the five-level schema. Blue is reserved for dignity protocol on arrival and is not produced by this five-class head. Colour accuracy is therefore not equivalent to five-class accuracy: \(f_{\mathrm{SATS}}\) is many-to-one on \(\{4,5\}\).
 
 \section{Clinical pathways \(P(C_{\mathrm{NLP}})\)}
 \label{sec:pathways}
@@ -779,11 +781,13 @@ Once \(C_{\mathrm{NLP}}\) is known, the chatbot attaches a pathway card that spe
 \end{equation}
 where \(P(C_{\mathrm{NLP}})\) is the pathway card for colour \(C_{\mathrm{NLP}}\), \(T_{\max}\) is the maximum waiting time, destination is the primary clinical department, actions list support steps (nursing, pharmacy, diagnostics), and escalation defines what happens if the timer expires or the patient worsens. Colour alone is not enough at intake: the pathway card names where the patient should go and how soon they should be seen. The four tuple components correspond directly to the columns in Table~\ref{tab:pathways}.
 
-\textbf{Lexical child-marker rule.} BioBERT has no age feature, so Pediatrics is never a default destination for adult ASTS colours. Before the pathway card is finalised, a deterministic (non-neural) check runs on the complaint \(X\). Define the marker set
+\textbf{Age-agnostic classifier.} The current classifier maps \(X\to\hat{y}\), not \((X,\mathrm{age})\to\hat{y}\). BioBERT has no age feature, so Pediatrics is never a default destination for adult ASTS colours and paediatric TEWS tables remain out of scope. Before the pathway card is finalised, a deterministic (non-neural) check runs on the complaint \(X\). Define the marker set
 \begin{equation}
   \mathcal{M}_{\mathrm{child}}=\{\texttt{child},\,\texttt{son},\,\texttt{daughter},\,\texttt{baby},\,\texttt{infant},\,\texttt{toddler}\}.
 \end{equation}
 Normalise \(X\) to lowercase. If any element of \(\mathcal{M}_{\mathrm{child}}\) appears as a substring of \(X\), override the destination field of \(P(C_{\mathrm{NLP}})\) to Pediatrics; otherwise keep the adult destination for that colour. This rule is applied after \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\) and does not change the colour itself.
+
+The pathway configuration below represents the authors' documented interpretation of observed workflow at \examplehospital{} and published SATS rules; it should not be interpreted as an official clinical protocol unless formally approved by the hospital.
 
 \begin{table}[H]
 \centering
@@ -1099,24 +1103,63 @@ The walkthrough shows why every mathematical object in Chapter~\ref{ch:method} a
 \section{End-to-end summary}
 \label{sec:e2e}
 
-For any chief complaint \(X\), the implemented text path (matching the prototype \texttt{/predict} endpoint) proceeds as follows:
+For any chief complaint \(X\), the implemented text path (matching the prototype \texttt{/predict} endpoint) runs only when the clinical gate passes: \(g(X)\ge\tau_g\) with deployed \(\tau_g=0.30\) (Section~\ref{sec:gate}); otherwise the system stops after the gate and assigns no colour. When the gate passes,
 \begin{equation}
 \begin{aligned}
-  X &\xrightarrow[\ref{sec:gate}]{g} \tau(X) \xrightarrow[\ref{sec:tokenisation}--\ref{sec:h0}]{} H^{(0)} \\
-  &\xrightarrow[\ref{sec:encoder}--\ref{sec:attention}]{12} h_{\mathrm{[CLS]}} \\
-  &\xrightarrow[\ref{sec:classification}]{} \hat{\mathbf{y}}
-    \xrightarrow[\ref{sec:fsats}]{} C_{\mathrm{NLP}}
-    \xrightarrow[\ref{sec:pathways}]{} P(C_{\mathrm{NLP}}),
+  X &\xrightarrow[\ref{sec:tokenisation}]{\tau} \mathrm{ids}
+    \xrightarrow[\ref{sec:h0}]{\mathrm{emb}} H^{(0)}
+    \xrightarrow[\ref{sec:encoder}--\ref{sec:attention}]{B} h_{\mathrm{[CLS]}} \\
+  &\xrightarrow[\ref{sec:classification}]{S} \hat{\mathbf{y}}
+    \xrightarrow{\arg\max} \hat{c}
+    \xrightarrow[\ref{sec:fsats}]{f_{\mathrm{SATS}}} C_{\mathrm{NLP}}
+    \xrightarrow[\ref{sec:pathways}]{P} P(C_{\mathrm{NLP}}),
 \end{aligned}
   \label{eq:e2e-chain}
 \end{equation}
-where each arrow label points to the section that defines that transformation: \(g\) is the clinical gate, \(\tau(X)\) is tokenisation, \(H^{(0)}\) is the input embedding matrix, \(h_{\mathrm{[CLS]}}\) is the final summary vector, \(\hat{\mathbf{y}}\) is the five-class Softmax distribution, \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\) is the SATS colour, and \(P(C_{\mathrm{NLP}})\) is the pathway card. If \(g(X) < 0.30\), the chain stops after the gate and no colour is assigned.
+where \(\tau\) is WordPiece tokenisation to integer IDs, \(\mathrm{emb}\) builds the input embedding matrix \(H^{(0)}\), \(B\) is the twelve-layer BioBERT map to the summary vector \(h_{\mathrm{[CLS]}}\), \(S\) is the Softmax classification head producing the five-class distribution \(\hat{\mathbf{y}}\), \(\hat{c}=\arg\max_c\hat{y}_c\) is the predicted ESI-style level, \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\) is the SATS-aligned colour, and \(P(C_{\mathrm{NLP}})\) is the pathway card. The tokeniser map \(\tau\) is distinct from the gate threshold \(\tau_g\) and the confidence threshold \(\tau_c\) below.
+
+\paragraph{Composite operator form.}
+Writing the maps explicitly for a mathematics audience, let \(M=128\) be the project sequence length, \(V\) the WordPiece vocabulary size, and
+\begin{align*}
+  g &: X \mapsto [0,1]
+    \quad\text{(clinical gate score)}, \\
+  \tau &: X \mapsto \{1,\ldots,V\}^{M}
+    \quad\text{(padded WordPiece IDs)}, \\
+  \mathrm{emb} &: \{1,\ldots,V\}^{M} \mapsto \mathbb{R}^{M\times 768}
+    \quad\text{(builds \(H^{(0)}\))}, \\
+  B &: \mathbb{R}^{M\times 768} \mapsto \mathbb{R}^{768}
+    \quad\text{(\(L=12\) encoder layers to \(h_{\mathrm{[CLS]}}\))}, \\
+  S &: \mathbb{R}^{768} \mapsto \Delta^{4}
+    \quad\text{(Softmax head)}, \\
+  \arg\max &: \Delta^{4} \mapsto \{1,\ldots,5\}
+    \quad\text{(predicted level \(\hat{c}\))}, \\
+  f_{\mathrm{SATS}} &: \{1,\ldots,5\} \mapsto \{R,O,Y,G\}, \\
+  P &: \{R,O,Y,G\} \mapsto \text{PathwayCards},
+\end{align*}
+where the probability simplex is
+\[
+  \Delta^{4}=\bigl\{p\in\mathbb{R}^{5}: p_i\ge 0,\; \sum_{i=1}^{5}p_i=1\bigr\}.
+\]
+In informal prose the embedding step may be absorbed into the ``encoder stack,'' but the typed composition keeps \(\mathrm{emb}\) explicit so \(H^{(0)}\) is not orphaned. The text-path operator (when the gate passes) is
+\begin{equation}
+  F = P \circ f_{\mathrm{SATS}} \circ \arg\max \circ S \circ B \circ \mathrm{emb} \circ \tau,
+  \label{eq:composite-F}
+\end{equation}
+subject to \(g(X)\ge \tau_g\). Empirically scored evaluation applies to \(S\circ B\circ\mathrm{emb}\circ\tau\) (ESI-style \(\hat{\mathbf{y}}\)); \(f_{\mathrm{SATS}}\) and \(P\) are proposed or protocol maps in the hierarchy of evidence (Chapter~\ref{ch:intro}).
+
+\paragraph{Confidence deferral.}
+Let \(\hat{y}_{(1)}=\max_c\hat{y}_c\). Deployments should defer to a nurse when
+\begin{equation}
+  \hat{y}_{(1)} < \tau_c
+  \label{eq:tau-c}
+\end{equation}
+for a chosen confidence threshold \(\tau_c\in(0,1)\) (prototype default discussion uses \(\tau_c=0.60\) as a policy parameter, not an optimised clinical cutoff). The quantity \(\hat{y}_{(1)}\) is the maximum Softmax probability and must \emph{not} be interpreted as a calibrated clinical probability.
 
 \begin{enumerate}
-\item \textbf{Clinical relevance gate.} Compute \(g(X)\); if \(g(X) < 0.30\), return a request for clinical detail and stop.
-\item \textbf{Tokenisation and embedding.} Map \(X\) to tokens, build \(H^{(0)} \in \mathbb{R}^{M \times 768}\) (Sections~\ref{sec:tokenisation}--\ref{sec:h0}).
-\item \textbf{BioBERT encoding.} Apply \(L=12\) encoder layers with self-attention (Sections~\ref{sec:encoder}--\ref{sec:attention}) to obtain \(h_{\mathrm{[CLS]}}\).
-\item \textbf{Classification.} Apply the softmax head (Section~\ref{sec:classification}):
+\item \textbf{Clinical relevance gate.} Compute \(g(X)\); if \(g(X) < \tau_g=0.30\), return a request for clinical detail and stop.
+\item \textbf{Tokenisation and embedding.} Apply \(\tau\) then \(\mathrm{emb}\) to build \(H^{(0)} \in \mathbb{R}^{M \times 768}\) with \(M=128\) (Sections~\ref{sec:tokenisation}--\ref{sec:h0}).
+\item \textbf{BioBERT encoding.} Apply \(B\) with \(L=12\) encoder layers and hidden size \(768\) (Sections~\ref{sec:encoder}--\ref{sec:attention}) to obtain \(h_{\mathrm{[CLS]}}\in\mathbb{R}^{768}\).
+\item \textbf{Classification.} Apply the Softmax head \(S\) (Section~\ref{sec:classification}) with learned parameters \(W\in\mathbb{R}^{5\times 768}\) and \(\mathbf{b}\in\mathbb{R}^{5}\):
 \begin{align*}
   \hat{\mathbf{y}} &= \mathrm{softmax}(W h_{\mathrm{[CLS]}} + \mathbf{b}), \\
   \hat{c} &= \arg\max_c \hat{y}_c.
@@ -1148,15 +1191,15 @@ The illustrative complaint in this chapter instantiates the same pipeline; one w
 \label{fig:e2e}
 \end{figure}
 
-The diagram above matches the pipeline in Section~\ref{sec:overview}. In order:
+The diagram above matches the pipeline in Section~\ref{sec:overview} and Equation~\eqref{eq:e2e-chain}. In order:
 \begin{enumerate}
 \item \textbf{Complaint \(X\)} enters as free text from the patient or attendant.
-\item \textbf{Gate} computes \(g(X)\); non-clinical input is rejected before BioBERT runs.
-\item \textbf{Tokenise and embed} map text to integer IDs and build the matrix \(H^{(0)}\).
-\item \textbf{BioBERT} applies twelve encoder layers with self-attention across all tokens.
-\item \textbf{\texttt{[CLS]} summary} extracts the fixed-length vector \(h_{\mathrm{[CLS]}}\) from row 0.
-\item \textbf{Softmax} outputs acuity probabilities \(\hat{\mathbf{y}}\) over five classes.
-\item \textbf{Colour and pathway} apply \(f_{\mathrm{SATS}}(\hat{c})\) and return the pathway card \(P(C_{\mathrm{NLP}})\).
+\item \textbf{Gate} computes \(g(X)\); if \(g(X)<\tau_g\), non-clinical input is rejected before BioBERT runs.
+\item \textbf{Tokenise and embed} apply \(\tau\) and \(\mathrm{emb}\) to map text to integer IDs and build \(H^{(0)}\).
+\item \textbf{BioBERT} applies \(B\) (\(L=12\) encoder layers with self-attention) across all tokens.
+\item \textbf{\texttt{[CLS]} summary} extracts the fixed-length vector \(h_{\mathrm{[CLS]}}\in\mathbb{R}^{768}\) from row 0.
+\item \textbf{Softmax} applies \(S\) to output acuity probabilities \(\hat{\mathbf{y}}\) over five classes; \(\hat{c}=\arg\max_c\hat{y}_c\).
+\item \textbf{Colour and pathway} apply \(f_{\mathrm{SATS}}(\hat{c})\) to obtain \(C_{\mathrm{NLP}}\) and return the pathway card \(P(C_{\mathrm{NLP}})\).
 \end{enumerate}
 
 \section{Implementation note}
@@ -1168,12 +1211,12 @@ Figure~\ref{fig:system-architecture} shows the deployable system: patient-facing
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-  node distance=0.5cm and 0.45cm,
-  box/.style={draw=green!60!black, rectangle, fill=green!10, text width=2.5cm, align=center,
-    minimum height=1.1cm, rounded corners, font=\small, inner sep=3pt},
+  node distance=0.30cm and 0.16cm,
+  box/.style={draw=green!60!black, rectangle, fill=green!10, text width=2.0cm, align=center,
+    minimum height=1.0cm, rounded corners, font=\footnotesize, inner sep=2.5pt},
   user/.style={box, fill=gray!12},
   api/.style={box, fill=green!18},
-  route/.style={box, fill=triageYellow!25, text width=2.65cm},
+  route/.style={box, fill=triageYellow!25, text width=2.1cm},
   arrow/.style={->, >=latex, thick, draw=black!55},
   darrow/.style={->, >=latex, thick, draw=black!45, dashed}]
   \node[user] (pat) {Patient or\\attendant};
@@ -1181,18 +1224,18 @@ Figure~\ref{fig:system-architecture} shows the deployable system: patient-facing
   \node[api, right=of ui] (api) {Chatbot\\API};
   \node[box, right=of api] (gate) {Clinical\\gate};
   \node[box, right=of gate] (bert) {BioBERT\\classifier};
-  \node[font=\bfseries\small, above=0.55cm of api] {Deployable triage system};
-  \node[box, below=1.35cm of api] (card) {Pathway\\card};
+  \node[box, right=of bert] (card) {Pathway\\card};
   \node[route, right=of card] (dept) {Department\\routing};
-  \node[box, fill=gray!8, left=of card] (tews) {Nurse vitals\\(TEWS)};
+  \node[font=\bfseries\small, above=0.32cm of gate] {Deployable triage system};
+  \node[box, fill=gray!8, below=0.45cm of card] (tews) {Nurse vitals\\(TEWS)};
   \draw[arrow] (pat) -- (ui);
-  \draw[arrow] (ui) -- node[above, font=\footnotesize] {JSON} (api);
+  \draw[arrow] (ui) -- node[above, font=\scriptsize] {JSON} (api);
   \draw[arrow] (api) -- (gate);
   \draw[arrow] (gate) -- (bert);
-  \draw[arrow] (bert.south) |- (card.east);
+  \draw[arrow] (bert) -- (card);
   \draw[arrow] (card) -- (dept);
   \draw[darrow] (tews) -- (card);
-  \node[font=\footnotesize\itshape, text=black!65, below=0.5cm of card] {English chief complaint in; acuity, colour, and pathway out};
+  \node[font=\footnotesize\itshape, text=black!65, below=0.28cm of tews] {English chief complaint in; acuity, colour, and pathway out};
 \end{tikzpicture}}
 \caption{System architecture: user interface, chatbot API, BioBERT inference pipeline, pathway card, and department routing. Nurse TEWS runs in parallel (dashed); prototype code in Appendix~\ref{app:github}.}
 \label{fig:system-architecture}

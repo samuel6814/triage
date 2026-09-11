@@ -55,8 +55,8 @@ Primary reported metrics are from external evaluation on MIMIC-IV-ED and NHAMCS.
 
 \begin{enumerate}
 \item \textbf{Train / validation (Triagegeist).} Stratified 90/10 split (seed~42) for Stage~3 fine-tuning and checkpoint selection. No Triagegeist holdout accuracy is reported as a Results headline.
-\item \textbf{External A: MIMIC-IV-ED.} Text-only on \texttt{chiefcomplaint} \(\rightarrow\) predict acuity; gold = \texttt{acuity} \(\in\{1,\ldots,5\}\). Full MIMIC-IV-ED v2.2 is credentialed on PhysioNet \citep{mimicived2023}; this project evaluates the open demo matching the same triage schema \citep{mimiciveddemo2023} (\(N=207\) after filters) until a full extract is available.
-\item \textbf{External B: NHAMCS 2018--22.} Text-only on \texttt{chief\_complaint\_text} \(\rightarrow\) predict acuity; gold = \texttt{target\_triage\_acuity} \citep{nhamcs201822}. After filters, \(N=58{,}124\) rows remain; metrics below use a stratified subsample of \(N=12{,}000\) (seed~42) for compute, with full-set class support reported in Table~\ref{tab:external-support}.
+\item \textbf{A: MIMIC-IV-ED.} Text-only on \texttt{chiefcomplaint} \(\rightarrow\) predict acuity; gold = \texttt{acuity} \(\in\{1,\ldots,5\}\). Full MIMIC-IV-ED v2.2 is credentialed on PhysioNet \citep{mimicived2023}; this project evaluates the open demo matching the same triage schema \citep{mimiciveddemo2023} (\(N=207\) after filters) until a full extract is available.
+\item \textbf{B: NHAMCS 2018--22.} Text-only on \texttt{chief\_complaint\_text} \(\rightarrow\) predict acuity; gold = \texttt{target\_triage\_acuity} \citep{nhamcs201822}. After filters, \(N=58{,}124\) rows remain; metrics below use a stratified subsample of \(N=12{,}000\) (seed~42) for compute, with full-set class support reported in Table~\ref{tab:external-support}.
 \end{enumerate}
 
 \textbf{Pre-processing (both external sets).} Drop empty, NaN, or whitespace-only complaints; keep acuity in \(\{1,\ldots,5\}\); do \emph{not} expand nursing abbreviations (e.g.\ CP, SOB); tokenise with BioBERT WordPiece and truncate/pad to project length \(M=128\).
@@ -68,7 +68,31 @@ Two checkpoints are compared:
 \item \textbf{Stratified-oversampling variant:} text augmentation plus random minority oversampling on the Triagegeist training split, then end-to-end fine-tuning (Section~\ref{sec:oversampling-choice}).
 \end{enumerate}
 
-Metrics: five-class accuracy and macro-F1; 4-colour accuracy after \(f_{\mathrm{SATS}}\); under-triage (predicted less urgent than true); over-triage (more urgent); critical under-triage (true Red\(\rightarrow\)non-Red; true Orange\(\rightarrow\)Yellow/Green); latency.
+Metrics: five-class accuracy and macro-F1; 4-colour accuracy after \(f_{\mathrm{SATS}}\); under-triage (predicted less urgent than true); over-triage (more urgent); critical under-triage (true Red\(\rightarrow\)non-Red; true Orange\(\rightarrow\)Yellow/Green); ordinal mean absolute error (MAE); latency.
+
+\paragraph{Error taxonomy.}
+Classification, colour, and under-triage errors are related but not identical. For gold level \(y\) and prediction \(\hat{y}\),
+\begin{align*}
+  E_{\mathrm{class}} &= \mathbf{1}(\hat{y}\neq y), \\
+  E_{\mathrm{colour}} &= \mathbf{1}\bigl(f_{\mathrm{SATS}}(\hat{y})\neq f_{\mathrm{SATS}}(y)\bigr), \\
+  E_{\mathrm{under}} &= \mathbf{1}(\hat{y}> y)
+\end{align*}
+(with ESI convention that smaller integers are more urgent). Ordinal severity of class error is summarised by
+\[
+  \mathrm{MAE}=\frac{1}{N}\sum_{i=1}^{N}\lvert\hat{y}_i-y_i\rvert.
+\]
+
+\paragraph{Cost-sensitive objective (interpretive).}
+Stakeholders may weigh under-triage, over-triage, and classification error differently. An interpretive risk functional (not used as the training loss in this project) is
+\[
+  R(\theta)=\lambda_u U(\theta)+\lambda_o O(\theta)+\lambda_e E(\theta),
+\]
+where \(U\) is under-triage rate, \(O\) is over-triage rate, \(E\) is five-class error rate, and \(\lambda_u,\lambda_o,\lambda_e\ge 0\) encode relative clinical cost. Stratified oversampling is interpreted as increasing emphasis on rare Red recall at the expense of \(E\) and often \(O\).
+
+\subsection{Headline external metrics}
+\label{sec:nhamcs-results}
+
+Table~\ref{tab:external-metrics} is the primary results table for this chapter (NHAMCS and MIMIC demo; baseline vs stratified oversampling). Supporting acuity counts appear in Table~\ref{tab:external-support}.
 
 \subsection{Acuity distribution on test sets}
 \label{sec:external-support}
@@ -94,7 +118,15 @@ MIMIC-IV-ED demo & 18 & 97 & 90 & 2 & 0 & 207 \\
 \subsection{Why prior in-distribution accuracy looked inflated}
 \label{sec:high-accuracy}
 
-A Triagegeist duplicate analysis finds only 4{,}949 unique normalised complaint strings among 80{,}000 training rows (duplicate rate \(\approx 93.8\%\); 4{,}184 templates appear at least five times). High template reuse helps explain why earlier in-distribution holdout figures near 99.9\% looked unrealistically strong: they largely measure agreement on repeated synthetic phrasing, not generalisation. Those figures are therefore retired from the Results headline in favour of MIMIC/NHAMCS metrics below.
+Let \(N=80{,}000\) denote the Triagegeist training-pair count used for Stage~3. After normalising complaint strings, only
+\[
+  N_{\mathrm{unique}}=4{,}949
+\]
+distinct complaints remain, so the duplicate rate is
+\[
+  D=1-\frac{N_{\mathrm{unique}}}{N}=1-\frac{4{,}949}{80{,}000}\approx 0.9381
+\]
+(about 93.8\%; 4{,}184 templates appear at least five times). Random row-level splitting can therefore place near-identical linguistic templates in both training and validation folds, inflating in-distribution accuracy. High template reuse helps explain why earlier holdout figures near 99.9\% looked unrealistically strong: they largely measure agreement on repeated synthetic phrasing, not generalisation. Those figures are therefore retired from the Results headline in favour of MIMIC/NHAMCS metrics below. A full complaint-level deduplicated retrain is left as future work.
 
 \subsection{Stratified oversampling for class imbalance}
 \label{sec:oversampling-choice}
@@ -112,9 +144,8 @@ The choice follows from the training objective. End-to-end Stage~3 is meant to a
 The NHAMCS and MIMIC comparisons below therefore contrast the baseline Stage~3 model with this stratified-oversampling checkpoint, not with an embedding-SMOTE head.
 
 \subsection{NHAMCS external results}
-\label{sec:nhamcs-results}
 
-On the stratified NHAMCS subsample (\(N=12{,}000\)), baseline BioBERT reaches 47.60\% five-class accuracy, 0.288 macro-F1, and 49.95\% colour accuracy after \(f_{\mathrm{SATS}}\) (Table~\ref{tab:external-metrics}). Under-triage is 28.39\% and over-triage 24.01\%. Level~1 recall is only 8.00\% (support 175) despite 82.35\% Level~1 precision: most true Red cases are predicted as Orange or Yellow (Figure~\ref{fig:confusion-nhamcs-baseline}), which is the primary safety concern under domain shift \citep{Berkowitz2019}.
+On the stratified NHAMCS subsample (\(N=12{,}000\)), baseline BioBERT reaches 47.60\% five-class accuracy, 0.288 macro-F1, and 49.95\% colour accuracy after \(f_{\mathrm{SATS}}\) (Table~\ref{tab:external-metrics}). Ordinal MAE is \(0.627\) (baseline) versus \(0.934\) after stratified oversampling, so rebalancing widens average class distance even while raising Red recall. Under-triage is 28.39\% and over-triage 24.01\%. Level~1 recall is only 8.00\% (support 175) despite 82.35\% Level~1 precision: most true Red cases are predicted as Orange or Yellow (Figure~\ref{fig:confusion-nhamcs-baseline}), which is the primary safety concern under domain shift \citep{Berkowitz2019}.
 
 \begin{table}[H]
 \centering
@@ -127,6 +158,7 @@ On the stratified NHAMCS subsample (\(N=12{,}000\)), baseline BioBERT reaches 47
 Accuracy & 0.4760 & 0.3045 & 0.3043 & 0.2126 \\
 Macro-F1 & 0.2882 & 0.2146 & 0.1748 & 0.1781 \\
 Colour accuracy & 0.4995 & 0.3422 & 0.3043 & 0.2126 \\
+MAE (ordinal) & 0.6272 & 0.9335 & 1.0000 & 1.0773 \\
 Under-triage & 0.2839 & 0.3903 & 0.6377 & 0.6087 \\
 Over-triage & 0.2401 & 0.3052 & 0.0580 & 0.1787 \\
 Recall L1 (Red) & 0.0800 & 0.2171 & 0.1111 & 0.5000 \\
@@ -134,9 +166,44 @@ Precision L1 & 0.8235 & 0.0597 & 0.4000 & 0.2647 \\
 Latency p50 (ms) & 94.00 & 96.18 & n/a & n/a \\
 \hline
 \end{tabular}
-\caption{External classification, colour, under/over-triage, and latency metrics. MIMIC columns use the open demo (\(N=207\)). MIMIC latency is reported as n/a: published timing uses the NHAMCS evaluation run (Section~\ref{sec:latency}).}
+\caption{External classification, colour, ordinal MAE, under/over-triage, and latency metrics. MIMIC columns use the open demo (\(N=207\)). MIMIC latency is reported as n/a: published timing uses the NHAMCS evaluation run (Section~\ref{sec:latency}).}
 \label{tab:external-metrics}
 \end{table}
+
+\paragraph{Simple baselines on the same NHAMCS subsample.}
+A majority-class predictor (always Level~3) reaches 50.87\% accuracy and 0.135 macro-F1 with Level~1 recall \(0\) on the \(N=12{,}000\) NHAMCS subsample. Baseline BioBERT (trained on Triagegeist, evaluated under domain shift) is slightly below majority accuracy (47.60\%) but substantially above majority macro-F1 (0.288) and recovers non-zero Red recall (8.00\%). A same-domain TF-IDF + logistic regression baseline trained on 70\% of the NHAMCS subsample and tested on the held-out 30\% reaches 45.83\% accuracy, 0.346 macro-F1, and 28.85\% Level~1 recall: lexical features help when train and test share NHAMCS phrasing, which is a different regime from Triagegeist\(\rightarrow\)NHAMCS transfer. These comparisons answer whether BioBERT adds value beyond naive rules: it does on rare-class and macro metrics under shift, while raw accuracy alone can favour majority guessing on a Level~3-dominated survey. Table~\ref{tab:simple-baselines} reports the full computed panel, including MIMIC demo transfer rows.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{|l|l|r|r|r|r|r|r|}
+\hline
+\textbf{Corpus} & \textbf{Model} & \textbf{Acc} & \textbf{Macro-F1} & \textbf{MAE} & \textbf{Under} & \textbf{Over} & \textbf{L1 rec.} \\
+\hline
+NHAMCS & Majority (L3) & 0.5087 & 0.1349 & 0.5472 & 0.1625 & 0.3288 & 0.0000 \\
+NHAMCS & TF-IDF+LR & 0.4583 & 0.3465 & 0.7344 & 0.2539 & 0.2878 & 0.2885 \\
+NHAMCS & BioBERT base. & 0.4760 & 0.2882 & 0.6272 & 0.2839 & 0.2401 & 0.0800 \\
+\hline
+MIMIC demo & Majority (L2) & 0.4686 & 0.1595 & 0.5411 & 0.0870 & 0.4444 & 0.0000 \\
+MIMIC demo & TF-IDF+LR & 0.2609 & 0.1824 & 1.5169 & 0.6280 & 0.1111 & 0.1111 \\
+MIMIC demo & BioBERT base. & 0.3043 & 0.1748 & 1.0000 & 0.6377 & 0.0580 & 0.1111 \\
+\hline
+\end{tabular}
+\caption{Simple baselines versus BioBERT. NHAMCS majority and BioBERT use the full stratified subsample (\(N=12{,}000\)); TF-IDF+LR is a same-domain 70\%/30\% holdout (\(N_{\mathrm{test}}=3{,}600\)). MIMIC demo (\(N=207\)): majority is constant Level~2; TF-IDF+LR is trained on the NHAMCS subsample and evaluated on MIMIC; BioBERT is Triagegeist-trained under domain shift (Table~\ref{tab:external-metrics}). Protocols differ across rows, so comparisons are interpretive rather than a single matched bake-off.}
+\label{tab:simple-baselines}
+\end{table}
+
+\paragraph{Significance of the baseline and ordinal metrics.}
+Table~\ref{tab:simple-baselines} makes the accuracy-versus-safety gap concrete. On NHAMCS, majority accuracy (0.5087) exceeds BioBERT baseline accuracy (0.4760) because Level~3 dominates the survey subsample, yet majority Level~1 recall is exactly \(0\): a constant Level~3 rule never flags Red language. Raw accuracy alone is therefore a poor success measure for triage assist.
+
+Macro-F1 and Level~1 recall tell a different story. BioBERT under Triagegeist\(\rightarrow\)NHAMCS shift raises macro-F1 from 0.1349 (majority) to 0.2882 and recovers non-zero Red recall (0.0800). The same-domain TF-IDF+LR holdout reaches Level~1 recall 0.2885 with macro-F1 0.3465, but that model trains and tests on NHAMCS phrasing; it is not evidence that bag-of-words beats BioBERT under the transfer regime this project actually deploys. The table columns should be read with those protocols in mind.
+
+Ordinal MAE is the mean absolute class distance \(\lvert\hat{y}-y\rvert\). Majority MAE on NHAMCS is 0.5472; BioBERT baseline MAE is 0.6272, so when BioBERT errs it can land farther from the true ESI level even while improving rare-class detection relative to constant Level~3. Stratified oversampling widens that distance further (MAE \(0.9335\) in Table~\ref{tab:external-metrics}) while lifting Red recall, which is the same trade-off summarised under Finding~3 and the interpretive risk \(R(\theta)\).
+
+The published under-triage, over-triage, and five-class error rates are the empirical averages of the indicators \(E_{\mathrm{under}}\), over-triage, and \(E_{\mathrm{class}}\) defined earlier in this chapter; colour mismatches after \(f_{\mathrm{SATS}}\) correspond to \(E_{\mathrm{colour}}\). No separate taxonomy experiment was run beyond those rates. Likewise \(R(\theta)=\lambda_u U+\lambda_o O+\lambda_e E\) remains interpretive: oversampling is read as raising emphasis on Red recall at the expense of classification error \(E\) and often over-triage \(O\), not as an optimised schedule for the \(\lambda\) weights.
+
+On the MIMIC demo (\(N=207\)), majority accuracy remains high (0.4686) with MAE 0.5411, while NHAMCS-trained TF-IDF+LR and Triagegeist-trained BioBERT both show much larger ordinal error (MAE \(1.5169\) and \(1.0000\)) and high under-triage. That pattern reinforces how fragile lexical and neural transfer are on a small, shifted ED corpus: headline accuracy for a constant label can look competitive while safety-relevant distance and under-triage degrade.
 
 \begin{figure}[H]
 \centering
@@ -259,16 +326,16 @@ Once the chatbot assigns a colour in approximately 100\,ms, pathway timer rules 
 
 Classification output (colour + confidence + department list) is the machine-readable input to this routing layer. External evaluation (Section~\ref{sec:nhamcs-results}) bounds offline reliability under domain shift; live intake at \examplehospital{} still requires nurse override.
 
-\section{Anticipated impact on healthcare delivery}
+\section{Discussion: anticipated impact on healthcare delivery}
 \label{sec:impact}
 
-The following analysis interprets how the chatbot can support faster, clearer hospital flow at \examplehospital{}, drawing on external metrics where available and on published triage literature elsewhere. No prospective waiting-time trial has yet been conducted at \examplehospital{} \citep{Mitchell2023}.
+The following discussion interprets how the chatbot \emph{could} support hospital flow at \examplehospital{}, drawing on external metrics where available and on published triage literature elsewhere. These paragraphs are not measured outcome results. No prospective waiting-time trial has yet been conducted at \examplehospital{} \citep{Mitchell2023}.
 
 \subsection{Functional chatbot and workflow improvement}
 
-We anticipate a functional chatbot that suggests urgency from a single chief complaint and supports hospital workflow by assigning SATS colour and department direction at intake \citep{stewart2023nlp,Mitchell2023}. External NHAMCS evaluation reports 47.60\% five-class accuracy and 49.95\% colour accuracy for the baseline checkpoint (Section~\ref{sec:nhamcs-results}), indicating that text carries a partial acuity signal under domain shift rather than near-perfect agreement. Median inference latency of approximately 94--100\,ms on evaluation hardware supports rapid digital response at arrival (Table~\ref{tab:nurse-vs-chatbot}).
+We anticipate a functional chatbot that suggests ESI-style urgency from a single chief complaint and supports hospital workflow by recommending a SATS-aligned colour and department direction at intake \citep{stewart2023nlp,Mitchell2023}. External NHAMCS evaluation reports 47.60\% five-class accuracy and 49.95\% colour accuracy for the baseline checkpoint (Section~\ref{sec:nhamcs-results}), indicating that text carries a partial acuity signal under domain shift rather than near-perfect agreement. Median inference latency of approximately 94--100\,ms on evaluation hardware supports rapid digital response at arrival (Table~\ref{tab:nurse-vs-chatbot}).
 
-Figure~\ref{fig:anticipated-workflow} compares time-to-first-acuity-signal: traditional intake (top) waits for a nurse; chatbot-assisted intake (bottom) classifies text immediately and runs nurse vitals in parallel.
+Figure~\ref{fig:anticipated-workflow} compares \emph{time to computational acuity signal}: traditional intake (top) waits for a nurse before any colour exists; chatbot-assisted intake (bottom) produces a model colour recommendation in tens of milliseconds while nurse vitals (TEWS) still run in parallel. The figure does \emph{not} claim that total time from arrival to definitive clinical assessment equals inference latency.
 
 \begin{figure}[H]
 \centering
@@ -304,7 +371,7 @@ Figure~\ref{fig:anticipated-workflow} compares time-to-first-acuity-signal: trad
   \node[foot] at (4.8, 1.05) {Response: \(\approx\)100\,ms};
   \node[foot] at (4.8, 0.65) {Nurse vitals (TEWS) in parallel};
 \end{tikzpicture}}
-\caption{Stacked intake comparison at \examplehospital{}. \textbf{Top:} patient queues minutes to hours before a nurse assigns colour. \textbf{Bottom:} chatbot classifies the complaint in \(\approx\)100\,ms and issues a pathway card; nurse vitals continue in parallel. Colour routing (Red/Orange vs Green) is detailed in Section~\ref{sec:pathway-results}.}
+\caption{Time to computational acuity signal at \examplehospital{} (schematic). \textbf{Top:} traditional intake may wait minutes to hours before a nurse assigns colour. \textbf{Bottom:} chatbot issues an ESI-style / \(f_{\mathrm{SATS}}\) colour recommendation in \(\approx\)100\,ms inference time; nurse TEWS vitals continue in parallel. This is \emph{not} a measured reduction in total door-to-provider waiting time. Colour routing (Red/Orange vs Green) is detailed in Section~\ref{sec:pathway-results}.}
 \label{fig:anticipated-workflow}
 \end{figure}
 
@@ -314,9 +381,9 @@ The stacked workflow diagram has two panels read left to right. The top panel is
 
 Published triage literature suggests wait times for initial triage may decrease when patients interact with the bot immediately rather than queue for a nurse \citep{Mitchell2023,Nurchis2025}. External evaluation shows the model can assign colour and pathway in approximately 100\,ms once valid clinical text is submitted (Table~\ref{tab:nurse-vs-chatbot}). Non-urgent (Green) cases can be digitally queued for later consultation while urgent cases are fast-tracked through Red and Orange escalation rules (Table~\ref{tab:pathway-scenarios}), potentially reducing overall waiting duration \citep{Sundstrom2014,Yilmaz2021}. Parallel diagnostics orders flagged on Yellow and Green pathway cards may further shorten total time to definitive care \citep{Sundstrom2014}.
 
-\subsection{Critical-case sensitivity}
+\subsection{Critical-case sensitivity and safety implications}
 
-The chatbot algorithm, combined with Red/Orange pathway escalation, is designed to trigger alerts when language suggests life-threatening conditions \citep{gligorijevic2018deep,satsmanual}. On NHAMCS, baseline Level~1 recall is only 8.00\% (support 175), with most missed Red cases predicted as Orange or Yellow (Figure~\ref{fig:confusion-nhamcs-baseline}). Stratified oversampling raises Level~1 recall to 21.71\% at large cost to precision. High offline sensitivity for critical cases is therefore \emph{not} demonstrated on US external text; nurse override and prospective audit remain essential \citep{Berkowitz2019}. Waiting-time deterioration increases adverse outcomes when triage colour is not reassessed \citep{Nurchis2025}; digital timers on Orange and Yellow pathway cards reduce this risk \citep{satsmanual}.
+The principal limitation of the baseline system is poor recall for the most urgent class under external domain shift. On NHAMCS, baseline Level~1 (Red) recall is only 8.00\% (support 175): about 92\% of true Red cases were not identified as Red, with most missed cases predicted as Orange or Yellow (Figure~\ref{fig:confusion-nhamcs-baseline}). Stratified oversampling raises Level~1 recall to 21.71\% at large cost to precision, so no satisfactory operating point has yet been established for unsupervised critical-case screening. High offline sensitivity for critical cases is therefore \emph{not} demonstrated on US external text; nurse override and prospective audit remain essential \citep{Berkowitz2019}. Waiting-time deterioration increases adverse outcomes when triage colour is not reassessed \citep{Nurchis2025}; digital timers on Orange and Yellow pathway cards are intended to reduce this risk \citep{satsmanual}.
 
 \subsection{Patient satisfaction and appropriate categorisation}
 
@@ -335,13 +402,17 @@ Project success would be measured by smoother patient flow, colour-coded pathway
 \section{Discussion of findings}
 \label{sec:discussion}
 
-Combining the model architecture analysis with the external metrics suggests three core conclusions, addressing the research objectives established in Chapter~\ref{ch:intro}.
+Combining the model architecture analysis with the external metrics suggests five findings, addressing the research questions in Chapter~\ref{ch:intro}.
 
-First, Stage~3 fine-tuning is required: naive bounds (uniform random near 20\%; majority-class about 36\% on Triagegeist with 0\% Red recall) show that biomedical pre-training and encoder transfer alone are near chance for five-class acuity prediction. The Softmax head becomes useful for routing only after supervised fine-tuning on labeled chief complaints. Published performance under domain shift is then read from Figure~\ref{fig:external-metrics-compare} and Table~\ref{tab:external-metrics}, not from retired Triagegeist holdout headlines.
+\textbf{Finding 1.} BioBERT learns a partial acuity signal from free text after Stage~3 fine-tuning. Naive bounds remain near chance without that supervised step.
 
-Second, the deterministic \(f_{\mathrm{SATS}}\) mapping ensures that colour routing errors are inherited from the acuity prediction \(\hat{\mathbf{y}}\). Softmax probabilities therefore remain critical: a dominant Yellow prediction dictates a different operational response than a near-tie between Yellow and Green, reinforcing human oversight for low-confidence outputs.
+\textbf{Finding 2.} External domain shift substantially degrades performance relative to retired in-distribution Triagegeist headlines; NHAMCS baseline accuracy is 47.60\% with ordinal MAE \(0.627\).
 
-Finally, clinical pathways operationalise the Softmax output. Tables~\ref{tab:pathway-scenarios}--\ref{tab:pathway-examples} show how millisecond-scale text classification binds to hospital actions: timers, destinations, and support departments. Prospective time-motion data are still required for impact measurement; the architecture establishes an auditable protocol for intake assist, not unsupervised discharge.
+\textbf{Finding 3.} Class rebalancing (stratified oversampling) increases Red recall (8.00\%\(\to\)21.71\% on NHAMCS) but introduces many false urgent predictions and worsens MAE, so no free lunch exists under \(R(\theta)\).
+
+\textbf{Finding 4.} The ESI\(\to\)SATS map \(f_{\mathrm{SATS}}\) is operational rather than clinically validated; colour accuracy is not interchangeable with five-class accuracy because Levels~4 and~5 share Green.
+
+\textbf{Finding 5.} Latency near 94\,ms is suitable for real-time interaction, but latency alone does not establish clinical utility or waiting-time reduction.
 
 \paragraph{Safety posture.}
-External accuracy under domain shift does not license unsupervised discharge decisions. The deployed posture is triage assist with nurse override, TEWS in parallel, gate rejection of non-clinical text, and mandatory review for low Softmax confidence or text--vitals conflict \citep{stewart2023nlp,Berkowitz2019}. That posture is consistent with SATS training manuals and with under-triage quality literature.
+External accuracy under domain shift does not license unsupervised discharge decisions. The deployed posture is triage assist with nurse override, TEWS in parallel, gate rejection of non-clinical text, and mandatory review when \(\max_c\hat{y}_c < \tau_c\) or text conflicts with vitals \citep{stewart2023nlp,Berkowitz2019}. That posture is consistent with SATS training manuals and with under-triage quality literature.

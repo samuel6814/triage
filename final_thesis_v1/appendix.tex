@@ -39,7 +39,7 @@ For reproducibility, Stage~3 training used the following checklist (full values 
 
 \begin{enumerate}
 \item Join Triagegeist \texttt{train.csv} and \texttt{chief\_complaints.csv} on \texttt{patient\_id}.
-\item Keep only the English free-text chief complaint (why the patient came) and the nurse-assigned urgency level (\(1\)--\(5\)); drop vitals and demographics.
+\item Keep only the English free-text chief complaint (why the patient came) and the ESI-style urgency label (\(1\)--\(5\)); drop vitals and demographics.
 \item Stratified 90/10 split with seed~42 (\(N_{\mathrm{train}}\approx 72{,}000\), \(N_{\mathrm{eval}}=8{,}000\)).
 \item Load BioBERT encoder; discard any prior two-class head; initialise \(W\in\mathbb{R}^{5\times 768}\), \(\mathbf{b}\in\mathbb{R}^{5}\).
 \item Train three epochs, batch size 16, learning rate \(2\times 10^{-5}\), weight decay 0.01, max length 128, FP16 enabled.

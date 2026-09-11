@@ -7,7 +7,10 @@ Hospitals in Ghana operate under sustained pressure: crowded waiting areas, limi
 
 Hospitals in Ghana, including \examplehospital{}, apply SATS to structure intake across clinical departments, not only in a single emergency bay. Colour codes (Red, Orange, Yellow, Green, and Blue for dignity protocols) express how quickly a patient must be seen and where they should stream next: resuscitation, acute beds, urgent waiting, or routine outpatient care. Nurses at triage also compute a Triage Early Warning Score (TEWS) from objective vital signs. Yet many delays begin earlier, when a patient arrives with only words: a headache, fever, weakness, or abdominal pain described in free text before any thermometer or pulse oximeter reading is available.
 
-This project proposes a digital \emph{Flow Management Engine} in the form of a hospital chatbot for color-coded clinical pathways using Bidirectional Encoder Representations from Transformers (BERT). The chatbot accepts a single English free-text \emph{chief complaint} (the primary reason the patient presents, in their own words; see Section~\ref{sec:chief-complaints}) and returns a SATS colour reflecting urgency together with acuity probabilities and a clinical pathway card that can guide routing across outpatient departments, wards, and intake queues. The core contribution is mathematical: a pipeline from unstructured complaint text to acuity probabilities, colour, and pathway card, developed in Chapter~\ref{ch:method}. The deployed encoder is BioBERT, a biomedical BERT checkpoint fine-tuned for five-class triage. Crucially, this system is engineered strictly as a rapid, nurse-overridable decision-support tool. It expedites initial routing and queue management while strictly preserving the primacy of human clinical judgment and objective vital-sign scoring.
+This project proposes a digital \emph{Flow Management Engine} in the form of a hospital chatbot for color-coded clinical pathways using Bidirectional Encoder Representations from Transformers (BERT). The chatbot accepts a single English free-text \emph{chief complaint} (the primary reason the patient presents, in their own words; see Section~\ref{sec:chief-complaints}) and returns an ESI-style acuity estimate, a SATS-aligned colour via a deterministic heuristic, and a clinical pathway card that can guide routing across outpatient departments, wards, and intake queues. The core contribution is mathematical: a pipeline from unstructured complaint text to acuity probabilities, colour, and pathway card, developed in Chapter~\ref{ch:method}. The deployed encoder is BioBERT, a biomedical BERT checkpoint fine-tuned for five-class triage. Crucially, this system is engineered strictly as a rapid, nurse-overridable decision-support tool. It expedites initial routing and queue management while strictly preserving the primacy of human clinical judgment and objective vital-sign scoring.
+
+\paragraph{Hierarchy of evidence.}
+Three layers must be kept distinct throughout this project. Empirically evaluated: BioBERT maps free text \(X\) to an ESI-style level \(\hat{c}\in\{1,\ldots,5\}\) (external metrics in Chapter~\ref{ch:results}). Proposed heuristic: \(\hat{c}\) is converted to a SATS-aligned colour \(C_{\mathrm{NLP}}=f_{\mathrm{SATS}}(\hat{c})\) (Section~\ref{sec:fsats}); this is an operational crosswalk, not a claim of clinical equivalence between ESI and SATS. Protocol mapping: colour \(C_{\mathrm{NLP}}\) indexes a pathway card \(P(C)\) documented from SATS practice and an observational visit to \examplehospital{}. Only the first layer is scored against gold acuity labels; the second and third are specified, auditable rules awaiting local clinical adjudication.
 
 \section{Motivation and significance}
 
@@ -25,17 +28,17 @@ For mathematics students and hospital stakeholders alike, the significance is tw
 
 Low- and middle-income country (LMIC) hospitals struggle with crowded waiting rooms and limited human resources at intake. Patients may wait hours before first assessment. Critical cases are not always identified quickly, while less urgent presentations congest acute zones. Medical systems are confusing; without immediate direction, patients do not know whether to join the emergency stream, the polyclinic, or self-care advice.
 
-Manual, paper-based triage creates acuity discontinuity, rendering patient status static rather than dynamically responsive to clinical deterioration. This discontinuity manifests in five systemic failures:
+Manual, paper-based triage can create acuity discontinuity, rendering patient status static rather than dynamically responsive to clinical deterioration. This project organises the problem into five systemic issues, distinguishing what the literature documents, what an observational visit to \examplehospital{} suggests, and what this project hypothesizes as addressable by a text-first Flow Management Engine:
 
 \begin{enumerate}
-\item \textbf{Pre-Assessment Bottleneck.} Critical delays accumulate prior to any clinical evaluation because the initial human assessor is fundamentally capacity-constrained.
-\item \textbf{Acuity Degradation.} Patients correctly triaged as Orange or Red frequently lose their time-critical priority when transitioning to imaging, laboratories, or wards, as paper records fail to enforce dynamic countdown timers across departments.
-\item \textbf{Low-Acuity Congestion.} Non-urgent (Green) presentations lack automated diversion toward outpatient or self-care routes, inadvertently occupying acute beds and human resources required for life-saving interventions.
-\item \textbf{Vital-Sign Latency.} At arrival, objective measurements are rarely complete. Subjective, high-risk language (e.g.\ ``worst headache of my life'') remains computationally unutilized by TEWS until physical vitals are subsequently recorded.
-\item \textbf{Protocol Misalignment.} Existing generic symptom checkers fail to map predictions to standardized SATS hospital pathways or local operational routing, rendering their outputs unactionable at the facility level.
+\item \textbf{Pre-Assessment Bottleneck.} The literature identifies capacity-constrained first contact as a source of delay before clinical evaluation in busy LMIC emergency and intake settings \citep{Rominski2014,Mitchell2023}. Observations at \examplehospital{} suggest that queues form before a structured chief complaint is captured digitally. This project hypothesizes that a gated chatbot can collect complaint text earlier without replacing nurse assessment.
+\item \textbf{Acuity Degradation.} The literature identifies that urgency assigned at triage may not travel with the patient through imaging, laboratories, or wards when documentation is static \citep{satsmanual,Sundstrom2014}. This project hypothesizes that binding colour to destination, \(T_{\max}\), and escalation on a pathway card can reduce loss of priority after the intake desk; countdown enforcement across departments was not measured prospectively here.
+\item \textbf{Low-Acuity Congestion.} The literature identifies non-urgent (Green) load on acute capacity as harmful to time-critical care \citep{Yilmaz2021}. Observations at \examplehospital{} suggest outpatient and specialty streams already exist for lower urgency. This project hypothesizes that automated Green diversion recommendations can support, not replace, local routing policy.
+\item \textbf{Vital-Sign Latency.} The literature and SATS practice establish that TEWS requires measured vitals \citep{satsmanual}. At arrival, objective measurements are often incomplete, so high-risk language in the complaint is unused by TEWS until vitals are recorded. This project hypothesizes that an ESI-style text estimate can supply a preliminary colour for routing assist before TEWS is available, while TEWS remains the nurse vital-sign standard.
+\item \textbf{Protocol Misalignment.} The literature on triage NLP often stops at label prediction without facility pathway cards \citep{stewart2023nlp}. Observations at \examplehospital{} map colours to concrete departments. This project hypothesizes that a deterministic \(f_{\mathrm{SATS}}\) plus \(P(C)\) can make text predictions operationally actionable, subject to clinical validation of the ESI-to-SATS heuristic.
 \end{enumerate}
 
-Without a framework to manage flow hospital-wide, overcrowding and resource mismatch persist; the most vulnerable patients become invisible to the system after the first desk.
+Without a framework to manage flow hospital-wide, overcrowding and resource mismatch persist; the most vulnerable patients can become invisible to the system after the first desk.
 
 \section{Aim and objectives}
 
@@ -47,17 +50,18 @@ To design and specify a hospital chatbot that maps an unstructured English chief
 
 \begin{enumerate}
 \item \textbf{Build a BioBERT classifier.} Predict an ESI-style urgency level (\(1\)--\(5\)) from a single unstructured English chief complaint using a fine-tuned BioBERT Softmax classification head.
-\item \textbf{Deploy colour and pathway at intake.} Return a SATS colour and a pathway card from text alone before vitals are taken, with TEWS kept as the parallel nurse vital-sign standard.
+\item \textbf{Map ESI-style acuity to SATS-aligned guidance.} Develop a deterministic mapping from predicted ESI-style acuity to a SATS-aligned colour and pathway recommendation for text-first intake assistance before vitals are taken, with TEWS kept as the parallel nurse vital-sign standard.
 \item \textbf{Add a clinical gate.} Reject non-clinical chat so that non-medical messages receive no colour before BioBERT runs.
 \end{enumerate}
 
 \section{Research questions}
 \label{sec:rqs}
 
-Transitioning the theoretical capabilities of Transformer language models into a practical clinical tool requires systematic validation. To evaluate the computational accuracy, operational utility, and clinical safety of the proposed Flow Management Engine, this research seeks to answer the following three questions.
+Transitioning the theoretical capabilities of Transformer language models into a practical clinical tool requires systematic validation. To evaluate computational accuracy, operational specification, and safety posture of the proposed Flow Management Engine, this research seeks to answer the following questions.
 
 \begin{enumerate}
 \item Can a fine-tuned BioBERT model accurately classify unstructured English chief complaints into the correct ESI-style urgency level (\(1\)--\(5\)) under external domain shift?
-\item Can a deterministic mapping heuristic (\(f_{\mathrm{SATS}}\)) successfully provision SATS colour and pathway guidance from text prior to the acquisition of physical vitals?
-\item Can a mathematical clinical relevance gate reliably detect and reject non-medical inputs before executing the Transformer classification model?
+\item How can a deterministic mapping heuristic (\(f_{\mathrm{SATS}}\)) be used to transform predicted ESI-style acuity into SATS-aligned colour and pathway guidance before vital signs are available?
+\item Can a mathematical clinical relevance gate detect and reject non-medical inputs before executing the Transformer classification model, as measured by accuracy, sensitivity, and specificity on a labeled clinical versus non-clinical contrast set?
+\item Does training with additional Level~1 (Red) examples, to offset class imbalance, improve critical-case detection on the evaluation datasets, and at what cost to overall accuracy?
 \end{enumerate}

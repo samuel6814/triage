@@ -13,13 +13,16 @@ A structural driver is competition for acute capacity by non-urgent patients: th
 
 \textbf{Implication for this project.} Any chatbot that assigns SATS colours must also attach destinations and timers; otherwise colour remains a label that dies at the desk (acuity discontinuity in Chapter~\ref{ch:intro}). The next section reviews how SATS already supplies those colours and waiting-time rules in Ghanaian practice.
 
-\section{SATS in LMIC and Ghanaian practice}
+\section{Ghanaian clinical context and SATS implementation}
+\label{sec:ghana-sats}
 
 The South African Triage Scale (SATS) provides a five-colour framework (Red, Orange, Yellow, Green, Blue) with maximum waiting times \(T_{\max}\) (the longest time allowed for each colour before the patient should be seen or reassessed) and destination rules \citep{satsmanual}. Implementation at Komfo Anokye Teaching Hospital (KATH) and related Ghanaian settings demonstrated that standardised colour coding can structure flow even when staffing is constrained, provided urgency information travels with the patient \citep{Rominski2014,kathsats}.
 
 SATS combines physiological early warning (TEWS) with clinical discriminators that can escalate colour when high-risk symptoms are present even if vitals are only mildly abnormal (for example central chest pain). Colour codes therefore already exist in hospital policy. The research gap is not inventing colours, but (i)~assigning them from free-text complaints before full vitals, and (ii)~binding colours to pathway protocols so acuity does not disappear after intake.
 
-Hospitals such as \examplehospital{} apply similar colour logic across clinical departments, not only in a single emergency bay. That multi-department setting motivates pathway cards that name outpatient urgent streams, surgery, obstetrics, pediatrics, and support units rather than a single undifferentiated ``ED'' destination.
+Hospitals such as \examplehospital{} apply similar colour logic across clinical departments, not only in a single emergency bay. That multi-department setting motivates pathway cards that name outpatient urgent streams, surgery, obstetrics, pediatrics, and support units rather than a single undifferentiated ``ED'' destination. An observational site visit and staff inquiries informed the pathway tables in Chapter~\ref{ch:method}; those tables are the authors' documented interpretation of observed workflow and published SATS rules, not an official hospital protocol unless formally approved.
+
+Local labeled triage NLP corpora for Ghanaian patient phrasing are not available at the scale of Triagegeist or NHAMCS. Formal English training and US external tests therefore leave cross-linguistic shift (Pidgin, Twi-influenced English) and local case-mix as open validation challenges rather than afterthoughts.
 
 Colour alone still needs an objective vital-sign companion when measurements exist. The next section therefore turns to TEWS, the nurse-facing score that runs in parallel with any text-based colour.
 
@@ -51,7 +54,7 @@ Sequential recurrent language models read text predominantly in one direction, l
 \]
 where \(t_i\) is token \(i\), \(E_{\mathrm{word}}\), \(E_{\mathrm{pos}}\), and \(E_{\mathrm{seg}}\) are word, position, and segment embeddings, and \(s\) is the segment id (defined fully in Chapter~\ref{ch:method}). BERT is an encoder stack: it produces contextual vectors for classification and tagging rather than open-ended generation.
 
-\citet{lee2020biobert} continued pre-training on PubMed and PubMed Central text to produce Biomedical BERT (BioBERT), a domain-specific encoder whose embedding space places clinical terms nearer related concepts. Fine-tuning BioBERT on nurse-labeled chief complaints yields a supervised classifier from text to acuity levels. Classification with a fixed five-class label set reduces open-ended generative hallucination risk compared with unconstrained large language models that invent diagnoses in free prose \citep{stewart2023nlp}. The fixed map \(f_{\mathrm{SATS}}\) then converts the predicted acuity level into a SATS colour for pathway routing.
+\citet{lee2020biobert} continued pre-training on PubMed and PubMed Central text to produce Biomedical BERT (BioBERT), a domain-specific encoder whose pre-training adapts the learned representations to biomedical language. Fine-tuning BioBERT on synthetic Triagegeist chief-complaint / ESI-style label pairs yields a supervised classifier from text to acuity levels. Classification with a fixed five-class label set reduces open-ended generative hallucination risk compared with unconstrained large language models that invent diagnoses in free prose \citep{stewart2023nlp}. The fixed map \(f_{\mathrm{SATS}}\) then converts the predicted acuity level into a SATS-aligned colour for pathway routing.
 
 Those models must still be judged against published triage NLP evidence. The next section reviews what that literature already shows and where it stops short for Ghanaian intake.
 
@@ -93,16 +96,35 @@ Triage NLP & ED text classifiers and reviews \citep{stewart2023nlp,gligorijevic2
 \label{tab:lit-synthesis}
 \end{table}
 
+Table~\ref{tab:triage-nlp-compare} situates representative triage NLP studies against this project on dataset, input, model, output, external validation, and Ghana/SATS pathway binding.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|p{2.1cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|p{1.8cm}|c|c|}
+\hline
+\textbf{Study} & \textbf{Dataset} & \textbf{Input} & \textbf{Model} & \textbf{Output} & \textbf{Ext.\ val.} & \textbf{Ghana/SATS} \\
+\hline
+Gligorijevic et al.\ (2018) & ED text & Free text & Deep attention & Acuity & Limited & No \\
+Stewart et al.\ (2023) review & Multiple & Text \(\pm\) EHR & Various NLP & Labels / CDS & Mixed & No \\
+MIMIC-IV-ED / NHAMCS corpora & US ED & Complaint text & (eval only here) & ESI-style & Yes (US) & No \\
+This project & Triagegeist train; MIMIC/NHAMCS test & Chief complaint & BioBERT & ESI \(\to\) \(f_{\mathrm{SATS}}\) \(\to\) \(P(C)\) & Yes (US) & KNUST pathways \\
+\hline
+\end{tabular}
+\caption{Comparison of triage NLP settings. Ext.\ val.\ = evaluation outside the training corpus. Ghana/SATS = SATS-aligned pathway cards for a Ghanaian facility.}
+\label{tab:triage-nlp-compare}
+\end{table}
+
 \section{Research gap}
 
-Existing work separates vital-sign scores (TEWS), manual SATS colour assignment, and NLP classifiers trained largely abroad. There is no unified mathematical account of how a free-text English chief complaint at Ghanaian hospital intake becomes a SATS colour and pathway card using BioBERT, while TEWS remains documented as the nurse-facing vital standard and nurses retain override.
+Existing work separates vital-sign scores (TEWS), manual SATS colour assignment, and NLP classifiers trained largely abroad. In the literature reviewed for this project, we did not identify a unified mathematical account of how a free-text English chief complaint at Ghanaian hospital intake becomes a SATS-aligned colour and pathway card using BioBERT, while TEWS remains documented as the nurse-facing vital standard and nurses retain override.
 
-In short, prior art provides colours, scores, and growing NLP evidence; it does not provide the integrated text path
+In short, prior art provides colours, scores, and growing NLP evidence; the reviewed sources do not provide the integrated text path
 \[
   X \xrightarrow{\tau} H^{(0)} \xrightarrow{\mathrm{BioBERT}} \hat{\mathbf{y}} \xrightarrow{f_{\mathrm{SATS}}} C_{\mathrm{NLP}} \xrightarrow{} P(C_{\mathrm{NLP}})
 \]
-where \(X\) is the chief complaint, \(\tau\) is tokenisation, \(H^{(0)}\) is the input embedding matrix, \(\hat{\mathbf{y}}\) is the acuity distribution, \(f_{\mathrm{SATS}}\) is the fixed map from acuity level to SATS colour \(C_{\mathrm{NLP}}\), and \(P(C_{\mathrm{NLP}})\) is the pathway card (destination, \(T_{\max}\), actions, escalation), all developed in Chapter~\ref{ch:method},
-with clinical gating, Softmax framed as a Categorical distribution over mutually exclusive acuity levels, and department routing tables matched to Ghanaian healthcare facilities.
+where \(X\) is the chief complaint, \(\tau\) is tokenisation, \(H^{(0)}\) is the input embedding matrix, \(\hat{\mathbf{y}}\) is the ESI-style acuity distribution, \(f_{\mathrm{SATS}}\) is the proposed heuristic from acuity level to SATS-aligned colour \(C_{\mathrm{NLP}}\), and \(P(C_{\mathrm{NLP}})\) is the pathway card (destination, \(T_{\max}\), actions, escalation), all developed in Chapter~\ref{ch:method},
+with clinical gating, Softmax framed as a Categorical distribution over mutually exclusive acuity levels, and department routing tables matched to Ghanaian healthcare facilities. The ESI-to-SATS step remains a proposed heuristic (Section~\ref{sec:fsats}), distinct from empirically scored ESI-style classification.
 
 This project addresses three specific gaps in the current triage literature:
 
