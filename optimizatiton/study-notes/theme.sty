@@ -1,0 +1,130 @@
+% theme.sty — custom study-notes theme for MATH 466
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{theme}[2026/08/09 MATH 466 Study Notes Theme]
+
+\RequirePackage{xcolor}
+\RequirePackage{tcolorbox}
+\RequirePackage{enumitem}
+\RequirePackage{booktabs}
+\RequirePackage{array}
+\RequirePackage{multirow}
+\RequirePackage{colortbl}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+
+\tcbuselibrary{skins,breakable}
+
+% --- Palette (muted academic teal / slate; avoid purple defaults) ---
+\definecolor{snPrimary}{HTML}{1B4F72}
+\definecolor{snAccent}{HTML}{1A7A5C}
+\definecolor{snWarn}{HTML}{A15C00}
+\definecolor{snSoft}{HTML}{E8F1F5}
+\definecolor{snIdea}{HTML}{E8F5F0}
+\definecolor{snWarnBg}{HTML}{FFF4E5}
+\definecolor{snResult}{HTML}{EAF6EA}
+\definecolor{snQuestion}{HTML}{F4F7FA}
+\definecolor{snRule}{HTML}{5D6D7E}
+
+% --- Boxes ---
+\newtcolorbox{questionbox}[1][]{%
+  breakable,
+  colback=snQuestion,
+  colframe=snPrimary,
+  fonttitle=\bfseries,
+  title={The Question},
+  boxrule=0.8pt,
+  arc=2pt,
+  left=8pt,right=8pt,top=6pt,bottom=6pt,
+  #1
+}
+
+\newtcolorbox{ideabox}[1][]{%
+  breakable,
+  colback=snIdea,
+  colframe=snAccent,
+  fonttitle=\bfseries,
+  title={What this step is doing},
+  boxrule=0.7pt,
+  arc=2pt,
+  left=8pt,right=8pt,top=5pt,bottom=5pt,
+  #1
+}
+
+\newtcolorbox{warningbox}[1][]{%
+  breakable,
+  colback=snWarnBg,
+  colframe=snWarn,
+  fonttitle=\bfseries,
+  title={Watch out},
+  boxrule=0.7pt,
+  arc=2pt,
+  left=8pt,right=8pt,top=5pt,bottom=5pt,
+  #1
+}
+
+\newtcolorbox{resultbox}[1][]{%
+  breakable,
+  colback=snResult,
+  colframe=snAccent,
+  fonttitle=\bfseries,
+  title={Final Answer},
+  boxrule=1pt,
+  arc=2pt,
+  left=8pt,right=8pt,top=6pt,bottom=6pt,
+  #1
+}
+
+\newtcolorbox{algobox}[1][]{%
+  breakable,
+  colback=snSoft,
+  colframe=snPrimary,
+  fonttitle=\bfseries,
+  title={Algorithm summary},
+  boxrule=0.7pt,
+  arc=2pt,
+  left=8pt,right=8pt,top=5pt,bottom=5pt,
+  #1
+}
+
+% --- Step macro ---
+\newcounter{stepcounter}[section]
+\newcommand{\Step}[1]{%
+  \par\medskip
+  \refstepcounter{stepcounter}%
+  \noindent{\color{snPrimary}\bfseries Step~\thestepcounter:\ #1}\par\smallskip
+}
+
+\newcommand{\PartHeading}[1]{%
+  \subsection*{#1}%
+}
+
+% --- Math / notation helpers ---
+\newcommand{\BigM}{M}
+\newcommand{\cij}{c_{ij}}
+\newcommand{\xij}{x_{ij}}
+\newcommand{\kij}{k_{ij}}
+\newcommand{\cost}[1]{\ensuremath{#1}}
+
+% Small cost corner cell for tableau display
+\newcommand{\cellcost}[1]{\ensuremath{\scriptstyle #1}}
+
+% Enumerate spacing for study notes
+\setlist[enumerate]{itemsep=0.45em, topsep=0.55em, leftmargin=1.6em}
+\setlist[itemize]{itemsep=0.35em, topsep=0.45em, leftmargin=1.4em}
+
+% Section styling
+\RequirePackage{titlesec}
+\titleformat{\section}
+  {\Large\bfseries\color{snPrimary}}{\thesection.}{0.6em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{snPrimary}}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{snAccent}}{\thesubsubsection}{0.4em}{}
+
+\titlespacing*{\section}{0pt}{1.4em}{0.7em}
+\titlespacing*{\subsection}{0pt}{1.1em}{0.45em}
+
+\newcommand{\notebox}[1]{%
+  \par\smallskip\noindent\textit{#1}\par\smallskip
+}

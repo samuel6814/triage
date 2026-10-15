@@ -1,0 +1,146 @@
+{
+  "nhamcs_baseline": {
+    "point": {
+      "accuracy": 0.476,
+      "colour_accuracy": 0.4995,
+      "recall_L1": 0.08,
+      "n": 12000,
+      "n_L1": 175
+    },
+    "B": 2000,
+    "seed": 42,
+    "method": "ordinary bootstrap, percentile 95% CI from confusion-matrix expansion",
+    "accuracy": {
+      "estimate": 0.476,
+      "ci95": [
+        0.467,
+        0.4846666666666667
+      ]
+    },
+    "colour_accuracy": {
+      "estimate": 0.4995,
+      "ci95": [
+        0.49033125,
+        0.50816875
+      ]
+    },
+    "recall_L1": {
+      "estimate": 0.08,
+      "ci95": [
+        0.043478260869565216,
+        0.12359701582699044
+      ]
+    },
+    "source": "nhamcs_baseline_metrics.json",
+    "dataset": "nhamcs",
+    "model_name": "Baseline"
+  },
+  "nhamcs_oversample": {
+    "point": {
+      "accuracy": 0.3045,
+      "colour_accuracy": 0.34225,
+      "recall_L1": 0.21714285714285714,
+      "n": 12000,
+      "n_L1": 175
+    },
+    "B": 2000,
+    "seed": 42,
+    "method": "ordinary bootstrap, percentile 95% CI from confusion-matrix expansion",
+    "accuracy": {
+      "estimate": 0.3045,
+      "ci95": [
+        0.29599791666666664,
+        0.31325
+      ]
+    },
+    "colour_accuracy": {
+      "estimate": 0.34225,
+      "ci95": [
+        0.33358333333333334,
+        0.35125208333333335
+      ]
+    },
+    "recall_L1": {
+      "estimate": 0.21714285714285714,
+      "ci95": [
+        0.15789473684210525,
+        0.2784090909090909
+      ]
+    },
+    "source": "nhamcs_oversample_metrics.json",
+    "dataset": "nhamcs",
+    "model_name": "Oversample"
+  },
+  "mimic_demo_baseline": {
+    "point": {
+      "accuracy": 0.30434782608695654,
+      "colour_accuracy": 0.30434782608695654,
+      "recall_L1": 0.1111111111111111,
+      "n": 207,
+      "n_L1": 18
+    },
+    "B": 2000,
+    "seed": 42,
+    "method": "ordinary bootstrap, percentile 95% CI from confusion-matrix expansion",
+    "accuracy": {
+      "estimate": 0.30434782608695654,
+      "ci95": [
+        0.2463768115942029,
+        0.3671497584541063
+      ]
+    },
+    "colour_accuracy": {
+      "estimate": 0.30434782608695654,
+      "ci95": [
+        0.2463768115942029,
+        0.3671497584541063
+      ]
+    },
+    "recall_L1": {
+      "estimate": 0.1111111111111111,
+      "ci95": [
+        0.0,
+        0.26666666666666666
+      ]
+    },
+    "source": "mimic_demo_baseline_metrics.json",
+    "dataset": "mimic_demo",
+    "model_name": "Baseline"
+  },
+  "mimic_demo_oversample": {
+    "point": {
+      "accuracy": 0.21256038647342995,
+      "colour_accuracy": 0.21256038647342995,
+      "recall_L1": 0.5,
+      "n": 207,
+      "n_L1": 18
+    },
+    "B": 2000,
+    "seed": 42,
+    "method": "ordinary bootstrap, percentile 95% CI from confusion-matrix expansion",
+    "accuracy": {
+      "estimate": 0.21256038647342995,
+      "ci95": [
+        0.15942028985507245,
+        0.27053140096618356
+      ]
+    },
+    "colour_accuracy": {
+      "estimate": 0.21256038647342995,
+      "ci95": [
+        0.15942028985507245,
+        0.27053140096618356
+      ]
+    },
+    "recall_L1": {
+      "estimate": 0.5,
+      "ci95": [
+        0.2631006864988558,
+        0.7334210526315784
+      ]
+    },
+    "source": "mimic_demo_oversample_metrics.json",
+    "dataset": "mimic_demo",
+    "model_name": "Oversample"
+  }
+}

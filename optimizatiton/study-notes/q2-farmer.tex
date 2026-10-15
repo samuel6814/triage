@@ -1,0 +1,151 @@
+\section{Question 2 --- Farmer Crop Allocation}
+
+\begin{questionbox}
+A farmer has \(1{,}000\) acres of land on which he can grow corn, wheat or soyabean.
+Each acre of corn costs Rs.\ \(100\) for preparation, requires \(7\) men-days of work and
+yields a profit of Rs.\ \(30\). An acre of wheat costs \(120\) to prepare, requires \(10\)
+men-days of work and yields a profit of \(40\). An acre of soyabean costs \(70\) to prepare,
+requires \(8\) men-days of work and yields a profit of \(20\). If the farmer has \(100{,}000\)
+for preparation and can count on \(8{,}000\) men-days of work, determine how many acres
+should be allocated to each crop in order to maximize profits.
+\end{questionbox}
+
+\begin{warningbox}[title={Units in the question text}]
+The assignment mixes ``Rs'' and ``\$''. We treat all money figures as the \emph{same}
+currency unit (call it rupees). Only the numbers matter for the LP.
+\end{warningbox}
+
+% ----------------------------------------------------------------------
+\PartHeading{Formulation}
+% ----------------------------------------------------------------------
+
+\begin{ideabox}
+Three decision variables (acres of each crop), one profit objective, and three
+resource limits: land, preparation budget, and labour.
+\end{ideabox}
+
+\Step{Decision variables}
+\begin{align*}
+  x_c &= \text{acres of corn},\\
+  x_w &= \text{acres of wheat},\\
+  x_s &= \text{acres of soyabean}.
+\end{align*}
+
+\Step{Objective --- maximise profit}
+\[
+  \max\; Z = 30x_c + 40x_w + 20x_s.
+\]
+
+\Step{Constraints}
+\begin{align*}
+  x_c + x_w + x_s &\le 1000 && \text{(land, acres)},\\
+  100x_c + 120x_w + 70x_s &\le 100000 && \text{(preparation budget)},\\
+  7x_c + 10x_w + 8x_s &\le 8000 && \text{(men-days)},\\
+  x_c,x_w,x_s &\ge 0.
+\end{align*}
+
+\Step{Standard form with slack variables}
+Introduce \(s_1,s_2,s_3\ge 0\):
+\begin{align*}
+  x_c + x_w + x_s + s_1 &= 1000,\\
+  100x_c + 120x_w + 70x_s + s_2 &= 100000,\\
+  7x_c + 10x_w + 8x_s + s_3 &= 8000,\\
+  Z - 30x_c - 40x_w - 20x_s &= 0.
+\end{align*}
+Initial basis: \(\{s_1,s_2,s_3\}\) with \(Z=0\).
+
+% ----------------------------------------------------------------------
+\PartHeading{Simplex solution}
+% ----------------------------------------------------------------------
+
+\begin{ideabox}
+At each iteration: (1)~enter the non-basic variable with the most positive
+\(C_j-Z_j\) (biggest profit improvement per unit); (2)~leave via the minimum
+non-negative ratio test; (3)~pivot until every \(C_j-Z_j\le 0\).
+\end{ideabox}
+
+\Step{Initial tableau}
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|c|ccc|ccc|c}
+\toprule
+\(C_B\) & Basis & \(x_c\) & \(x_w\) & \(x_s\) & \(s_1\) & \(s_2\) & \(s_3\) & RHS \\
+\midrule
+0 & \(s_1\) & 1 & 1 & 1 & 1 & 0 & 0 & 1000 \\
+0 & \(s_2\) & 100 & 120 & 70 & 0 & 1 & 0 & 100000 \\
+0 & \(s_3\) & 7 & 10 & 8 & 0 & 0 & 1 & 8000 \\
+\midrule
+ & \(C_j\) & 30 & 40 & 20 & 0 & 0 & 0 & \\
+ & \(Z_j\) & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+ & \(C_j-Z_j\) & 30 & \textbf{40} & 20 & 0 & 0 & 0 & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Enter \(x_w\) (largest \(C_j-Z_j=40\)). Ratio test:
+\[
+  \frac{1000}{1}=1000,\quad
+  \frac{100000}{120}\approx 833.33,\quad
+  \frac{8000}{10}=800.
+\]
+Minimum ratio \(800\) \(\Rightarrow\) \(s_3\) leaves. Pivot element \(=10\).
+
+\Step{Iteration 1 --- after pivoting \(x_w\) into the basis}
+Divide the pivot row by \(10\), then clear the \(x_w\) column:
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|c|ccc|ccc|c}
+\toprule
+\(C_B\) & Basis & \(x_c\) & \(x_w\) & \(x_s\) & \(s_1\) & \(s_2\) & \(s_3\) & RHS \\
+\midrule
+0 & \(s_1\) & \(0.3\) & 0 & \(0.2\) & 1 & 0 & \(-0.1\) & 200 \\
+0 & \(s_2\) & 16 & 0 & \(-26\) & 0 & 1 & \(-12\) & 4000 \\
+40 & \(x_w\) & \(0.7\) & 1 & \(0.8\) & 0 & 0 & \(0.1\) & 800 \\
+\midrule
+ & \(C_j-Z_j\) & \textbf{2} & 0 & \(-12\) & 0 & 0 & \(-4\) & \(Z=32000\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Still improving: enter \(x_c\) (\(C_j-Z_j=2\)). Ratios:
+\[
+  \frac{200}{0.3}\approx 666.67,\quad
+  \frac{4000}{16}=250,\quad
+  \frac{800}{0.7}\approx 1142.86.
+\]
+Minimum \(250\) \(\Rightarrow\) \(s_2\) leaves. Pivot element \(=16\).
+
+\Step{Iteration 2 --- optimal tableau}
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|c|ccc|ccc|c}
+\toprule
+\(C_B\) & Basis & \(x_c\) & \(x_w\) & \(x_s\) & \(s_1\) & \(s_2\) & \(s_3\) & RHS \\
+\midrule
+0 & \(s_1\) & 0 & 0 & \(\tfrac{11}{16}\) & 1 & \(-\tfrac{3}{160}\) & \(\tfrac{1}{8}\) & 125 \\
+30 & \(x_c\) & 1 & 0 & \(-\tfrac{13}{8}\) & 0 & \(\tfrac{1}{16}\) & \(-\tfrac{3}{4}\) & 250 \\
+40 & \(x_w\) & 0 & 1 & \(\tfrac{31}{16}\) & 0 & \(-\tfrac{7}{160}\) & \(\tfrac{5}{8}\) & 625 \\
+\midrule
+ & \(C_j-Z_j\) & 0 & 0 & \(-\tfrac{35}{4}\) & 0 & \(-\tfrac{1}{8}\) & \(-\tfrac{5}{2}\) & \(Z=32500\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Every \(C_j-Z_j\le 0\), so we stop.
+
+\Step{Read the solution and check constraints}
+\[
+  x_c^*=250,\qquad x_w^*=625,\qquad x_s^*=0,\qquad Z^*=32\,500.
+\]
+Unused land: \(s_1^*=125\) acres.
+\begin{itemize}
+  \item Land: \(250+625+0=875\le 1000\) (125 acres idle).
+  \item Budget: \(100(250)+120(625)=25\,000+75\,000=100\,000\) (tight).
+  \item Labour: \(7(250)+10(625)=1\,750+6\,250=8\,000\) (tight).
+  \item Profit: \(30(250)+40(625)=7\,500+25\,000=32\,500\).
+\end{itemize}
+
+\begin{resultbox}
+Allocate \textbf{250 acres to corn}, \textbf{625 acres to wheat}, and \textbf{0 acres to soyabean}.
+Maximum profit \(= \mathbf{32\,500}\).
+\end{resultbox}

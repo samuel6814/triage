@@ -16,7 +16,7 @@ A structural driver is competition for acute capacity by non-urgent patients: th
 \section{Ghanaian clinical context and SATS implementation}
 \label{sec:ghana-sats}
 
-The South African Triage Scale (SATS) provides a five-colour framework (Red, Orange, Yellow, Green, Blue) with maximum waiting times \(T_{\max}\) (the longest time allowed for each colour before the patient should be seen or reassessed) and destination rules \citep{satsmanual}. Implementation at Komfo Anokye Teaching Hospital (KATH) and related Ghanaian settings demonstrated that standardised colour coding can structure flow even when staffing is constrained, provided urgency information travels with the patient \citep{Rominski2014,kathsats}.
+The South African Triage Scale (SATS) assigns four urgency colours for living patients (Red, Orange, Yellow, Green), each with a maximum waiting time \(T_{\max}\) (the longest time allowed for each colour before the patient should be seen or reassessed) and destination rules \citep{satsmanual}. Blue is not a fifth urgency level: it marks deceased-on-arrival or dignity protocol. Implementation at Komfo Anokye Teaching Hospital (KATH) and related Ghanaian settings demonstrated that standardised colour coding can structure flow even when staffing is constrained, provided urgency information travels with the patient \citep{Rominski2014,kathsats}.
 
 SATS combines physiological early warning (TEWS) with clinical discriminators that can escalate colour when high-risk symptoms are present even if vitals are only mildly abnormal (for example central chest pain). Colour codes therefore already exist in hospital policy. The research gap is not inventing colours, but (i)~assigning them from free-text complaints before full vitals, and (ii)~binding colours to pathway protocols so acuity does not disappear after intake.
 
@@ -101,16 +101,29 @@ Table~\ref{tab:triage-nlp-compare} situates representative triage NLP studies ag
 \begin{table}[H]
 \centering
 \footnotesize
-\begin{tabular}{|p{2.1cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|p{1.8cm}|c|c|}
+\begin{tabularx}{\textwidth}{%
+  |>{\raggedright\arraybackslash}p{2.05cm}%
+  |>{\raggedright\arraybackslash}X%
+  |>{\raggedright\arraybackslash}p{1.45cm}%
+  |>{\raggedright\arraybackslash}p{1.55cm}%
+  |>{\raggedright\arraybackslash}X%
+  |>{\centering\arraybackslash}p{1.15cm}%
+  |>{\raggedright\arraybackslash}p{1.35cm}|}
 \hline
 \textbf{Study} & \textbf{Dataset} & \textbf{Input} & \textbf{Model} & \textbf{Output} & \textbf{Ext.\ val.} & \textbf{Ghana/SATS} \\
 \hline
 Gligorijevic et al.\ (2018) & ED text & Free text & Deep attention & Acuity & Limited & No \\
 Stewart et al.\ (2023) review & Multiple & Text \(\pm\) EHR & Various NLP & Labels / CDS & Mixed & No \\
 MIMIC-IV-ED / NHAMCS corpora & US ED & Complaint text & (eval only here) & ESI-style & Yes (US) & No \\
-This project & Triagegeist train; MIMIC/NHAMCS test & Chief complaint & BioBERT & ESI \(\to\) \(f_{\mathrm{SATS}}\) \(\to\) \(P(C)\) & Yes (US) & KNUST pathways \\
+This project &
+  Triagegeist train;\newline MIMIC/\newline NHAMCS test &
+  Chief complaint &
+  BioBERT &
+  ESI \(\to\) \(f_{\mathrm{SATS}}\)\newline \(\to\,P(C)\) &
+  Yes (US) &
+  KNUST pathways \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Comparison of triage NLP settings. Ext.\ val.\ = evaluation outside the training corpus. Ghana/SATS = SATS-aligned pathway cards for a Ghanaian facility.}
 \label{tab:triage-nlp-compare}
 \end{table}

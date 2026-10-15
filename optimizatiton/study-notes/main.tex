@@ -1,0 +1,77 @@
+\documentclass[11pt,a4paper]{article}
+
+\input{preamble}
+
+\title{\vspace{-1.2em}\bfseries\color{snPrimary} MATH 466 --- Assignment Study Notes}
+\author{Worked solutions with step-by-step explanations\\[0.35em]
+\large Operations Research: Transshipment, LP \& Sensitivity}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\color{snRule}\rule{0.85\textwidth}{0.6pt}
+\end{center}
+
+\begin{ideabox}[title={How to read these notes}]
+Each question is restated first (so you know exactly what is being asked), then solved
+in small steps. Before a block of algebra you will usually see a short
+``What this step is doing'' box --- that is the \emph{why}, not just the \emph{how}.
+
+\begin{itemize}
+  \item \textbf{Question~1} converts a transshipment network into an LP, builds the
+        transportation tableau (with buffer \(B\)), finds an IBFS by ADBAM, then
+        proves optimality with the \(uv\) (MODI) method.
+  \item \textbf{Question~2} is a three-variable production LP solved by the simplex method.
+  \item \textbf{Question~3} is another LP, followed by post-optimality
+        (range of feasibility / range of optimality).
+\end{itemize}
+\end{ideabox}
+
+\tableofcontents
+\newpage
+
+\input{q1-transshipment}
+\newpage
+\input{q2-farmer}
+\newpage
+\input{q3-ores}
+\newpage
+
+\section*{Appendix A: ADBAM at a glance}
+\begin{algobox}
+\textbf{Acheson Demand-Based Allocation Method (ADBAM / DBAM)}
+--- find an Initial Basic Feasible Solution for a balanced transportation tableau.
+
+\begin{enumerate}
+  \item Choose the destination with the \emph{smallest remaining demand}
+        \(a_j^*=\min\{a_j\}\). (Ties: prefer the column whose cheapest available cell is smallest.)
+  \item In that column, select the cheapest available cell \(c_{ij}\) (among rows with leftover supply).
+  \item Allocate \(x_{ij}=\min\{b_i,a_j\}\). Update supply and demand.
+  \item If both supply and demand of that cell are exhausted, return to step~1.
+        If only demand is exhausted, stay in the same \emph{row} and pick its next cheapest open column.
+        If only supply is exhausted, stay in the same \emph{column} and pick its next cheapest open row.
+  \item Repeat until every supply and demand is zero.
+\end{enumerate}
+Unlike Northwest Corner / Least Cost / Vogel, ADBAM is \emph{demand-led}: it
+picks the destination first, then the cheapest route into it.
+\end{algobox}
+
+\section*{Appendix B: Notation}
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Symbol & Meaning \\
+\midrule
+\(x_{ij}\) & units shipped from node/source \(i\) to node/destination \(j\) \\
+\(c_{ij}\) & unit shipping cost on arc \((i,j)\) \\
+\(B\) & buffer for transshipment nodes (\(B=\sum\) external supplies) \\
+\(M\) & prohibitively large cost (forbidden route) \\
+\(u_i,v_j\) & MODI dual variables for row \(i\) and column \(j\) \\
+\(k_{ij}=c_{ij}-u_i-v_j\) & opportunity cost of an empty cell \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}

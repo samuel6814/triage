@@ -6,24 +6,31 @@ export const LAYER_FUNCTIONS = String.raw`\mathbf{D} = f_{\mathrm{NLP}}(X),\quad
 
 export const VOICE_PIPELINE = String.raw`X = g_{\mathrm{trans}}\!\bigl(g_{\mathrm{ASR}}(\mathrm{audio})\bigr)`;
 
-export const TEWS_SUM = String.raw`T = f_{\mathrm{TEWS}}(\mathbf{v}) = \sum_{k=1}^{6} w_k \, f_k(v_k), \quad w_k = 1`;
+export const TEWS_SUM = String.raw`T = f_{\mathrm{TEWS}}(\mathbf{v}) = \sum_{k=1}^{7} w_k \, f_k(v_k), \quad w_k = 1`;
 
 export const TEWS_HR = String.raw`f_1(v_1) = \begin{cases}
-  3 & v_1 \ge 130 \\
-  2 & 111 \le v_1 \le 129 \text{ or } v_1 \le 40 \\
-  1 & 101 \le v_1 \le 110 \text{ or } 41 \le v_1 \le 50 \\
+  3 & v_1 > 129 \\
+  2 & v_1 < 41 \text{ or } 111 \le v_1 \le 129 \\
+  1 & 41 \le v_1 \le 50 \text{ or } 101 \le v_1 \le 110 \\
   0 & 51 \le v_1 \le 100
 \end{cases}`;
 
 export const TEWS_RR = String.raw`f_2(v_2) = \begin{cases}
-  3 & v_2 \ge 30 \text{ or } v_2 \le 8 \\
-  2 & 21 \le v_2 \le 29 \\
-  1 & 9 \le v_2 \le 14 \\
-  0 & 15 \le v_2 \le 20
+  3 & v_2 > 29 \\
+  2 & v_2 < 9 \text{ or } 21 \le v_2 \le 29 \\
+  1 & 15 \le v_2 \le 20 \\
+  0 & 9 \le v_2 \le 14
+\end{cases}`;
+
+export const TEWS_SBP = String.raw`f_3(v_3) = \begin{cases}
+  3 & v_3 < 71 \\
+  2 & 71 \le v_3 \le 80 \text{ or } v_3 > 199 \\
+  1 & 81 \le v_3 \le 100 \\
+  0 & 101 \le v_3 \le 199
 \end{cases}`;
 
 export const TEWS_COLOUR_MAP = String.raw`C_{\mathrm{TEWS}}(T) = \begin{cases}
-  \text{Red} & T > 7 \\
+  \text{Red} & T \ge 7 \\
   \text{Orange} & 5 \leq T \leq 6 \\
   \text{Yellow} & 3 \leq T \leq 4 \\
   \text{Green} & T \leq 2
@@ -31,7 +38,7 @@ export const TEWS_COLOUR_MAP = String.raw`C_{\mathrm{TEWS}}(T) = \begin{cases}
 
 export const TEWS_PARTIAL = String.raw`T_{\mathrm{partial}} = \sum_{k \in \mathcal{K}_{\mathrm{obs}}} w_k \, f_k(v_k), \quad \mathcal{K}_{\mathrm{obs}} = \{k : v_k \text{ measured}\}`;
 
-export const TEWS_EXAMPLE = String.raw`f_1(125) = 2,\quad f_2(26) = 2,\quad f_{3:6} = 0 \;\Rightarrow\; T = 4 \;\Rightarrow\; C_{\mathrm{TEWS}} = \text{Yellow}`;
+export const TEWS_EXAMPLE = String.raw`f_1(125) = 2,\quad f_2(26) = 2,\quad f_3(120) = 0,\quad f_{4:7} = 0 \;\Rightarrow\; T = 4 \;\Rightarrow\; C_{\mathrm{TEWS}} = \text{Yellow}`;
 
 export const BAYES_POSTERIOR = String.raw`P(C_k \mid E) = \frac{P(E \mid C_k)\, P(C_k)}{\sum_{j} P(E \mid C_j)\, P(C_j)}`;
 

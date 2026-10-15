@@ -1,0 +1,222 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+
+%----------------------------------------------------
+% Packages
+%----------------------------------------------------
+\RequirePackage{Gabby} % optional, if available
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{natbib}
+
+%----------------------------------------------------
+% Custom Command
+%----------------------------------------------------
+\newcommand{\bcol}[2][blue]{\textcolor{#1}{#2}}
+
+%----------------------------------------------------
+% Title Information (EDIT THIS)
+%----------------------------------------------------
+\title[Project Title (Short)]%
+{Full Project Title Goes Here}
+
+\author[Student Names]%
+{{\scriptsize by}\\
+	\bcol[green!40!black]{Student Name 1 \quad Student Name 2 \quad Student Name 3}\\
+	\bigskip
+	{\small Supervisor: Prof.\ Supervisor’s Name}}
+
+\institute[KNUST-Maths]%
+{Department of Mathematics\\
+	Kwame Nkrumah University of Science and Technology}
+
+\logo{\includegraphics[scale=0.1]{KNUSTlogo}}
+\date{\scriptsize \today}
+
+%====================================================
+\begin{document}
+	
+	%----------------------------------------------------
+	% Title Page
+	%----------------------------------------------------
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	%----------------------------------------------------
+	% Outline
+	%----------------------------------------------------
+	\begin{frame}{Outline of Presentation}
+		\tableofcontents
+	\end{frame}
+	
+	%====================================================
+	\section{Background of the Study  (Maximum 4 Slides)}
+	
+	\begin{frame}{Background of the Study}
+		\begin{block}{Purpose of This Section}
+			Introduce the general area of study and provide the context of the research.
+		\end{block}
+		
+		\begin{itemize}
+			\item Briefly describe the real-world or academic problem.
+			\item Introduce key concepts needed to understand the project.
+			\item Avoid technical details at this stage.
+		\end{itemize}
+		
+		\begin{alertblock}{Presentation Tip}
+			Use clear bullet points. Each point should be understandable without further explanation.
+		\end{alertblock}
+		
+		\begin{exampleblock}{Good Practice}
+			Where possible, use figures, diagrams, or illustrations instead of long text.
+		\end{exampleblock}
+	\end{frame}
+	
+	%====================================================
+	\section{Problem Statement  (Maximum 2 Slides)}
+	
+	\begin{frame}{Problem Statement}
+		\begin{columns}[T]
+			\begin{column}{0.48\textwidth}
+				\begin{block}{What Is the Problem?}
+					\begin{itemize}
+						\item Clearly state the specific problem being addressed.
+						\item Explain what is missing or inadequate in existing studies.
+					\end{itemize}
+				\end{block}
+			\end{column}
+			
+			\begin{column}{0.48\textwidth}
+				\begin{block}{Why Is It a Problem?}
+					\begin{itemize}
+						\item Explain why the problem is important.
+						\item Relate it to real-world applications or theory.
+					\end{itemize}
+				\end{block}
+			\end{column}
+		\end{columns}
+		
+		\begin{alertblock}{Presentation Tip}
+			Do not read directly from the slides. Explain the problem in your own words.
+		\end{alertblock}
+	\end{frame}
+	
+	%====================================================
+	\section{Objectives  (Maximum 1 Slide)}
+	
+	\begin{frame}{Objectives of the Study}
+		\begin{block}{General Objective}
+			State the main aim of the project in one sentence.
+		\end{block}
+		
+		\begin{block}{Specific Objectives}
+			\begin{enumerate}
+				\item Begin each objective with an action verb (e.g., develop, analyse, investigate).
+				\item Objectives should be achievable and measurable.
+				\item Avoid equations unless absolutely necessary.
+			\end{enumerate}
+		\end{block}
+	\end{frame}
+	
+	%====================================================
+	\section{Methodology  (Maximum 8 Slides)}
+	
+	\begin{frame}{Methodology}
+		\begin{itemize}
+			\item Describe the approach used to solve the problem. \pause
+			\item Present models, algorithms, or analytical techniques.  \pause
+			\item Explain assumptions clearly.
+		\end{itemize}
+		
+		\begin{exampleblock}{Mathematics Projects}
+			Clearly define variables, parameters, and governing equations.
+		\end{exampleblock}
+	\end{frame}
+	
+	\begin{frame}{Referencing}
+		\begin{block}{Citation Style}
+			Referencing in Beamer follows the same style as the main project report.
+		\end{block}
+		
+		\begin{enumerate}
+			\item In-text citation: \cite{Fosu2020}
+			\item Parenthetical citation: \citep{Appati2015}
+			\item Multiple sources: \citep{Fosu2021,Appati2015}
+		\end{enumerate}
+		
+\vspace{1cm}
+
+		Follow this link for more on referencing with Jabref
+\begin{center}
+\href{https://youtu.be/zzlXj93WgJQ}{\bcol{https://youtu.be/zzlXj93WgJQ}}
+
+\end{center}
+		
+	\end{frame}
+	
+	%====================================================
+	\section{Analysis and Results  (Maximum 8 Slides)}
+	
+	\begin{frame}{Analysis and Results}
+		\begin{itemize}[<+->]
+			\item Present key results only (avoid overcrowding slides).
+			\item Use tables and figures where possible.
+			\item Number equations for easy referencing.
+		\end{itemize}
+		
+		\begin{alertblock}{Important}
+			Always interpret results - do not just display them.
+		\end{alertblock}
+	\end{frame}
+	
+	
+	\begin{frame}[fragile]{Some Tips} 
+		\begin{enumerate} 
+			\item Working with Tables, Figures and Equations is the same for beamer. 
+			\item Bullet your points: Each point should be powerful enough to explain itself. 
+			\item If possible, use pictures to introduce the background. 
+			\item Capture literature as part of the background. 
+			\item Ensure proper spacing by using 
+			\begin{verbatim} 
+				\medskip, \bikskip, \vspace{2cm}, \qquad, \quad 
+			\end{verbatim} 
+			\item Colours could be used to highlight some equations 
+			\begin{equation}\label{key} \bcol[red]{2+ \sin x = 2000} \qquad \bcol[green]{2+ \sin x = 2000}\qquad \bcol{2+ \sin x = 2000} 
+		\end{equation} 
+	\end{enumerate} 
+\end{frame}
+	
+	%====================================================
+	\section{Conclusion and Recommendations  (Maximum 3 Slides)}
+	
+	\begin{frame}{Conclusion and Recommendations}
+		\begin{block}{Conclusion}
+			Summarise the main findings and relate them to the objectives.
+		\end{block}
+		
+		\begin{block}{Recommendations}
+			Suggest practical applications, improvements, or directions for future work.
+		\end{block}
+	\end{frame}
+	
+	%====================================================
+	\section{Selected References}
+	
+	\begin{frame}{Selected References}
+		\small
+		\bibliographystyle{apalike}
+		\bibliography{myref}
+	\end{frame}
+	
+	%====================================================
+	\section*{}
+	
+	\begin{frame}
+		\begin{center}
+			{\Huge Thank You}
+		\end{center}
+	\end{frame}
+	
+	%====================================================
+\end{document}

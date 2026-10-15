@@ -1,0 +1,250 @@
+\section{Question 3 --- Products, Ores and Sensitivity}
+
+\begin{questionbox}
+A company produces three products \(A\), \(B\) and \(C\). These products require three ores
+\(O_1\), \(O_2\) and \(O_3\). The maximum quantities of the ores \(O_1\), \(O_2\) and \(O_3\)
+available are \(22\) tonnes, \(14\) tonnes and \(14\) tonnes, respectively. For one tonne of
+each of these products, the ore requirements are:
+
+\begin{center}
+\begin{tabular}{c|ccc}
+ & \(A\) & \(B\) & \(C\) \\
+\hline
+\(O_1\) & 3 & --- & 3 \\
+\(O_2\) & 1 & 2 & 3 \\
+\(O_3\) & 3 & 2 & 3 \\
+\hline
+Profit per tonne & 1000 & 4000 & 5000 \\
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+  \item[(a)] How many tonnes of each product should the company produce in order to
+        maximize its profits?
+  \item[(b)] Determine the range of feasibility for the right-hand side value of ore \(O_2\).
+  \item[(c)] Determine the range of optimality for the profit coefficient of product \(A\).
+\end{enumerate}
+\end{questionbox}
+
+\begin{notebox}
+The dash for \(B\) under \(O_1\) means product \(B\) uses \textbf{no} ore \(O_1\)
+(coefficient \(0\)).
+\end{notebox}
+
+% ----------------------------------------------------------------------
+\PartHeading{(a) Optimal production plan}
+% ----------------------------------------------------------------------
+
+\begin{ideabox}
+Formulate the LP, put it in standard form, then run the simplex algorithm until all
+\(C_j-Z_j\le 0\).
+\end{ideabox}
+
+\Step{Decision variables}
+Let \(x_A,x_B,x_C\) be tonnes of products \(A\), \(B\), \(C\).
+
+\Step{LP model}
+\begin{align*}
+  \max\; Z &= 1000x_A + 4000x_B + 5000x_C \\
+  \text{s.t.}\quad
+  3x_A + 3x_C &\le 22 && (O_1),\\
+  x_A + 2x_B + 3x_C &\le 14 && (O_2),\\
+  3x_A + 2x_B + 3x_C &\le 14 && (O_3),\\
+  x_A,x_B,x_C &\ge 0.
+\end{align*}
+
+\Step{Standard form}
+\begin{align*}
+  3x_A + 0\cdot x_B + 3x_C + s_1 &= 22,\\
+  x_A + 2x_B + 3x_C + s_2 &= 14,\\
+  3x_A + 2x_B + 3x_C + s_3 &= 14,\\
+  Z - 1000x_A - 4000x_B - 5000x_C &= 0.
+\end{align*}
+
+\Step{Initial tableau}
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{c|c|ccc|ccc|c}
+\toprule
+\(C_B\) & Basis & \(x_A\) & \(x_B\) & \(x_C\) & \(s_1\) & \(s_2\) & \(s_3\) & RHS \\
+\midrule
+0 & \(s_1\) & 3 & 0 & 3 & 1 & 0 & 0 & 22 \\
+0 & \(s_2\) & 1 & 2 & 3 & 0 & 1 & 0 & 14 \\
+0 & \(s_3\) & 3 & 2 & 3 & 0 & 0 & 1 & 14 \\
+\midrule
+ & \(C_j-Z_j\) & 1000 & 4000 & \textbf{5000} & 0 & 0 & 0 & \(Z=0\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Enter \(x_C\) (largest indicator \(5000\)). Ratios:
+\[
+  \tfrac{22}{3},\qquad \tfrac{14}{3},\qquad \tfrac{14}{3}.
+\]
+There is a tie between \(s_2\) and \(s_3\); we let \(s_2\) leave (either choice is valid).
+Pivot \(=3\).
+
+\Step{Iteration 1}
+After pivoting \(x_C\) into the basis:
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{c|c|ccc|ccc|c}
+\toprule
+\(C_B\) & Basis & \(x_A\) & \(x_B\) & \(x_C\) & \(s_1\) & \(s_2\) & \(s_3\) & RHS \\
+\midrule
+0 & \(s_1\) & 2 & \(-2\) & 0 & 1 & \(-1\) & 0 & 8 \\
+5000 & \(x_C\) & \(\tfrac13\) & \(\tfrac23\) & 1 & 0 & \(\tfrac13\) & 0 & \(\tfrac{14}{3}\) \\
+0 & \(s_3\) & 2 & 0 & 0 & 0 & \(-1\) & 1 & 0 \\
+\midrule
+ & \(C_j-Z_j\) & \(-\tfrac{2000}{3}\) & \(\mathbf{\tfrac{2000}{3}}\) & 0 & 0 & \(-\tfrac{5000}{3}\) & 0 & \(Z=\tfrac{70000}{3}\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+How the indicators were obtained:
+\begin{align*}
+  C_A-Z_A &= 1000 - 5000\cdot\tfrac13 = -\tfrac{2000}{3},\\
+  C_B-Z_B &= 4000 - 5000\cdot\tfrac23 = \tfrac{2000}{3}>0.
+\end{align*}
+So enter \(x_B\). In the \(x_B\) column the only useful positive pivot candidate is
+\(\frac{2}{3}\) in the \(x_C\)-row (the \(s_1\) entry is \(-2<0\); the \(s_3\) entry is \(0\)).
+Ratio \(=\frac{14/3}{2/3}=7\). Thus \(x_C\) leaves.
+
+\Step{Iteration 2 --- optimal tableau}
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|c|ccc|ccc|c}
+\toprule
+\(C_B\) & Basis & \(x_A\) & \(x_B\) & \(x_C\) & \(s_1\) & \(s_2\) & \(s_3\) & RHS \\
+\midrule
+0 & \(s_1\) & 3 & 0 & 3 & 1 & 0 & 0 & 22 \\
+4000 & \(x_B\) & \(\tfrac12\) & 1 & \(\tfrac32\) & 0 & \(\tfrac12\) & 0 & 7 \\
+0 & \(s_3\) & 2 & 0 & 0 & 0 & \(-1\) & 1 & 0 \\
+\midrule
+ & \(C_j-Z_j\) & \(-1000\) & 0 & \(-1000\) & 0 & \(-2000\) & 0 & \(Z=28000\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+(Equivalently, the optimality row may be written with signs flipped as \(Z_j-C_j\); what
+matters is that no non-basic variable improves \(Z\).)
+
+All improvement indicators for non-basics are non-positive \(\Rightarrow\) optimal.
+
+\begin{resultbox}[title={Part (a)}]
+Produce
+\[
+  x_A^*=0,\qquad x_B^*=7,\qquad x_C^*=0
+\]
+tonnes, with maximum profit
+\[
+  Z^*=28\,000.
+\]
+Ore \(O_1\) is unused (\(s_1^*=22\)); ores \(O_2\) and \(O_3\) are fully used.
+\end{resultbox}
+
+\begin{warningbox}
+The optimal tableau is \emph{degenerate} (\(s_3^*=0\) while basic). That is normal here:
+when \(x_A=x_C=0\), constraints \(O_2\) and \(O_3\) both reduce to \(2x_B\le 14\), so they
+become the same restriction.
+\end{warningbox}
+
+% ----------------------------------------------------------------------
+\PartHeading{(b) Range of feasibility for the RHS of \(O_2\)}
+% ----------------------------------------------------------------------
+
+\begin{ideabox}
+Replace the \(O_2\) right-hand side \(14\) by \(14+\Delta\). The current basis stays feasible
+as long as every basic RHS stays non-negative. Those new RHS values equal
+\[
+  \bar{b} + \Delta\cdot\bigl(B^{-1}e_2\bigr),
+\]
+and the column \(B^{-1}e_2\) is exactly the final-tableau column of the \(O_2\) slack \(s_2\).
+\end{ideabox}
+
+\Step{Read \(B^{-1}e_2\) from the optimal tableau}
+Basic variables (in row order): \(s_1\), \(x_B\), \(s_3\). The \(s_2\) column is
+\[
+  B^{-1}e_2 =
+  \begin{pmatrix} 0 \\ \tfrac12 \\ -1 \end{pmatrix}.
+\]
+Current basic RHS: \(\bar{b}=(22,\;7,\;0)^\top\).
+
+\Step{Impose non-negativity after the change}
+\[
+\begin{pmatrix} 22 \\ 7 \\ 0 \end{pmatrix}
++
+\Delta
+\begin{pmatrix} 0 \\ \tfrac12 \\ -1 \end{pmatrix}
+\ge
+\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}
+\quad\Longleftrightarrow\quad
+\begin{cases}
+  22 \ge 0 & \text{(always)},\\
+  7+\tfrac12\Delta \ge 0 & \Rightarrow\ \Delta\ge -14,\\
+  0-\Delta \ge 0 & \Rightarrow\ \Delta\le 0.
+\end{cases}
+\]
+Hence
+\[
+  -14\le\Delta\le 0
+  \qquad\text{i.e.}\qquad
+  0\le b_2\le 14.
+\]
+
+\begin{resultbox}[title={Part (b)}]
+Range of feasibility for the RHS of ore \(O_2\):
+\[
+  \boxed{\,0\le b_{O_2}\le 14\,}.
+\]
+(Increasing \(O_2\) above \(14\) cannot help while \(O_3\) is still capped at \(14\), because
+\(B\) also needs \(O_3\). Decreasing \(O_2\) below \(0\) is meaningless; at \(0\) we get
+\(x_B=0\).)
+\end{resultbox}
+
+% ----------------------------------------------------------------------
+\PartHeading{(c) Range of optimality for the profit of \(A\)}
+% ----------------------------------------------------------------------
+
+\begin{ideabox}
+Product \(A\) is \emph{non-basic} at the optimum. Changing its profit coefficient only
+changes \emph{its own} reduced cost. The basis (and therefore the production plan)
+stays optimal as long as \(A\)'s reduced cost does not become attractive enough to enter.
+\end{ideabox}
+
+\Step{Current reduced cost of \(A\)}
+From the optimal tableau,
+\[
+  \bar{c}_A = C_A - Z_A = -1000
+\]
+(or equivalently \(Z_A-C_A=+1000\)). So bringing one tonne of \(A\) into the plan would
+\emph{worsen} profit by \(1000\).
+
+\Step{Allowable change \(\delta\) in \(C_A\)}
+Write the new profit as \(C_A'=1000+\delta\). Then the new reduced cost is
+\[
+  \bar{c}_A' = (1000+\delta)-Z_A = \bar{c}_A+\delta = -1000+\delta.
+\]
+For maximisation we need \(\bar{c}_A'\le 0\):
+\[
+  -1000+\delta\le 0 \quad\Rightarrow\quad \delta\le 1000.
+\]
+Decreasing \(C_A\) (negative \(\delta\)) only makes \(A\) less attractive, so there is no
+finite lower bound from optimality.
+
+Therefore
+\[
+  C_A' = 1000+\delta \le 2000,
+  \qquad\text{i.e.}\qquad
+  C_A\in(-\infty,\,2000].
+\]
+
+\begin{resultbox}[title={Part (c)}]
+Range of optimality for the profit coefficient of product \(A\):
+\[
+  \boxed{\,C_A\le 2000\,}
+\]
+(with the usual implicit \(C_A\) free to fall arbitrarily). As long as \(A\)'s unit profit
+does not exceed \(2000\), the optimal basis stays \(\{s_1,x_B,s_3\}\) and the company
+still produces \(7\) tonnes of \(B\) only.
+\end{resultbox}

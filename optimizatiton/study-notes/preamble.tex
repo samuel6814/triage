@@ -1,0 +1,44 @@
+% Shared preamble for study notes
+\usepackage[margin=2.4cm,includehead,headheight=22pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+
+\usepackage{theme}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=snPrimary,
+  urlcolor=snAccent,
+  citecolor=snPrimary,
+  pdftitle={MATH 466 Assignment Study Notes},
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{snRule}MATH 466 --- Study Notes}
+\fancyhead[R]{\small\color{snRule}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{snRule}\leaders\hrule height \headrulewidth\hfill}}
+
+\onehalfspacing
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+
+\newcommand{\course}{MATH 466 --- Optimization II}
